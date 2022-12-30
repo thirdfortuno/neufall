@@ -27,7 +27,7 @@ func _ready():
 			var tile = tile_scene.instance()
 			tile.x = x
 			tile.y = y
-			tile.state = grid.getValue(x,y)
+			tile.state = grid_tile_states.getValue(x,y)
 			tile.position = Vector2(x*TILE_SIZE + TILE_SIZE/2, y*TILE_SIZE + TILE_SIZE/2)
 			add_child(tile)
 			grid_tiles.setValue(x,y,tile)
