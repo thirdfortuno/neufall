@@ -1,0 +1,18 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://Unit/Unit.gd" type="Script" id=1]
+[ext_resource path="res://Unit/Sprites/Hack/hack_shadow.png" type="Texture" id=2]
+[ext_resource path="res://Unit/Sprites/Hack/hack.png" type="Texture" id=3]
+[ext_resource path="res://Unit/Body/Body.tscn" type="PackedScene" id=4]
+
+[node name="Node2D" type="Node2D"]
+script = ExtResource( 1 )
+body_scene = ExtResource( 4 )
+
+[node name="SpriteMain" type="Sprite" parent="."]
+z_index = 1
+texture = ExtResource( 3 )
+
+[node name="SpriteShadow" type="Sprite" parent="."]
+z_index = 1
+texture = ExtResource( 2 )
