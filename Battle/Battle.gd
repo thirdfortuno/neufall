@@ -22,8 +22,14 @@ var unit_input = [
 		"x": 1,
 		"y": 1,
 		"hp_max": 5,
-		"moves_max": 4
-	}
+		"moves_max": 20
+	},
+	{
+		"x": 3,
+		"y": 2,
+		"hp_max": 5,
+		"moves_max": 20
+	},
 ]
 
 var height
@@ -158,17 +164,18 @@ func _handle_unit_move(tile):
 	var y = tile.y
 	var legal_range = _unit_move_get_legal_range(unit_selected, unit_selected.moves_available)
 	if (legal_range["adjacent"].has(tile)):
-		unit_selected.move_to(x, y)
+		var into_self = grid_units.get_value(x, y) == unit_selected
+		unit_selected.move_to(x, y, into_self)
 
 		_clear_tile_tags()
 		var new_legal_range = _unit_move_get_legal_range(unit_selected, unit_selected.moves_available)
 		for tile in new_legal_range["all"]:
 			tile.set_ui("moveable")
 	
-	var test = 0
-	while test != -1:
-		test = grid_units.grid_data.find(unit_selected)
-		grid_units.grid_data[test] = null
+	var unit_grid_cleared = 0
+	while unit_grid_cleared != -1:
+		unit_grid_cleared = grid_units.grid_data.find(unit_selected)
+		grid_units.grid_data[unit_grid_cleared] = null
 	
 	for body in unit_selected.bodies:
 		grid_units.set_value(body.x, body.y, unit_selected)

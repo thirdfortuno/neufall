@@ -45,6 +45,7 @@ func get_value(x, y):
 
 func set_value(x, y, value):
 	grid_data[_get_index(x,y)] = value
+	
 
 # Since gdscript doesn't currently support different inits based off number of arguments passed,
 # we do create our own version instead

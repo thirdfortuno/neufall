@@ -10,19 +10,36 @@ var bodies = []
 var moves_max
 var moves_available
 
-func move_to(x_new, y_new):
+func move_to(x_new, y_new, into_self = false):
 	x = x_new
 	y = y_new
 	moves_available = moves_available - 1
 	
 	self.global_position = Vector2(x*32 + 16, y*32 + 16)
 	
-	if bodies.size() < hp_max:
+
+	if into_self:
+		var body
+
+		for body_search in bodies:
+			if body_search.x == x && body_search.y == y:
+				body = body_search
+				break
+		
+		bodies.pop_at(bodies.find(body))
+		bodies.push_front(body)
+	elif bodies.size() < hp_max:
 		var body = body_scene.instance()
 		body.x = x
 		body.y = y
 		
 		add_child(body)
+		bodies.push_front(body)
+	elif bodies.size() == hp_max:
+		var body = bodies.pop_back()
+		body.x = x
+		body.y = y
+		
 		bodies.push_front(body)
 
 func update_body_positions():

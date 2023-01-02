@@ -1,6 +1,6 @@
 extends Node2D
 
-var spr_array = [
+const SPR_ARRAY = [
 	preload("Sprites/body0.png"),
 	preload("Sprites/body1.png"),
 	preload("Sprites/body2.png"),
@@ -38,11 +38,11 @@ func update_sprite():
 	if adjacents["left"] == unit:
 		index = index + 8
 	
-	$Sprite.texture = spr_array[index]
+	$Sprite.texture = SPR_ARRAY[index]
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	$Sprite.texture = spr_array[0]
+	$Sprite.texture = SPR_ARRAY[0]
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):
