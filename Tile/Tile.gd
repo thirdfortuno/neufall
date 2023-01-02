@@ -12,7 +12,7 @@ var state
 var state_ui = 'unselected'
 var state_target
 
-func setUI(sprite):
+func set_ui(sprite):
 	match(sprite):
 		"moveable":
 			$SpriteTag.texture = spr_tile_moveable

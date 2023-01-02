@@ -27,7 +27,7 @@ func update_sprite():
 	var unit = self.get_parent()
 	var index = 0
 	
-	var adjacents = grid_units.getAdjacentValuesDict(x,y)
+	var adjacents = grid_units.get_adjacent_values_dict(x,y)
 	
 	if adjacents["up"] == unit:
 		index = index + 1

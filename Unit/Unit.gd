@@ -10,7 +10,7 @@ var bodies = []
 var moves_max
 var moves_available
 
-func moveTo(x_new, y_new):
+func move_to(x_new, y_new):
 	x = x_new
 	y = y_new
 	moves_available = moves_available - 1
