@@ -5,6 +5,35 @@ var width
 
 var grid_data = []
 
+func getAdjacentValues(x, y):
+	var values = []
+	if x != 0:
+		values.append(getValue(x-1, y))
+	if x < width - 1:
+		values.append(getValue(x+1, y))
+	if y != 0:
+		values.append(getValue(x, y-1))
+	if y < height - 1:
+		values.append(getValue(x, y+1))
+	return values
+
+func getAdjacentValuesDict(x, y):
+	var values = {
+		"up": null,
+		"right": null,
+		"down": null,
+		"left": null
+	}
+	if x != 0:
+		values["left"] = getValue(x-1, y)
+	if x < width - 1:
+		values["right"] = getValue(x+1, y)
+	if y != 0:
+		values["up"] = getValue(x, y-1)
+	if y < height - 1:
+		values["down"] = getValue(x, y+1)
+	return values
+
 func getSize():
 	return {
 		"width": width,

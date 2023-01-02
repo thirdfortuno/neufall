@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/tile_hover.png-83cda0895cc57a2c4a5732326cb16fa2.stex"
+path="res://.import/tile_active.png-ee5391ec8f1967351bba370f470e0259.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Tile/tile_hover.png"
-dest_files=[ "res://.import/tile_hover.png-83cda0895cc57a2c4a5732326cb16fa2.stex" ]
+source_file="res://Tile/Sprites/tile_active.png"
+dest_files=[ "res://.import/tile_active.png-ee5391ec8f1967351bba370f470e0259.stex" ]
 
 [params]
 
