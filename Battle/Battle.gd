@@ -86,6 +86,9 @@ func _init_units():
 		var x = u["x"]
 		var y = u["y"]
 		
+		unit.connect("damaged", self, "_handle_unit_damaged")
+		unit.connect("killed", self, "_handle_unit_killed")
+		
 		unit.x = x
 		unit.y = y
 		unit.position = Vector2(
@@ -145,6 +148,12 @@ func _clear_tile_tags():
 	for tile in grid_tiles.grid_data:
 		tile.set_ui("none")
 
+func _clear_unit_from_grid(unit):
+	var clear_unit_move_grid = 0
+	while clear_unit_move_grid != -1:
+		clear_unit_move_grid = grid_units.grid_data.find(unit)
+		grid_units.grid_data[clear_unit_move_grid] = null
+
 func _on_tile_select(tile):
 	match click_state:
 		"default":
@@ -168,6 +177,21 @@ func _on_tile_select(tile):
 		"unit_move":
 			_handle_unit_move(tile)
 
+func _handle_unit_damaged(unit):
+	_clear_unit_from_grid(unit_selected)
+	
+	for body in unit.bodies:
+		grid_units.set_value(body.x, body.y, unit)
+
+func _handle_unit_killed(unit):
+	if unit_selected == unit:
+		unit_selected = null
+		click_state = "default"
+	
+	units_live.erase(unit)
+	_clear_unit_from_grid(unit)
+	_clear_tile_tags()
+
 func _handle_unit_move(tile):
 	var x = tile.x
 	var y = tile.y
@@ -189,12 +213,8 @@ func _handle_unit_move(tile):
 
 		for tile in new_legal_range["all"]:
 			tile.set_ui("moveable")
-	
-	var clear_unit_move_grid = 0
 
-	while clear_unit_move_grid != -1:
-		clear_unit_move_grid = grid_units.grid_data.find(unit_selected)
-		grid_units.grid_data[clear_unit_move_grid] = null
+	_clear_unit_from_grid(unit_selected)
 	
 	for body in unit_selected.bodies:
 		grid_units.set_value(body.x, body.y, unit_selected)
@@ -212,6 +232,13 @@ func _input(_ev):
 		
 		for tile in grid_tiles.grid_data:
 			tile.set_ui(null)
+	
+	if Input.is_key_pressed(KEY_E):
+		if unit_selected:
+			unit_selected.damage(2)
+	
+	if Input.is_key_pressed(KEY_R):
+		print(units_live)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):
