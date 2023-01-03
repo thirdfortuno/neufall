@@ -2,13 +2,21 @@ extends Node2D
 
 signal selected
 
-var spr_tile_hover = preload("tile_hover.png")
-var spr_tile_selected = preload("tile_selected.png")
+var spr_tile_hover = preload("Sprites/tile_hover.png")
+var spr_tile_selected = preload("Sprites/tile_selected.png")
+var spr_tile_moveable = preload("Sprites/tile_moveable.png")
 
 var x
 var y
 var state
 var state_ui = 'unselected'
+
+func set_ui(sprite):
+	match(sprite):
+		"moveable":
+			$SpriteTag.texture = spr_tile_moveable
+		_:
+			$SpriteTag.texture = null
 
 func select():
 	state_ui = 'selected'
