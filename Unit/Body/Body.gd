@@ -22,9 +22,7 @@ const SPR_ARRAY = [
 var x
 var y
 
-func update_sprite():
-	var grid_units = self.get_parent().get_parent().grid_units
-	var unit = self.get_parent()
+func update_sprite(grid_units, unit):
 	var index = 0
 	
 	var adjacents = grid_units.get_adjacent_values_dict(x,y)

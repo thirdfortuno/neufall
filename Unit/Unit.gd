@@ -17,7 +17,6 @@ func move_to(x_new, y_new, into_self = false):
 	
 	self.global_position = Vector2(x*32 + 16, y*32 + 16)
 	
-
 	if into_self:
 		var body
 
@@ -42,10 +41,10 @@ func move_to(x_new, y_new, into_self = false):
 		
 		bodies.push_front(body)
 
-func update_body_positions():
+func update_body_positions(grid_units):
 	for body in bodies:
 		body.global_position = Vector2(body.x*32 + 16, body.y*32 + 16)
-		body.update_sprite()
+		body.update_sprite(grid_units, self)
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
