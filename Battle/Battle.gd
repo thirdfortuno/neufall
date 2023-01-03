@@ -68,7 +68,10 @@ func _init_tiles(grid_tile_states):
 			tile.x = x
 			tile.y = y
 			tile.state = grid_tile_states.get_value(x,y)
-			tile.position = Vector2(x*TILE_SIZE + TILE_SIZE/2, y*TILE_SIZE + TILE_SIZE/2)
+			tile.position = Vector2(
+					x*TILE_SIZE + TILE_SIZE/2,
+					y*TILE_SIZE + TILE_SIZE/2
+			)
 
 			tile.connect("selected", self, "_on_tile_select")
 
@@ -85,7 +88,10 @@ func _init_units():
 		
 		unit.x = x
 		unit.y = y
-		unit.position = Vector2(x*TILE_SIZE + TILE_SIZE/2, y*TILE_SIZE + TILE_SIZE/2)
+		unit.position = Vector2(
+				x*TILE_SIZE + TILE_SIZE/2,
+				y*TILE_SIZE + TILE_SIZE/2
+		)
 		
 		unit.hp_max = u["hp_max"]
 		unit.moves_max = u["moves_max"]
@@ -152,7 +158,10 @@ func _on_tile_select(tile):
 
 				if unit:
 					unit_selected = unit
-					var legal_range = _unit_move_get_legal_range(unit, unit.moves_available)
+					var legal_range = _unit_move_get_legal_range(
+							unit,
+							unit.moves_available
+					)
 					for tile in legal_range["all"]:
 						tile.set_ui("moveable")
 					click_state = "unit_move"
@@ -162,7 +171,10 @@ func _on_tile_select(tile):
 func _handle_unit_move(tile):
 	var x = tile.x
 	var y = tile.y
-	var legal_range = _unit_move_get_legal_range(unit_selected, unit_selected.moves_available)
+	var legal_range = _unit_move_get_legal_range(
+			unit_selected,
+			unit_selected.moves_available
+	)
 
 	if (legal_range["adjacent"].has(tile)):
 		var into_self = grid_units.get_value(x, y) == unit_selected
@@ -170,7 +182,10 @@ func _handle_unit_move(tile):
 
 		_clear_tile_tags()
 
-		var new_legal_range = _unit_move_get_legal_range(unit_selected, unit_selected.moves_available)
+		var new_legal_range = _unit_move_get_legal_range(
+				unit_selected,
+				unit_selected.moves_available
+		)
 
 		for tile in new_legal_range["all"]:
 			tile.set_ui("moveable")
