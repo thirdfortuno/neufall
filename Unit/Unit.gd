@@ -2,6 +2,9 @@ extends Node2D
 
 export(PackedScene) var body_scene
 
+signal killed(unit)
+signal damaged(unit)
+
 var x
 var y
 
@@ -9,6 +12,19 @@ var hp_max
 var bodies = []
 var moves_max
 var moves_available
+
+func damage(amount):
+	var iterations = 0
+	while bodies.size() > 0 && iterations < amount:
+		var body = bodies.pop_back()
+		body.queue_free()
+		iterations = iterations + 1
+	
+	if bodies.size() == 0:
+		emit_signal("killed", self)
+		self.queue_free()
+	else:
+		emit_signal("damaged", self)
 
 func move_to(x_new, y_new, into_self = false):
 	x = x_new
