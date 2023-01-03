@@ -10,7 +10,6 @@ var x
 var y
 var state
 var state_ui = 'unselected'
-var state_target
 
 func set_ui(sprite):
 	match(sprite):
