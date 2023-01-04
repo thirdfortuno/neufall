@@ -213,6 +213,8 @@ func _handle_unit_move(tile):
 
 		for tile in new_legal_range["all"]:
 			tile.set_ui("moveable")
+	else: 
+		return
 
 	_clear_unit_from_grid(unit_selected)
 	
