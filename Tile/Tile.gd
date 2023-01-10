@@ -40,7 +40,7 @@ func _on_mouse_exited():
 		$SpriteSelection.texture = null
 
 func _on_input(_viewport, event, _shape_idx):
-	if (event is InputEventMouseButton && event.pressed):
+	if (event is InputEventMouseButton && event.button_index == BUTTON_LEFT):
 		emit_signal("selected", self)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.

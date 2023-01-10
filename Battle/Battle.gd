@@ -8,13 +8,17 @@ onready var Grid = preload("Grid.gd")
 const TILE_SIZE = 32
 
 var grid_input = [
-	[0,0,0,0,0,0,1,1,1,1],
-	[0,1,1,1,1,1,1,0,1,1],
-	[0,1,1,1,1,1,0,0,1,1],
-	[0,1,1,1,1,1,1,1,1,1],
-	[0,0,1,0,1,0,0,0,1,1],
-	[0,0,1,1,1,0,0,0,1,1],
-	[0,0,0,0,0,0,0,0,1,1]
+	[1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+	[1,1,1,1,1,1,1,0,1,1,1,1,1,1],
+	[1,1,1,1,1,1,0,0,1,1,1,1,1,1],
+	[1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+	[1,0,1,0,1,0,0,0,1,1,1,1,1,1],
+	[1,0,1,1,1,0,0,0,1,1,1,1,1,1],
+	[1,0,0,0,0,0,0,0,1,1,1,1,1,1],
+	[1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+	[1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+	[1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+	[1,1,1,1,1,1,1,1,1,1,1,1,1,1]
 ]
 
 var unit_input = [
@@ -57,6 +61,10 @@ func _ready():
 	_init_tiles(grid_tile_states)
 
 	_init_units()
+
+#################
+# INITALIZATION #
+#################
 
 func _init_tiles(grid_tile_states):
 	grid_tiles = Grid.new(width, height)
@@ -103,46 +111,9 @@ func _init_units():
 		grid_units.set_value(x,y,unit)
 		units_live.append(unit)
 
-func _unit_move_get_legal_range(unit, move_range):
-	var curr_tile = grid_tiles.get_value(unit.x, unit.y)
-	var tiles_legal = []
-	var tiles_to_explore_curr = []
-	var tiles_to_explore_next = []
-	var tiles_legal_adjacent = []
-
-	tiles_to_explore_next.append(curr_tile)
-
-	for depth in move_range + 1:
-		tiles_to_explore_curr = tiles_to_explore_next.duplicate()
-		tiles_to_explore_next.clear()
-		
-		for tile in tiles_to_explore_curr:
-			var x = tile.x
-			var y = tile.y
-			
-			if (tile.state == 1):
-				var unit_on_tile = grid_units.get_value(x, y)
-				
-				if (unit_on_tile == null || unit_on_tile == unit):
-					tiles_legal.append(tile)
-					
-					for tile_next in grid_tiles.get_adjacent_values(x, y):
-						if (
-							tiles_legal.find(tile_next) == -1 &&
-							tiles_to_explore_curr.find(tile_next) == -1 &&
-							tiles_to_explore_next.find(tile_next) == -1
-						):
-							tiles_to_explore_next.append(tile_next)
-		if depth == 1:
-			tiles_legal_adjacent = tiles_legal.duplicate()
-	
-	tiles_legal.erase(curr_tile)
-	tiles_legal_adjacent.erase(curr_tile)
-
-	return {
-		"adjacent": tiles_legal_adjacent,
-		"all": tiles_legal
-	}
+############
+# CLEARING #
+############
 
 func _clear_tile_tags():
 	for tile in grid_tiles.grid_data:
@@ -154,28 +125,9 @@ func _clear_unit_from_grid(unit):
 		clear_unit_move_grid = grid_units.grid_data.find(unit)
 		grid_units.grid_data[clear_unit_move_grid] = null
 
-func _on_tile_select(tile):
-	match click_state:
-		"default":
-			if click_state == "default":
-				if tile_selected:
-					tile_selected.unselect()
-				tile_selected = tile
-				tile_selected.select()
-
-				var unit = grid_units.get_value(tile.x, tile.y)
-
-				if unit:
-					unit_selected = unit
-					var legal_range = _unit_move_get_legal_range(
-							unit,
-							unit.moves_available
-					)
-					for tile in legal_range["all"]:
-						tile.set_ui("moveable")
-					click_state = "unit_move"
-		"unit_move":
-			_handle_unit_move(tile)
+#################
+# UNIT HANDLING #
+#################
 
 func _handle_unit_damaged(unit):
 	_clear_unit_from_grid(unit_selected)
@@ -223,8 +175,60 @@ func _handle_unit_move(tile):
 	
 	unit_selected.update_body_positions(grid_units)
 	
+	tile_selected.unselect()
+	tile_selected = tile
+	tile_selected.select()
+
+func _unit_move_get_legal_range(unit, move_range):
+	var curr_tile = grid_tiles.get_value(unit.x, unit.y)
+	var tiles_legal = []
+	var tiles_to_explore_curr = []
+	var tiles_to_explore_next = []
+	var tiles_legal_adjacent = []
+
+	tiles_to_explore_next.append(curr_tile)
+
+	for depth in move_range + 1:
+		tiles_to_explore_curr = tiles_to_explore_next.duplicate()
+		tiles_to_explore_next.clear()
+		
+		for tile in tiles_to_explore_curr:
+			var x = tile.x
+			var y = tile.y
+			
+			if (tile.state == 1):
+				var unit_on_tile = grid_units.get_value(x, y)
+				
+				if (unit_on_tile == null || unit_on_tile == unit):
+					tiles_legal.append(tile)
+					
+					for tile_next in grid_tiles.get_adjacent_values(x, y):
+						if (
+							tiles_legal.find(tile_next) == -1 &&
+							tiles_to_explore_curr.find(tile_next) == -1 &&
+							tiles_to_explore_next.find(tile_next) == -1
+						):
+							tiles_to_explore_next.append(tile_next)
+		if depth == 1:
+			tiles_legal_adjacent = tiles_legal.duplicate()
+	
+	tiles_legal.erase(curr_tile)
+	tiles_legal_adjacent.erase(curr_tile)
+
+	return {
+		"adjacent": tiles_legal_adjacent,
+		"all": tiles_legal
+	}
+
+#########
+# INPUT #
+#########
+
 func _input(_ev):
-	if Input.is_key_pressed(KEY_Q):
+	if (
+			Input.is_key_pressed(KEY_Q) ||
+			Input.is_mouse_button_pressed(BUTTON_RIGHT)
+	):
 		if tile_selected:
 			tile_selected.unselect()
 		tile_selected = null
@@ -241,6 +245,29 @@ func _input(_ev):
 	
 	if Input.is_key_pressed(KEY_R):
 		print(units_live)
+
+func _on_tile_select(tile):
+	match click_state:
+		"default":
+			if click_state == "default":
+				if tile_selected:
+					tile_selected.unselect()
+				tile_selected = tile
+				tile_selected.select()
+
+				var unit = grid_units.get_value(tile.x, tile.y)
+
+				if unit:
+					unit_selected = unit
+					var legal_range = _unit_move_get_legal_range(
+							unit,
+							unit.moves_available
+					)
+					for tile in legal_range["all"]:
+						tile.set_ui("moveable")
+					click_state = "unit_move"
+		"unit_move":
+			_handle_unit_move(tile)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):
