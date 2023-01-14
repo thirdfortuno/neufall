@@ -2,6 +2,7 @@ extends Node2D
 
 signal selected
 
+var spr_tile_damageable = preload("Sprites/tile_damageable.png")
 var spr_tile_hover = preload("Sprites/tile_hover.png")
 var spr_tile_selected = preload("Sprites/tile_selected.png")
 var spr_tile_moveable = preload("Sprites/tile_moveable.png")
@@ -13,6 +14,8 @@ var state_ui = 'unselected'
 
 func set_ui(sprite):
 	match(sprite):
+		"damageable":
+			$SpriteTag.texture = spr_tile_damageable
 		"moveable":
 			$SpriteTag.texture = spr_tile_moveable
 		_:
@@ -40,7 +43,11 @@ func _on_mouse_exited():
 		$SpriteSelection.texture = null
 
 func _on_input(_viewport, event, _shape_idx):
-	if (event is InputEventMouseButton && event.button_index == BUTTON_LEFT):
+	if (
+			event is InputEventMouseButton &&
+			event.button_index == BUTTON_LEFT &&
+			event.is_pressed()
+	):
 		emit_signal("selected", self)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
