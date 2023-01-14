@@ -8,10 +8,14 @@ signal damaged(unit)
 var x
 var y
 
+var type
+
 var hp_max
 var bodies = []
 var moves_max
 var moves_available
+
+var abilities
 
 func damage(amount):
 	var iterations = 0

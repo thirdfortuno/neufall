@@ -1,10 +1,58 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=5 format=2]
 
 [ext_resource path="res://Battle/Battle.gd" type="Script" id=1]
 [ext_resource path="res://Tile/Tile.tscn" type="PackedScene" id=2]
 [ext_resource path="res://Unit/Unit.tscn" type="PackedScene" id=3]
+[ext_resource path="res://Battle/SelectedUnitUI.gd" type="Script" id=4]
 
 [node name="Node2D" type="Node2D"]
 script = ExtResource( 1 )
 tile_scene = ExtResource( 2 )
 unit_scene = ExtResource( 3 )
+
+[node name="SelectedUnitUI" type="VBoxContainer" parent="."]
+margin_left = 450.0
+margin_right = 490.0
+margin_bottom = 40.0
+script = ExtResource( 4 )
+
+[node name="UnitName" type="Label" parent="SelectedUnitUI"]
+margin_right = 40.0
+margin_bottom = 14.0
+
+[node name="MoveButton" type="Button" parent="SelectedUnitUI"]
+visible = false
+margin_top = 18.0
+margin_right = 47.0
+margin_bottom = 38.0
+text = "Move"
+
+[node name="Ability1Button" type="Button" parent="SelectedUnitUI"]
+visible = false
+margin_top = 42.0
+margin_right = 47.0
+margin_bottom = 62.0
+
+[node name="Ability2Button" type="Button" parent="SelectedUnitUI"]
+visible = false
+margin_top = 42.0
+margin_right = 47.0
+margin_bottom = 62.0
+
+[node name="Ability3Button" type="Button" parent="SelectedUnitUI"]
+visible = false
+margin_top = 42.0
+margin_right = 47.0
+margin_bottom = 62.0
+
+[node name="Ability4Button" type="Button" parent="SelectedUnitUI"]
+visible = false
+margin_top = 42.0
+margin_right = 47.0
+margin_bottom = 62.0
+
+[connection signal="pressed" from="SelectedUnitUI/MoveButton" to="." method="_on_MoveButton_pressed"]
+[connection signal="pressed" from="SelectedUnitUI/Ability1Button" to="." method="_on_Ability1Button_pressed"]
+[connection signal="pressed" from="SelectedUnitUI/Ability2Button" to="." method="_on_Ability2Button_pressed"]
+[connection signal="pressed" from="SelectedUnitUI/Ability3Button" to="." method="_on_Ability3Button_pressed"]
+[connection signal="pressed" from="SelectedUnitUI/Ability4Button" to="." method="_on_Ability4Button_pressed"]
