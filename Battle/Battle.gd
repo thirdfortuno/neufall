@@ -26,24 +26,33 @@ var unit_input = [
 		"x": 1,
 		"y": 1,
 		"type": "Hack",
-		"hp_max": 5,
-		"moves_max": 8,
+		"hp_max": 3,
+		"moves_max": 3,
 		"abilities": [
 			{
 				"ability_name": "Slice",
 				"damage": 2,
-				"range": 1
+				"ability_range": 1
+			},
+			{
+				"ability_name": "Dice",
+				"damage": 2,
+				"ability_range": 2
 			}
 		]
 	},
 	{
 		"x": 3,
 		"y": 2,
-		"type": "Hack 2",
-		"hp_max": 5,
-		"moves_max": 8,
+		"type": "'Slingshot'",
+		"hp_max": 4,
+		"moves_max": 6,
 		"abilities": [
-
+			{
+				"ability_name": "Shot",
+				"damage": 1,
+				"ability_range": 3
+			}
 		]
 	},
 ]
@@ -56,6 +65,7 @@ var grid_units
 
 var tile_selected
 var unit_selected
+var ability_selected
 
 var click_state = "default"
 
@@ -152,8 +162,19 @@ func _clear_unit_from_grid(unit):
 # UNIT HANDLING #
 #################
 
+func _handle_unit_ability(tile):
+	var ability_range = _unit_ability_get_legal_range(
+			unit_selected,
+			ability_selected
+	)
+	
+	if ability_range["immediate"].has(tile):
+		var target_unit = grid_units.get_value(tile.x, tile.y)
+		if target_unit:
+			target_unit.damage(ability_selected["damage"])
+
 func _handle_unit_damaged(unit):
-	_clear_unit_from_grid(unit_selected)
+	_clear_unit_from_grid(unit)
 	
 	for body in unit.bodies:
 		grid_units.set_value(body.x, body.y, unit)
@@ -165,7 +186,6 @@ func _handle_unit_killed(unit):
 	
 	units_live.erase(unit)
 	_clear_unit_from_grid(unit)
-	_clear_tile_tags()
 
 func _handle_unit_move(tile):
 	var x = tile.x
@@ -209,6 +229,37 @@ func _handle_unit_select(unit):
 	unit_selected = unit
 	_hud_show_unit()
 	
+func _unit_ability_get_legal_range(unit, ability):
+	var curr_tile = grid_tiles.get_value(unit.x, unit.y)
+	var tiles_to_explore_curr = []
+	var tiles_to_explore_next = []
+	var tiles_immediate = []
+	# TODO: Show all possible tiles within range when using movement
+	#var tiles_postmove = []
+	
+	var immediate_range = ability["ability_range"]
+	
+	tiles_to_explore_next.append(curr_tile)
+	
+	for depth in immediate_range + 1:
+		tiles_to_explore_curr = tiles_to_explore_next.duplicate()
+		tiles_to_explore_next.clear()
+		
+		for tile in tiles_to_explore_curr:
+			var x = tile.x
+			var y = tile.y
+			
+			if !tiles_immediate.has(tile):
+				tiles_immediate.append(tile)
+		
+			for tile_next in grid_tiles.get_adjacent_values(x, y):
+				tiles_to_explore_next.append(tile_next)
+		
+	tiles_immediate.erase(curr_tile)
+	
+	return {
+		"immediate": tiles_immediate
+	}
 
 func _unit_move_get_legal_range(unit, move_range):
 	var curr_tile = grid_tiles.get_value(unit.x, unit.y)
@@ -255,7 +306,22 @@ func _unit_move_get_legal_range(unit, move_range):
 # HANDLING BUTTON PRESSES
 #
 
+func _handle_ability_button_pressed(ability):
+	_clear_tile_tags()
+	
+	ability_selected = ability
+	click_state = "unit_ability"
+	
+	var ability_range = _unit_ability_get_legal_range(
+			unit_selected,
+			ability_selected
+	)
+	
+	for tile in ability_range["immediate"]:
+		tile.set_ui("damageable")
+
 func _on_MoveButton_pressed():
+	ability_selected = null
 	if unit_selected:
 		click_state = "unit_move"
 		for tile in _unit_move_get_legal_range(
@@ -264,19 +330,19 @@ func _on_MoveButton_pressed():
 				tile.set_ui("moveable")
 
 func _on_Ability1Button_pressed():
-	pass # Replace with function body.
+	_handle_ability_button_pressed(unit_selected["abilities"][0])
 
 
 func _on_Ability2Button_pressed():
-	pass # Replace with function body.
+	_handle_ability_button_pressed(unit_selected["abilities"][1])
 
 
 func _on_Ability3Button_pressed():
-	pass # Replace with function body.
+	_handle_ability_button_pressed(unit_selected["abilities"][2])
 
 
 func _on_Ability4Button_pressed():
-	pass # Replace with function body.
+	_handle_ability_button_pressed(unit_selected["abilities"][3])
 
 #########
 # INPUT #
@@ -291,6 +357,7 @@ func _input(_ev):
 			tile_selected.unselect()
 		tile_selected = null
 		unit_selected = null
+		ability_selected = null
 
 		click_state = "default"
 		
@@ -307,6 +374,7 @@ func _input(_ev):
 		if unit_selected:
 			print(unit_selected.type)
 			print(click_state)
+		print(units_live)
 
 func _on_tile_select(tile):
 	match click_state:
@@ -321,6 +389,8 @@ func _on_tile_select(tile):
 			if unit:
 				click_state = "unit_select"
 				_handle_unit_select(unit)
+		"unit_ability":
+			_handle_unit_ability(tile)
 		"unit_move":
 			_handle_unit_move(tile)
 
