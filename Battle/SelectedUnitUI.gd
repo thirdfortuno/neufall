@@ -15,9 +15,9 @@ func show_unit(unit):
 		# Yeah uh. . . four words:
 		# Design Debt. Tech Debt
 		var ability_size = unit.abilities.size()
-		if ability_size == 1:
-			if ability_size == 2:
-				if ability_size == 3:
+		if ability_size >= 1:
+			if ability_size >= 2:
+				if ability_size >= 3:
 					if ability_size == 4:
 						$Ability4Button.text = unit.abilities[3].ability_name
 						$Ability4Button.visible = true
