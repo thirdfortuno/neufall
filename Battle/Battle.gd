@@ -25,14 +25,26 @@ var unit_input = [
 	{
 		"x": 1,
 		"y": 1,
+		"type": "Hack",
 		"hp_max": 5,
-		"moves_max": 20
+		"moves_max": 8,
+		"abilities": [
+			{
+				"ability_name": "Slice",
+				"damage": 2,
+				"range": 1
+			}
+		]
 	},
 	{
 		"x": 3,
 		"y": 2,
+		"type": "Hack 2",
 		"hp_max": 5,
-		"moves_max": 20
+		"moves_max": 8,
+		"abilities": [
+
+		]
 	},
 ]
 
@@ -104,13 +116,24 @@ func _init_units():
 				y*TILE_SIZE + TILE_SIZE/2
 		)
 		
+		unit.type = u["type"]
+		
 		unit.hp_max = u["hp_max"]
 		unit.moves_max = u["moves_max"]
+		
+		unit.abilities = u["abilities"]
 		
 		add_child(unit)
 		grid_units.set_value(x,y,unit)
 		units_live.append(unit)
 
+####################
+# HEADS UP DISPLAY #
+####################
+
+func _hud_show_unit():
+	$SelectedUnitUI.show_unit(unit_selected)
+	
 ############
 # CLEARING #
 ############
@@ -155,7 +178,7 @@ func _handle_unit_move(tile):
 	if (legal_range["adjacent"].has(tile)):
 		var into_self = grid_units.get_value(x, y) == unit_selected
 		unit_selected.move_to(x, y, into_self)
-
+		
 		_clear_tile_tags()
 
 		var new_legal_range = _unit_move_get_legal_range(
@@ -165,6 +188,9 @@ func _handle_unit_move(tile):
 
 		for tile in new_legal_range["all"]:
 			tile.set_ui("moveable")
+			
+		if unit_selected.moves_available == 0:
+			click_state = "unit_select"
 	else: 
 		return
 
@@ -178,6 +204,11 @@ func _handle_unit_move(tile):
 	tile_selected.unselect()
 	tile_selected = tile
 	tile_selected.select()
+
+func _handle_unit_select(unit):
+	unit_selected = unit
+	_hud_show_unit()
+	
 
 func _unit_move_get_legal_range(unit, move_range):
 	var curr_tile = grid_tiles.get_value(unit.x, unit.y)
@@ -220,6 +251,33 @@ func _unit_move_get_legal_range(unit, move_range):
 		"all": tiles_legal
 	}
 
+# 
+# HANDLING BUTTON PRESSES
+#
+
+func _on_MoveButton_pressed():
+	if unit_selected:
+		click_state = "unit_move"
+		for tile in _unit_move_get_legal_range(
+				unit_selected, unit_selected.moves_available
+		)["all"]:
+				tile.set_ui("moveable")
+
+func _on_Ability1Button_pressed():
+	pass # Replace with function body.
+
+
+func _on_Ability2Button_pressed():
+	pass # Replace with function body.
+
+
+func _on_Ability3Button_pressed():
+	pass # Replace with function body.
+
+
+func _on_Ability4Button_pressed():
+	pass # Replace with function body.
+
 #########
 # INPUT #
 #########
@@ -238,34 +296,31 @@ func _input(_ev):
 		
 		for tile in grid_tiles.grid_data:
 			tile.set_ui(null)
+		
+		_handle_unit_select(null)
 	
 	if Input.is_key_pressed(KEY_E):
 		if unit_selected:
 			unit_selected.damage(2)
 	
 	if Input.is_key_pressed(KEY_R):
-		print(units_live)
+		if unit_selected:
+			print(unit_selected.type)
+			print(click_state)
 
 func _on_tile_select(tile):
 	match click_state:
 		"default":
-			if click_state == "default":
-				if tile_selected:
-					tile_selected.unselect()
-				tile_selected = tile
-				tile_selected.select()
+			if tile_selected:
+				tile_selected.unselect()
+			tile_selected = tile
+			tile_selected.select()
 
-				var unit = grid_units.get_value(tile.x, tile.y)
+			var unit = grid_units.get_value(tile.x, tile.y)
 
-				if unit:
-					unit_selected = unit
-					var legal_range = _unit_move_get_legal_range(
-							unit,
-							unit.moves_available
-					)
-					for tile in legal_range["all"]:
-						tile.set_ui("moveable")
-					click_state = "unit_move"
+			if unit:
+				click_state = "unit_select"
+				_handle_unit_select(unit)
 		"unit_move":
 			_handle_unit_move(tile)
 
