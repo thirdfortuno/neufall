@@ -163,6 +163,9 @@ func _clear_unit_from_grid(unit):
 #################
 
 func _handle_unit_ability(tile):
+	if !unit_selected.active:
+		return
+		
 	var ability_range = _unit_ability_get_legal_range(
 			unit_selected,
 			ability_selected
@@ -172,6 +175,12 @@ func _handle_unit_ability(tile):
 		var target_unit = grid_units.get_value(tile.x, tile.y)
 		if target_unit:
 			target_unit.damage(ability_selected["damage"])
+			
+			unit_selected.active = false
+			
+			_clear_tile_tags()
+			
+			_hud_show_unit()
 
 func _handle_unit_damaged(unit):
 	_clear_unit_from_grid(unit)
@@ -307,6 +316,8 @@ func _unit_move_get_legal_range(unit, move_range):
 #
 
 func _handle_ability_button_pressed(ability):
+	if !unit_selected.active:
+		return
 	_clear_tile_tags()
 	
 	ability_selected = ability
@@ -323,6 +334,8 @@ func _handle_ability_button_pressed(ability):
 func _on_MoveButton_pressed():
 	ability_selected = null
 	if unit_selected:
+		if !unit_selected.active:
+			return
 		click_state = "unit_move"
 		for tile in _unit_move_get_legal_range(
 				unit_selected, unit_selected.moves_available
@@ -343,6 +356,10 @@ func _on_Ability3Button_pressed():
 
 func _on_Ability4Button_pressed():
 	_handle_ability_button_pressed(unit_selected["abilities"][3])
+
+func _on_SkipButton_pressed():
+	unit_selected.active = false
+	_hud_show_unit()
 
 #########
 # INPUT #
@@ -372,7 +389,7 @@ func _input(_ev):
 	
 	if Input.is_key_pressed(KEY_R):
 		if unit_selected:
-			print(unit_selected.type)
+			print(unit_selected.active)
 			print(click_state)
 		print(units_live)
 

@@ -7,7 +7,18 @@ func show_unit(unit):
 		
 		$MoveButton.visible = true
 		
-		if unit.moves_available > 0:
+		if unit.active:
+			$Ability4Button.disabled = false
+			$Ability3Button.disabled = false
+			$Ability2Button.disabled = false
+			$Ability1Button.disabled = false
+		else:
+			$Ability4Button.disabled = true
+			$Ability3Button.disabled = true
+			$Ability2Button.disabled = true
+			$Ability1Button.disabled = true
+		
+		if unit.moves_available > 0 && unit.active:
 			$MoveButton.disabled = false
 		else:
 			$MoveButton.disabled = true
