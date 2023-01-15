@@ -358,7 +358,8 @@ func _on_Ability4Button_pressed():
 	_handle_ability_button_pressed(unit_selected["abilities"][3])
 
 func _on_SkipButton_pressed():
-	unit_selected.active = false
+	if unit_selected:
+		unit_selected.active = false
 	_hud_show_unit()
 
 #########
