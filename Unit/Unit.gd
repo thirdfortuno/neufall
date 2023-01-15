@@ -15,6 +15,8 @@ var bodies = []
 var moves_max
 var moves_available
 
+var active = true
+
 var abilities
 
 func damage(amount):

@@ -17,7 +17,7 @@ margin_bottom = 40.0
 script = ExtResource( 4 )
 
 [node name="UnitName" type="Label" parent="SelectedUnitUI"]
-margin_right = 40.0
+margin_right = 70.0
 margin_bottom = 14.0
 
 [node name="MoveButton" type="Button" parent="SelectedUnitUI"]
@@ -51,8 +51,15 @@ margin_top = 42.0
 margin_right = 47.0
 margin_bottom = 62.0
 
+[node name="SkipButton" type="Button" parent="SelectedUnitUI"]
+margin_top = 18.0
+margin_right = 70.0
+margin_bottom = 38.0
+text = "Skip Turn"
+
 [connection signal="pressed" from="SelectedUnitUI/MoveButton" to="." method="_on_MoveButton_pressed"]
 [connection signal="pressed" from="SelectedUnitUI/Ability1Button" to="." method="_on_Ability1Button_pressed"]
 [connection signal="pressed" from="SelectedUnitUI/Ability2Button" to="." method="_on_Ability2Button_pressed"]
 [connection signal="pressed" from="SelectedUnitUI/Ability3Button" to="." method="_on_Ability3Button_pressed"]
 [connection signal="pressed" from="SelectedUnitUI/Ability4Button" to="." method="_on_Ability4Button_pressed"]
+[connection signal="pressed" from="SelectedUnitUI/SkipButton" to="." method="_on_SkipButton_pressed"]
