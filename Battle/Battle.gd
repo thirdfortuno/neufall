@@ -25,35 +25,46 @@ var unit_input = [
 	{
 		"x": 1,
 		"y": 1,
-		"type": "Hack",
-		"hp_max": 3,
-		"moves_max": 3,
-		"abilities": [
-			{
-				"ability_name": "Slice",
-				"damage": 2,
-				"ability_range": 1
-			},
-			{
-				"ability_name": "Dice",
-				"damage": 2,
-				"ability_range": 2
-			}
-		]
+		"team": "player",
+		"data": {
+			"type": "Hack",
+			"hp_max": 3,
+			"moves_max": 3,
+			"abilities": [
+				{
+					"ability_name": "Slice",
+					"damage": 2,
+					"ability_range": 1
+				},
+				{
+					"ability_name": "Dice",
+					"damage": 2,
+					"ability_range": 2
+				}
+			]
+		}
 	},
 	{
 		"x": 3,
-		"y": 2,
-		"type": "'Slingshot'",
-		"hp_max": 4,
-		"moves_max": 6,
-		"abilities": [
-			{
-				"ability_name": "Shot",
-				"damage": 1,
-				"ability_range": 3
-			}
-		]
+		"y": 3,
+		"team": "ai",
+		"data": {
+			"type": "Hack",
+			"hp_max": 3,
+			"moves_max": 3,
+			"abilities": [
+				{
+					"ability_name": "Slice",
+					"damage": 2,
+					"ability_range": 1
+				},
+				{
+					"ability_name": "Dice",
+					"damage": 2,
+					"ability_range": 2
+				}
+			]
+		}
 	},
 ]
 
@@ -63,13 +74,15 @@ var width
 var grid_tiles
 var grid_units
 
+var active_player = "player"
 var tile_selected
 var unit_selected
 var ability_selected
 
 var click_state = "default"
 
-var units_live = []
+var units_live_player = []
+var units_live_ai = []
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -115,27 +128,34 @@ func _init_units():
 		var unit = unit_scene.instance()
 		var x = u["x"]
 		var y = u["y"]
+		var team = u["team"]
 		
 		unit.connect("damaged", self, "_handle_unit_damaged")
 		unit.connect("killed", self, "_handle_unit_killed")
 		
 		unit.x = x
 		unit.y = y
+		unit.team = team
 		unit.position = Vector2(
 				x*TILE_SIZE + TILE_SIZE/2,
 				y*TILE_SIZE + TILE_SIZE/2
 		)
 		
-		unit.type = u["type"]
+		unit.type = u["data"]["type"]
 		
-		unit.hp_max = u["hp_max"]
-		unit.moves_max = u["moves_max"]
+		unit.hp_max = u["data"]["hp_max"]
+		unit.moves_max = u["data"]["moves_max"]
 		
-		unit.abilities = u["abilities"]
+		unit.abilities = u["data"]["abilities"]
 		
 		add_child(unit)
 		grid_units.set_value(x,y,unit)
-		units_live.append(unit)
+		
+		if team == "player":
+			units_live_player.append(unit)
+		elif team == "ai":
+			units_live_ai.append(unit)
+		
 
 ####################
 # HEADS UP DISPLAY #
@@ -158,12 +178,40 @@ func _clear_unit_from_grid(unit):
 		clear_unit_move_grid = grid_units.grid_data.find(unit)
 		grid_units.grid_data[clear_unit_move_grid] = null
 
+###################
+# BATTLE HANDLING #
+###################
+func _check_if_turn_done():
+	if active_player == "player":
+		for unit in units_live_player:
+			if unit.active:
+				return false
+	elif active_player == "ai":
+		for unit in units_live_ai:
+			if unit.active:
+				return false
+	_swap_active_player()
+
+func _swap_active_player():
+	if active_player == "player":
+		active_player = "ai"
+		for unit in units_live_ai:
+			unit.active = true
+			unit.moves_available = unit.moves_max
+	elif active_player == "ai":
+		active_player = "player"
+		for unit in units_live_player:
+			unit.active = true
+			unit.moves_available = unit.moves_max
+
 #################
 # UNIT HANDLING #
 #################
+func _is_unit_selected_active_and_on_team():
+	return unit_selected.active && (unit_selected.team == active_player)
 
 func _handle_unit_ability(tile):
-	if !unit_selected.active:
+	if !_is_unit_selected_active_and_on_team():
 		return
 		
 	var ability_range = _unit_ability_get_legal_range(
@@ -193,10 +241,13 @@ func _handle_unit_killed(unit):
 		unit_selected = null
 		click_state = "default"
 	
-	units_live.erase(unit)
+	units_live_player.erase(unit)
+	units_live_ai.erase(unit)
 	_clear_unit_from_grid(unit)
 
 func _handle_unit_move(tile):
+	if !_is_unit_selected_active_and_on_team():
+		return
 	var x = tile.x
 	var y = tile.y
 	var legal_range = _unit_move_get_legal_range(
@@ -316,7 +367,7 @@ func _unit_move_get_legal_range(unit, move_range):
 #
 
 func _handle_ability_button_pressed(ability):
-	if !unit_selected.active:
+	if !_is_unit_selected_active_and_on_team():
 		return
 	_clear_tile_tags()
 	
@@ -330,11 +381,13 @@ func _handle_ability_button_pressed(ability):
 	
 	for tile in ability_range["immediate"]:
 		tile.set_ui("damageable")
+	
+	_check_if_turn_done()
 
 func _on_MoveButton_pressed():
 	ability_selected = null
 	if unit_selected:
-		if !unit_selected.active:
+		if !_is_unit_selected_active_and_on_team():
 			return
 		click_state = "unit_move"
 		for tile in _unit_move_get_legal_range(
@@ -361,6 +414,7 @@ func _on_SkipButton_pressed():
 	if unit_selected:
 		unit_selected.active = false
 	_hud_show_unit()
+	_check_if_turn_done()
 
 #########
 # INPUT #
@@ -392,7 +446,6 @@ func _input(_ev):
 		if unit_selected:
 			print(unit_selected.active)
 			print(click_state)
-		print(units_live)
 
 func _on_tile_select(tile):
 	match click_state:
@@ -408,8 +461,12 @@ func _on_tile_select(tile):
 				click_state = "unit_select"
 				_handle_unit_select(unit)
 		"unit_ability":
+			if !_is_unit_selected_active_and_on_team():
+				return
 			_handle_unit_ability(tile)
 		"unit_move":
+			if !_is_unit_selected_active_and_on_team():
+				return
 			_handle_unit_move(tile)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
