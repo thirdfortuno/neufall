@@ -7,6 +7,7 @@ signal damaged(unit)
 
 var x
 var y
+var team
 
 var type
 
