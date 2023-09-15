@@ -19,6 +19,7 @@ var moves_available
 var active = true
 
 var abilities
+var behavior
 
 func damage(amount):
 	var iterations = 0

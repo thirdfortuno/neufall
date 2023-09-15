@@ -46,6 +46,14 @@ func get_value(x, y):
 func set_value(x, y, value):
 	grid_data[_get_index(x,y)] = value
 	
+func get_distance(x1, y1, x2, y2):
+	var x_dist = x1 - x2
+	var y_dist = y1 - y2
+	if x_dist < 0:
+		x_dist = x_dist * -1
+	if y_dist < 0:
+		y_dist = y_dist * -1
+	return x_dist + y_dist
 
 # Since gdscript doesn't currently support different inits based
 # off number of arguments passed, we create our own version instead
