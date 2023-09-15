@@ -4,6 +4,7 @@ export(PackedScene) var tile_scene
 export(PackedScene) var unit_scene
 
 onready var Grid = preload("Grid.gd")
+onready var AI = preload("AI.gd")
 
 const TILE_SIZE = 32
 
@@ -45,9 +46,9 @@ var unit_input = [
 		}
 	},
 	{
-		"x": 3,
-		"y": 3,
-		"team": "ai",
+		"x": 2,
+		"y": 2,
+		"team": "player",
 		"data": {
 			"type": "Hack",
 			"hp_max": 3,
@@ -62,6 +63,48 @@ var unit_input = [
 					"ability_name": "Dice",
 					"damage": 2,
 					"ability_range": 2
+				}
+			]
+		}
+	},
+	{
+		"x": 3,
+		"y": 3,
+		"team": "ai",
+		"data": {
+			"type": "Hack",
+			"hp_max": 3,
+			"moves_max": 3,
+			"abilities": [
+				{
+					"ability_name": "Slice",
+					"damage": 2,
+					"ability_range": 1
+				}
+			]
+		},
+		"behavior": {
+			"version": 1,
+			"search": [
+				{
+					"range": 3,
+					"method": "absolute"
+				}
+			],
+			"peace": [
+				{
+					"method": "roam"
+				}
+			],
+			"war": [
+				{
+					"method": "nearest"
+				},
+				{
+					"method": "weakest"
+				},
+				{
+					"method": "random"
 				}
 			]
 		}
@@ -84,6 +127,8 @@ var click_state = "default"
 var units_live_player = []
 var units_live_ai = []
 
+var ai_handler
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	var grid_tile_states = Grid.new(grid_input)
@@ -96,6 +141,8 @@ func _ready():
 	_init_tiles(grid_tile_states)
 
 	_init_units()
+	
+	ai_handler = AI.new()
 
 #################
 # INITALIZATION #
@@ -147,6 +194,8 @@ func _init_units():
 		unit.moves_max = u["data"]["moves_max"]
 		
 		unit.abilities = u["data"]["abilities"]
+		if u["team"] == "ai":
+			unit.behavior = u["behavior"]
 		
 		add_child(unit)
 		grid_units.set_value(x,y,unit)
@@ -198,11 +247,26 @@ func _swap_active_player():
 		for unit in units_live_ai:
 			unit.active = true
 			unit.moves_available = unit.moves_max
+		_ai_decisions()
 	elif active_player == "ai":
 		active_player = "player"
 		for unit in units_live_player:
 			unit.active = true
 			unit.moves_available = unit.moves_max
+
+func _ai_decisions():
+	if active_player == "ai":
+		for unit in units_live_ai:
+			if unit.active:
+				ai_handler.height = height
+				ai_handler.width = width
+				ai_handler.grid_tiles = grid_tiles
+				ai_handler.grid_units = grid_units
+				ai_handler.units_live_player = units_live_player
+				ai_handler.units_live_ai = units_live_ai
+				ai_handler.handle_unit(unit)
+				unit.active = false
+	_check_if_turn_done()
 
 #################
 # UNIT HANDLING #
