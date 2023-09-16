@@ -132,8 +132,8 @@ func _update_state():
 	height = get_parent().height
 	width = get_parent().width
 
-	grid_tiles= get_parent().grid_tiles
-	grid_units= get_parent().grid_units
+	grid_tiles = get_parent().grid_tiles
+	grid_units = get_parent().grid_units
 
 	units_live_player = get_parent().units_live_player
 	units_live_ai = get_parent().units_live_ai
