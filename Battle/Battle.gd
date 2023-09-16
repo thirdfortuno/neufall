@@ -87,7 +87,7 @@ var unit_input = [
 			"version": 1,
 			"search": [
 				{
-					"range": 3,
+					"range": 0,
 					"method": "absolute"
 				}
 			],
@@ -143,6 +143,7 @@ func _ready():
 	_init_units()
 	
 	ai_handler = AI.new()
+	add_child(ai_handler)
 
 #################
 # INITALIZATION #
@@ -247,6 +248,7 @@ func _swap_active_player():
 		for unit in units_live_ai:
 			unit.active = true
 			unit.moves_available = unit.moves_max
+		unit_selected = null
 		_ai_decisions()
 	elif active_player == "ai":
 		active_player = "player"
@@ -258,12 +260,7 @@ func _ai_decisions():
 	if active_player == "ai":
 		for unit in units_live_ai:
 			if unit.active:
-				ai_handler.height = height
-				ai_handler.width = width
-				ai_handler.grid_tiles = grid_tiles
-				ai_handler.grid_units = grid_units
-				ai_handler.units_live_player = units_live_player
-				ai_handler.units_live_ai = units_live_ai
+				unit_selected = unit
 				ai_handler.handle_unit(unit)
 				unit.active = false
 	_check_if_turn_done()

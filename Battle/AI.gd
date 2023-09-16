@@ -12,12 +12,12 @@ var units_live_player = []
 var units_live_ai = []
 
 func handle_unit(unit):
+	_update_state()
 	if unit.behavior.version == 1:
 		var units_in_range = []
 		var target_unit
 		if unit.behavior.search:
 			units_in_range = _unit_search(unit)
-			print(units_in_range)
 		if units_in_range.size() == 0:
 			if unit.behavior.peace:
 				_unit_peace(unit)
@@ -31,7 +31,12 @@ func _unit_search(unit):
 			return _unit_search_absolute(unit, search.range)
 
 func _unit_peace(unit):
-	pass
+	for peace in unit.behavior.peace:
+		if peace.method == "roam":
+			while unit.moves_available:
+				var legal_tiles = _unit_max_mobility(unit).adjacent
+				legal_tiles.shuffle()
+				get_parent()._handle_unit_move(legal_tiles[0])
 
 func _unit_war(unit, units_in_range):
 	var unit_to_target = units_in_range.duplicate()
@@ -89,6 +94,9 @@ func _unit_war(unit, units_in_range):
 				unit_to_target.resize(1)
 	return unit_to_target[0]
 
+func _unit_max_mobility(unit):
+	return get_parent()._unit_move_get_legal_range(unit, unit.moves_available)
+
 func _unit_search_absolute(unit, search_range):
 	var curr_tile = grid_tiles.get_value(unit.x, unit.y)
 	var tiles_to_explore_curr = []
@@ -119,3 +127,13 @@ func _unit_search_absolute(unit, search_range):
 				units_in_range.append(tile_unit)
 	
 	return units_in_range
+
+func _update_state():
+	height = get_parent().height
+	width = get_parent().width
+
+	grid_tiles = get_parent().grid_tiles
+	grid_units = get_parent().grid_units
+
+	units_live_player = get_parent().units_live_player
+	units_live_ai = get_parent().units_live_ai
