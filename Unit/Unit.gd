@@ -21,6 +21,10 @@ var active = true
 var abilities
 var behavior
 
+# See the _ready() function for knowing what's an ai unit
+var spr_main = preload("Sprites/SecurityCam/security_cam.png")
+var spr_shadow = preload("Sprites/SecurityCam/security_cam_shadow.png")
+
 func damage(amount):
 	var iterations = 0
 	while bodies.size() > 0 && iterations < amount:
@@ -80,6 +84,11 @@ func _ready():
 	bodies.append(body)
 	
 	moves_available = moves_max
+	
+	# Temporary so it's easier to know the enemy unit when testing
+	if team == "ai":
+		$SpriteMain.texture = spr_main
+		$SpriteShadow.texture = spr_shadow
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):
