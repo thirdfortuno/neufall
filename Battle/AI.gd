@@ -24,6 +24,12 @@ func handle_unit(unit):
 		else:
 			if unit.behavior.war:
 				target_unit = _unit_war(unit, units_in_range)
+				var grid_distance =  _get_distance_from_target(
+					target_unit,
+					unit.abilities[0].ability_range,
+					unit
+				)
+				
 
 func _unit_search(unit):
 	for search in unit.behavior.search:
@@ -127,6 +133,51 @@ func _unit_search_absolute(unit, search_range):
 				units_in_range.append(tile_unit)
 	
 	return units_in_range
+
+func _get_distance_from_target(target, ability_range, unit):
+	var grid_distance = Grid.new(width, height)
+	var tiles_to_explore_curr = []
+	var tiles_to_explore_next = []
+	var tiles_explored = []
+	var tiles_in_range = []
+	var distance = 0
+	for body in target.bodies:
+		tiles_to_explore_next.append(grid_tiles.get_value(body.x, body.y))
+	
+	while distance <= ability_range:
+		tiles_to_explore_curr = tiles_to_explore_next.duplicate()
+		tiles_explored.append_array(tiles_to_explore_curr)
+		tiles_to_explore_next.clear()
+		
+		for tile in tiles_to_explore_curr:
+			var x = tile.x
+			var y = tile.y
+			
+			if distance <= ability_range:
+				grid_distance.set_value(x, y, 0)
+				tiles_in_range.append(grid_tiles.get_value(x,y))
+
+			for tile_next in grid_tiles.get_adjacent_values(x, y):
+				if tiles_explored.find(tile_next) == -1:
+					tiles_to_explore_next.append(tile_next)
+		
+		distance = distance + 1
+	
+	for tile in tiles_in_range:
+		var x = tile.x
+		var y = tile.y
+		if grid_tiles.get_value(x, y).state == 0:
+			grid_distance.set_value(x, y, null)
+		if grid_units.get_value(x, y) != unit and grid_units.get_value(x, y) != null:
+			grid_distance.set_value(x, y, null)
+	
+	# Delete this in a later commit
+	for x in width:
+		for y in height:
+			if grid_distance.get_value(x, y) == 0:
+				grid_tiles.get_value(x, y).set_ui("damageable")
+	
+	return grid_distance
 
 func _update_state():
 	height = get_parent().height
