@@ -172,12 +172,6 @@ func _get_distance_from_target(target, ability_range, unit):
 		if grid_units.get_value(x, y) != unit and grid_units.get_value(x, y) != null:
 			grid_distance.set_value(x, y, null)
 	
-	# Delete this in a later commit
-	for x in width:
-		for y in height:
-			if grid_distance.get_value(x, y) == 0:
-				grid_tiles.get_value(x, y).set_ui("damageable")
-	
 	return grid_distance
 
 func _path_to_target(grid_distance, unit):
@@ -246,7 +240,6 @@ func _path_to_target(grid_distance, unit):
 	var route = []
 	var route_tile = grid_parent.get_value(unit.x, unit.y)
 	while typeof(route_tile) != TYPE_INT and route_tile != null:
-		route_tile.set_ui("moveable")
 		route.append(route_tile)
 		route_tile = grid_parent.get_value(route_tile.x, route_tile.y)
 	
