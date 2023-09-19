@@ -25,7 +25,7 @@ func select():
 	state_ui = 'selected'
 	$SpriteSelection.texture = spr_tile_selected
 
-func unselect():
+func deselect():
 	state_ui = 'unselected'
 	$SpriteSelection.texture = null
 
@@ -45,7 +45,7 @@ func _on_mouse_exited():
 func _on_input(_viewport, event, _shape_idx):
 	if (
 			event is InputEventMouseButton &&
-			event.button_index == BUTTON_LEFT &&
+			event.button_index == MOUSE_BUTTON_LEFT &&
 			event.is_pressed()
 	):
 		emit_signal("selected", self)

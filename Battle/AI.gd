@@ -1,6 +1,6 @@
 extends Node
 
-onready var Grid = preload("Grid.gd")
+@onready var Grid = preload("Grid.gd")
 
 var height
 var width
