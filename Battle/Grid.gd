@@ -55,6 +55,13 @@ func get_distance(x1, y1, x2, y2):
 		y_dist = y_dist * -1
 	return x_dist + y_dist
 
+func print_grid():
+	for y in height:
+		var row = []
+		for x in width:
+			row.append(grid_data[_get_index(x,y)])
+		print(row)
+
 # Since gdscript doesn't currently support different inits based
 # off number of arguments passed, we create our own version instead
 func _init(first, second = null):
