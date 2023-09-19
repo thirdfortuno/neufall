@@ -36,11 +36,11 @@ func update_sprite(grid_units, unit):
 	if adjacents["left"] == unit:
 		index = index + 8
 	
-	$Sprite.texture = SPR_ARRAY[index]
+	$Sprite2D.texture = SPR_ARRAY[index]
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	$Sprite.texture = SPR_ARRAY[0]
+	$Sprite2D.texture = SPR_ARRAY[0]
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):

@@ -1,10 +1,10 @@
 extends Node2D
 
-export(PackedScene) var tile_scene
-export(PackedScene) var unit_scene
+@export var tile_scene: PackedScene
+@export var unit_scene: PackedScene
 
-onready var Grid = preload("Grid.gd")
-onready var AI = preload("AI.gd")
+@onready var Grid = preload("Grid.gd")
+@onready var AI = preload("AI.gd")
 
 const TILE_SIZE = 32
 
@@ -163,7 +163,7 @@ func _init_tiles(grid_tile_states):
 
 	for x in width:
 		for y in height:
-			var tile = tile_scene.instance()
+			var tile = tile_scene.instantiate()
 
 			tile.x = x
 			tile.y = y
@@ -173,7 +173,7 @@ func _init_tiles(grid_tile_states):
 					y*TILE_SIZE + TILE_SIZE/2
 			)
 
-			tile.connect("selected", self, "_on_tile_select")
+			tile.connect("selected", Callable(self, "_on_tile_select"))
 
 			add_child(tile)
 			grid_tiles.set_value(x,y,tile)
@@ -182,13 +182,13 @@ func _init_units():
 	grid_units = Grid.new(width, height)
 	
 	for u in unit_input:
-		var unit = unit_scene.instance()
+		var unit = unit_scene.instantiate()
 		var x = u["x"]
 		var y = u["y"]
 		var team = u["team"]
 		
-		unit.connect("damaged", self, "_handle_unit_damaged")
-		unit.connect("killed", self, "_handle_unit_killed")
+		unit.connect("damaged", Callable(self, "_handle_unit_damaged"))
+		unit.connect("killed", Callable(self, "_handle_unit_killed"))
 		
 		unit.x = x
 		unit.y = y
@@ -336,8 +336,8 @@ func _handle_unit_move(tile):
 				unit_selected.moves_available
 		)
 
-		for tile in new_legal_range["all"]:
-			tile.set_ui("moveable")
+		for tile_candidate in new_legal_range["all"]:
+			tile_candidate.set_ui("moveable")
 			
 		if unit_selected.moves_available == 0:
 			click_state = "unit_select"
@@ -351,7 +351,7 @@ func _handle_unit_move(tile):
 	
 	unit_selected.update_body_positions(grid_units)
 	
-	tile_selected.unselect()
+	tile_selected.deselect()
 	tile_selected = tile
 	tile_selected.select()
 
@@ -493,10 +493,10 @@ func _on_SkipButton_pressed():
 func _input(_ev):
 	if (
 			Input.is_key_pressed(KEY_Q) ||
-			Input.is_mouse_button_pressed(BUTTON_RIGHT)
+			Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT)
 	):
 		if tile_selected:
-			tile_selected.unselect()
+			tile_selected.deselect()
 		tile_selected = null
 		unit_selected = null
 		ability_selected = null
@@ -521,7 +521,7 @@ func _on_tile_select(tile):
 	match click_state:
 		"default":
 			if tile_selected:
-				tile_selected.unselect()
+				tile_selected.deselect()
 			tile_selected = tile
 			tile_selected.select()
 

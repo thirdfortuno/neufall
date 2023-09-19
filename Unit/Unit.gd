@@ -1,6 +1,6 @@
 extends Node2D
 
-export(PackedScene) var body_scene
+@export var body_scene: PackedScene
 
 signal killed(unit)
 signal damaged(unit)
@@ -56,7 +56,7 @@ func move_to(x_new, y_new, into_self = false):
 		bodies.pop_at(bodies.find(body))
 		bodies.push_front(body)
 	elif bodies.size() < hp_max:
-		var body = body_scene.instance()
+		var body = body_scene.instantiate()
 		body.x = x
 		body.y = y
 		
@@ -76,7 +76,7 @@ func update_body_positions(grid_units):
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	var body = body_scene.instance()
+	var body = body_scene.instantiate()
 	body.x = x
 	body.y = y
 
