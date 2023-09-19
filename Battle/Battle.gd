@@ -8,6 +8,15 @@ onready var AI = preload("AI.gd")
 
 const TILE_SIZE = 32
 
+"""
+var grid_input = [
+	[1,1,1,1],
+	[1,1,1,1],
+	[1,1,1,0],
+	[1,1,1,1]
+]
+
+"""
 var grid_input = [
 	[1,1,1,1,1,1,1,1,1,1,1,1,1,1],
 	[1,1,1,1,1,1,1,0,1,1,1,1,1,1],
@@ -30,7 +39,7 @@ var unit_input = [
 		"data": {
 			"type": "Hack",
 			"hp_max": 3,
-			"moves_max": 3,
+			"moves_max": 5,
 			"abilities": [
 				{
 					"ability_name": "Slice",
@@ -52,7 +61,7 @@ var unit_input = [
 		"data": {
 			"type": "Hack",
 			"hp_max": 3,
-			"moves_max": 3,
+			"moves_max": 5,
 			"abilities": [
 				{
 					"ability_name": "Slice",
@@ -87,7 +96,7 @@ var unit_input = [
 			"version": 1,
 			"search": [
 				{
-					"range": 0,
+					"range": 5,
 					"method": "absolute"
 				}
 			],
@@ -223,10 +232,10 @@ func _clear_tile_tags():
 		tile.set_ui("none")
 
 func _clear_unit_from_grid(unit):
-	var clear_unit_move_grid = 0
-	while clear_unit_move_grid != -1:
-		clear_unit_move_grid = grid_units.grid_data.find(unit)
-		grid_units.grid_data[clear_unit_move_grid] = null
+	for x in width:
+		for y in height:
+			if grid_units.get_value(x, y) == unit:
+				grid_units.set_value(x, y, null)
 
 ###################
 # BATTLE HANDLING #
