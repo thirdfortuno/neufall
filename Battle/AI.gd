@@ -24,11 +24,13 @@ func handle_unit(unit):
 		else:
 			if unit.behavior.war:
 				target_unit = _unit_war(unit, units_in_range)
-				var grid_distance =  _get_distance_from_target(
+				var grid_distance = _get_distance_from_target(
 					target_unit,
 					unit.abilities[0].ability_range,
 					unit
 				)
+				var path = _path_to_target(grid_distance, unit)
+				_move_along_path(path, unit)
 				
 
 func _unit_search(unit):
@@ -178,6 +180,86 @@ func _get_distance_from_target(target, ability_range, unit):
 				grid_tiles.get_value(x, y).set_ui("damageable")
 	
 	return grid_distance
+
+func _path_to_target(grid_distance, unit):
+	var grid_weight = Grid.new(width, height)
+	var grid_parent = Grid.new(width, height)
+	var open_list = []
+	var closed_list = []
+	
+	for x in width:
+		for y in height:
+			if grid_distance.get_value(x, y) == 0:
+				if grid_units.get_value(x, y) == unit:
+					return
+				grid_weight.set_value(x, y, 0)
+				grid_parent.set_value(x, y, 0)
+				open_list.append(grid_tiles.get_value(x, y))
+			else:
+				grid_weight.set_value(x, y, 9999999999)
+	
+	open_list.shuffle()
+	
+	while open_list.size() != 0:
+		var smallest_distance = grid_weight.get_value(
+			open_list[0].x,
+			open_list[0].y
+		)
+		var tile_to_visit = open_list[0]
+		for tile in open_list:
+			if grid_weight.get_value(tile.x, tile.y) < smallest_distance:
+				smallest_distance = grid_weight.get_value(tile.x, tile.y)
+				tile_to_visit = tile
+		
+		open_list.erase(tile_to_visit)
+		
+		if closed_list.find(tile_to_visit) != -1:
+			continue
+		
+		closed_list.append(tile_to_visit)
+		
+		var neighbors = grid_tiles.get_adjacent_values(
+			tile_to_visit.x,
+			tile_to_visit.y
+		)
+		
+		for neighbor in neighbors:
+			if neighbor.state == 0:
+				continue
+			if grid_units.get_value(neighbor.x, neighbor.y) != null:
+				if grid_units.get_value(neighbor.x, neighbor.y) != unit:
+					continue
+			
+			var tentative_dist = grid_weight.get_value(
+				tile_to_visit.x,
+				tile_to_visit.y
+			) + 1
+			
+			if tentative_dist < grid_weight.get_value(neighbor.x, neighbor.y):
+				grid_weight.set_value(neighbor.x, neighbor.y, tentative_dist)
+				grid_parent.set_value(neighbor.x, neighbor.y, tile_to_visit)
+				open_list.append(neighbor)
+			
+			if grid_units.get_value(neighbor.x, neighbor.y) == unit:
+				open_list.clear()
+				break
+	
+	var route = []
+	var route_tile = grid_parent.get_value(unit.x, unit.y)
+	while typeof(route_tile) != TYPE_INT and route_tile != null:
+		route_tile.set_ui("moveable")
+		route.append(route_tile)
+		route_tile = grid_parent.get_value(route_tile.x, route_tile.y)
+	
+	return route
+	
+func _move_along_path(path, unit):
+	var moveable_path = path.duplicate()
+	if path.size() > unit.moves_available:
+		moveable_path.resize(unit.moves_available)
+	
+	for tile in moveable_path:
+		get_parent()._handle_unit_move(tile)
 
 func _update_state():
 	height = get_parent().height
