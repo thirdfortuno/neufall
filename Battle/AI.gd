@@ -31,7 +31,6 @@ func handle_unit(unit):
 				)
 				var path = _path_to_target(grid_distance, unit)
 				_move_along_path(path, unit)
-				
 
 func _unit_search(unit):
 	for search in unit.behavior.search:
