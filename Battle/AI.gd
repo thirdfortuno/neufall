@@ -31,6 +31,7 @@ func handle_unit(unit):
 				)
 				var path = _path_to_target(grid_distance, unit)
 				_move_along_path(path, unit)
+				_use_ability_on_target(unit.abilities[0], target_unit, unit)
 
 func _unit_search(unit):
 	for search in unit.behavior.search:
@@ -184,7 +185,7 @@ func _path_to_target(grid_distance, unit):
 		for y in height:
 			if grid_distance.get_value(x, y) == 0:
 				if grid_units.get_value(x, y) == unit:
-					return
+					return []
 				grid_weight.set_value(x, y, 0)
 				grid_parent.set_value(x, y, 0)
 				open_list.append(grid_tiles.get_value(x, y))
@@ -252,6 +253,21 @@ func _move_along_path(path, unit):
 	
 	for tile in moveable_path:
 		get_parent()._handle_unit_move(tile)
+
+func _use_ability_on_target(ability, target, unit):
+	get_parent().ability_selected = ability
+	for body in target.bodies:
+		if grid_units.get_distance(
+			body.x,
+			body.y,
+			unit.x,
+			unit.y
+		) <= ability.ability_range:
+			get_parent()._handle_unit_ability(grid_tiles.get_value(
+				body.x,
+				body.y
+			))
+			break
 
 func _update_state():
 	height = get_parent().height
