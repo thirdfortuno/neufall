@@ -18,75 +18,146 @@ var grid_input = [
 
 """
 var grid_input = [
-	[1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-	[1,1,1,1,1,1,1,0,1,1,1,1,1,1],
-	[1,1,1,1,1,1,0,0,1,1,1,1,1,1],
-	[1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-	[1,0,1,0,1,0,0,0,1,1,1,1,1,1],
-	[1,0,1,1,1,0,0,0,1,1,1,1,1,1],
-	[1,0,0,0,0,0,0,0,1,1,1,1,1,1],
-	[1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-	[1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-	[1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-	[1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+	[0,0,0,0,0,0,0,0,1,1,1,1],
+	[1,1,1,1,0,1,1,1,1,1,1,1],
+	[1,1,1,1,0,1,1,0,1,1,1,1],
+	[1,1,1,1,0,1,1,0,0,0,0,0],
+	[0,1,1,0,1,1,1,1,0,1,1,1],
+	[0,1,1,1,1,1,1,1,1,1,1,1],
+	[0,1,1,1,1,1,1,1,1,1,1,1],
+	[0,0,0,1,1,1,1,0,1,1,1,1]
 ]
 
 var unit_input = [
 	{
-		"x": 1,
+		"x": 6,
+		"y": 5,
+		"team": "player",
+		"data": {
+			"type": "Hack",
+			"hp_max": 4,
+			"moves_max": 2,
+			"abilities": [
+				{
+					"ability_name": "Slice",
+					"damage": 2,
+					"ability_range": 1
+				},
+			]
+		}
+	},
+	{
+		"x": 5,
+		"y": 6,
+		"team": "player",
+		"data": {
+			"type": "Bow",
+			"hp_max": 2,
+			"moves_max": 2,
+			"abilities": [
+				{
+					"ability_name": "Arrow",
+					"damage": 1,
+					"ability_range": 3
+				},
+			]
+		}
+	},
+	{
+		"x": 10,
 		"y": 1,
-		"team": "player",
-		"data": {
-			"type": "Hack",
-			"hp_max": 3,
-			"moves_max": 5,
-			"abilities": [
-				{
-					"ability_name": "Slice",
-					"damage": 2,
-					"ability_range": 1
-				},
-				{
-					"ability_name": "Dice",
-					"damage": 2,
-					"ability_range": 2
-				}
-			]
-		}
-	},
-	{
-		"x": 2,
-		"y": 2,
-		"team": "player",
-		"data": {
-			"type": "Hack",
-			"hp_max": 3,
-			"moves_max": 5,
-			"abilities": [
-				{
-					"ability_name": "Slice",
-					"damage": 2,
-					"ability_range": 1
-				},
-				{
-					"ability_name": "Dice",
-					"damage": 2,
-					"ability_range": 2
-				}
-			]
-		}
-	},
-	{
-		"x": 3,
-		"y": 3,
 		"team": "ai",
 		"data": {
-			"type": "Hack",
+			"type": "Wall",
 			"hp_max": 3,
-			"moves_max": 3,
+			"moves_max": 1,
 			"abilities": [
 				{
-					"ability_name": "Slice",
+					"ability_name": "Cut",
+					"damage": 2,
+					"ability_range": 1
+				}
+			]
+		},
+		"behavior": {
+			"version": 1,
+			"search": [
+				{
+					"range": 5,
+					"method": "absolute"
+				}
+			],
+			"peace": [
+				{
+					"method": "roam"
+				}
+			],
+			"war": [
+				{
+					"method": "nearest"
+				},
+				{
+					"method": "weakest"
+				},
+				{
+					"method": "random"
+				}
+			]
+		}
+	},
+	{
+		"x": 1,
+		"y": 2,
+		"team": "ai",
+		"data": {
+			"type": "Security Camera",
+			"hp_max": 2,
+			"moves_max": 2,
+			"abilities": [
+				{
+					"ability_name": "Phaser",
+					"damage": 2,
+					"ability_range": 2
+				}
+			]
+		},
+		"behavior": {
+			"version": 1,
+			"search": [
+				{
+					"range": 5,
+					"method": "absolute"
+				}
+			],
+			"peace": [
+				{
+					"method": "roam"
+				}
+			],
+			"war": [
+				{
+					"method": "nearest"
+				},
+				{
+					"method": "weakest"
+				},
+				{
+					"method": "random"
+				}
+			]
+		}
+	},
+	{
+		"x": 10,
+		"y": 6,
+		"team": "ai",
+		"data": {
+			"type": "Wall",
+			"hp_max": 3,
+			"moves_max": 1,
+			"abilities": [
+				{
+					"ability_name": "Cut",
 					"damage": 2,
 					"ability_range": 1
 				}
