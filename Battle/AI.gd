@@ -252,7 +252,7 @@ func _move_along_path(path, unit):
 		moveable_path.resize(unit.moves_available)
 	
 	for tile in moveable_path:
-		get_parent()._handle_unit_move(tile)
+		get_parent()._handle_unit_move(tile, unit)
 
 func _use_ability_on_target(ability, target, unit):
 	get_parent().ability_selected = ability
