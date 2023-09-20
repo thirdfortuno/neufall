@@ -299,7 +299,7 @@ func _handle_unit_damaged(unit):
 	for body in unit.bodies:
 		grid_units.set_value(body.x, body.y, unit)
 
-func _handle_unit_killed(unit): #DECOUPLE
+func _handle_unit_killed(unit):
 	if unit_selected == unit:
 		unit_selected = null
 		click_state = "default"
