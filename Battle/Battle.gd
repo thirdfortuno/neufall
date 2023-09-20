@@ -280,13 +280,10 @@ func _ai_decisions():
 func _is_unit_selected_active_and_on_team():
 	return unit_selected.active && (unit_selected.team == active_player)
 
-func _handle_unit_ability(tile):
-	if !_is_unit_selected_active_and_on_team():
-		return
-		
+func _handle_unit_ability(tile, unit, ability): #DECOUPLE
 	var ability_range = _unit_ability_get_legal_range(
-			unit_selected,
-			ability_selected
+			unit,
+			ability
 	)
 	
 	if ability_range["immediate"].has(tile):
@@ -294,11 +291,7 @@ func _handle_unit_ability(tile):
 		if target_unit:
 			target_unit.damage(ability_selected["damage"])
 			
-			unit_selected.active = false
-			
-			_clear_tile_tags()
-			
-			_hud_show_unit()
+			unit.active = false
 
 func _handle_unit_damaged(unit):
 	_clear_unit_from_grid(unit)
@@ -306,7 +299,7 @@ func _handle_unit_damaged(unit):
 	for body in unit.bodies:
 		grid_units.set_value(body.x, body.y, unit)
 
-func _handle_unit_killed(unit):
+func _handle_unit_killed(unit): #DECOUPLE
 	if unit_selected == unit:
 		unit_selected = null
 		click_state = "default"
@@ -315,7 +308,7 @@ func _handle_unit_killed(unit):
 	units_live_ai.erase(unit)
 	_clear_unit_from_grid(unit)
 
-func _handle_unit_move(tile):
+func _handle_unit_move(tile): #DECOUPLE
 	if !_is_unit_selected_active_and_on_team():
 		return
 	var x = tile.x
@@ -533,7 +526,9 @@ func _on_tile_select(tile):
 		"unit_ability":
 			if !_is_unit_selected_active_and_on_team():
 				return
-			_handle_unit_ability(tile)
+			_handle_unit_ability(tile, unit_selected, ability_selected)
+			_clear_tile_tags()
+			_hud_show_unit()
 		"unit_move":
 			if !_is_unit_selected_active_and_on_team():
 				return

@@ -266,7 +266,7 @@ func _use_ability_on_target(ability, target, unit):
 			get_parent()._handle_unit_ability(grid_tiles.get_value(
 				body.x,
 				body.y
-			))
+			), unit, ability)
 			break
 
 func _update_state():
