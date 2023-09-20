@@ -280,13 +280,10 @@ func _ai_decisions():
 func _is_unit_selected_active_and_on_team():
 	return unit_selected.active && (unit_selected.team == active_player)
 
-func _handle_unit_ability(tile):
-	if !_is_unit_selected_active_and_on_team():
-		return
-		
+func _handle_unit_ability(tile, unit, ability):
 	var ability_range = _unit_ability_get_legal_range(
-			unit_selected,
-			ability_selected
+			unit,
+			ability
 	)
 	
 	if ability_range["immediate"].has(tile):
@@ -294,11 +291,7 @@ func _handle_unit_ability(tile):
 		if target_unit:
 			target_unit.damage(ability_selected["damage"])
 			
-			unit_selected.active = false
-			
-			_clear_tile_tags()
-			
-			_hud_show_unit()
+			unit.active = false
 
 func _handle_unit_damaged(unit):
 	_clear_unit_from_grid(unit)
@@ -315,32 +308,32 @@ func _handle_unit_killed(unit):
 	units_live_ai.erase(unit)
 	_clear_unit_from_grid(unit)
 
-func _handle_unit_move(tile):
-	if !_is_unit_selected_active_and_on_team():
-		return
+func _player_handle_unit_move(tile, unit):
+	if unit.moves_available:
+		_handle_unit_move(tile, unit)
+	
+	var legal_range = _unit_move_get_legal_range(
+		unit,
+		unit.moves_available
+	)
+	
+	_clear_tile_tags()
+	
+	for moveable_tile in legal_range["all"]:
+		moveable_tile.set_ui("moveable")
+		
+	tile_selected.deselect()
+	tile_selected = tile
+	tile_selected.select()
+
+func _handle_unit_move(tile, unit):
 	var x = tile.x
 	var y = tile.y
-	var legal_range = _unit_move_get_legal_range(
-			unit_selected,
-			unit_selected.moves_available
-	)
-
-	if (legal_range["adjacent"].has(tile)):
-		var into_self = grid_units.get_value(x, y) == unit_selected
-		unit_selected.move_to(x, y, into_self)
-		
-		_clear_tile_tags()
-
-		var new_legal_range = _unit_move_get_legal_range(
-				unit_selected,
-				unit_selected.moves_available
-		)
-
-		for tile_candidate in new_legal_range["all"]:
-			tile_candidate.set_ui("moveable")
-			
-		if unit_selected.moves_available == 0:
-			click_state = "unit_select"
+	var adjacent_tiles = grid_tiles.get_adjacent_values(unit.x, unit.y)
+	
+	if (adjacent_tiles.has(tile)):
+		var into_self = grid_units.get_value(x, y) == unit
+		unit.move_to(x, y, into_self)
 	else: 
 		return
 
@@ -349,11 +342,7 @@ func _handle_unit_move(tile):
 	for body in unit_selected.bodies:
 		grid_units.set_value(body.x, body.y, unit_selected)
 	
-	unit_selected.update_body_positions(grid_units)
-	
-	tile_selected.deselect()
-	tile_selected = tile
-	tile_selected.select()
+	unit.update_body_positions(grid_units)
 
 func _handle_unit_select(unit):
 	unit_selected = unit
@@ -483,6 +472,7 @@ func _on_Ability4Button_pressed():
 func _on_SkipButton_pressed():
 	if unit_selected:
 		unit_selected.active = false
+	_clear_tile_tags()
 	_hud_show_unit()
 	_check_if_turn_done()
 
@@ -533,11 +523,13 @@ func _on_tile_select(tile):
 		"unit_ability":
 			if !_is_unit_selected_active_and_on_team():
 				return
-			_handle_unit_ability(tile)
+			_handle_unit_ability(tile, unit_selected, ability_selected)
+			_clear_tile_tags()
+			_hud_show_unit()
 		"unit_move":
 			if !_is_unit_selected_active_and_on_team():
 				return
-			_handle_unit_move(tile)
+			_player_handle_unit_move(tile, unit_selected)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):
