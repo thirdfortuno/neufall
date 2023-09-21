@@ -96,7 +96,7 @@ var unit_input = [
 			"version": 1,
 			"search": [
 				{
-					"range": 5,
+					"range": 15,
 					"method": "absolute"
 				}
 			],
