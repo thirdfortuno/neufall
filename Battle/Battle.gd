@@ -222,7 +222,10 @@ func _init_units():
 
 func _hud_show_unit():
 	$SelectedUnitUI.show_unit(unit_selected)
-	
+
+func _hud_show_tile():
+	$SelectedTileUI.show_tile(tile_selected)
+
 ############
 # CLEARING #
 ############
@@ -513,6 +516,7 @@ func _on_tile_select(tile):
 			if tile_selected:
 				tile_selected.deselect()
 			tile_selected = tile
+			_hud_show_tile()
 			tile_selected.select()
 
 			var unit = grid_units.get_value(tile.x, tile.y)
