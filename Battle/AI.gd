@@ -44,7 +44,7 @@ func _unit_peace(unit):
 			while unit.moves_available:
 				var legal_tiles = _unit_max_mobility(unit).adjacent
 				legal_tiles.shuffle()
-				get_parent()._handle_unit_move(legal_tiles[0])
+				get_parent()._handle_unit_move(legal_tiles[0], unit)
 
 func _unit_war(unit, units_in_range):
 	var unit_to_target = units_in_range.duplicate()
@@ -106,33 +106,18 @@ func _unit_max_mobility(unit):
 	return get_parent()._unit_move_get_legal_range(unit, unit.moves_available)
 
 func _unit_search_absolute(unit, search_range):
-	var curr_tile = grid_tiles.get_value(unit.x, unit.y)
-	var tiles_to_explore_curr = []
-	var tiles_to_explore_next = []
-	var tiles_in_range = []
 	var units_in_range = []
 	
-	tiles_to_explore_next.append(curr_tile)
-	
-	for depth in search_range + 1:
-		tiles_to_explore_curr = tiles_to_explore_next.duplicate()
-		tiles_to_explore_next.clear()
-		
-		for tile in tiles_to_explore_curr:
-			var x = tile.x
-			var y = tile.y
-			
-			if !tiles_in_range.has(tile):
-				tiles_in_range.append(tile)
-		
-			for tile_next in grid_tiles.get_adjacent_values(x, y):
-				tiles_to_explore_next.append(tile_next)
-	
-	for tile in tiles_in_range:
-		var tile_unit = grid_units.get_value(tile.x, tile.y)
-		if tile_unit != null and units_live_player.find(tile_unit) != -1:
-			if units_in_range.find(tile_unit) == -1:
-				units_in_range.append(tile_unit)
+	for player_unit in units_live_player:
+		for body in player_unit.bodies:
+			if grid_units.get_distance(
+				body.x,
+				body.y,
+				unit.x,
+				unit.y
+			) <= search_range:
+				units_in_range.append(player_unit)
+				break
 	
 	return units_in_range
 
@@ -248,6 +233,7 @@ func _path_to_target(grid_distance, unit):
 	
 func _move_along_path(path, unit):
 	var moveable_path = path.duplicate()
+	
 	if path.size() > unit.moves_available:
 		moveable_path.resize(unit.moves_available)
 	
