@@ -38,4 +38,3 @@ layout_mode = 2
 [connection signal="ability_4_button_pressed" from="BattleUI" to="." method="_on_Ability4Button_pressed"]
 [connection signal="end_turn_button_pressed" from="BattleUI" to="." method="_on_EndTurnButton_pressed"]
 [connection signal="move_button_pressed" from="BattleUI" to="." method="_on_MoveButton_pressed"]
-[connection signal="move_button_pressed" from="BattleUI" to="." method="_on_battle_ui_move_button_pressed"]

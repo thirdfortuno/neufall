@@ -51,7 +51,9 @@ var unit_input = [
 				{
 					"ability_name": "Dice",
 					"damage": 2,
-					"ability_range": 2
+					"ability_range": 2,
+					"size_requirement": 2,
+					"size_cost": 1
 				}
 			]
 		}
@@ -297,6 +299,10 @@ func _handle_unit_ability(tile, unit, ability):
 			target_unit.damage(ability_selected["damage"])
 			
 			unit.active = false
+			
+			if ability.has('size_cost'):
+				unit.damage(ability.size_cost)
+			
 			_check_if_turn_done()
 
 func _handle_unit_damaged(unit):
@@ -436,6 +442,10 @@ func _handle_ability_button_pressed(ability):
 	if !_is_unit_selected_active_and_on_team():
 		return
 	_clear_tile_tags()
+	
+	if ability.has('size_requirement'):
+		if ability.size_requirement > unit_selected.bodies.size():
+			return
 	
 	ability_selected = ability
 	click_state = "unit_ability"
