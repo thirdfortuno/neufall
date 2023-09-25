@@ -1,17 +1,26 @@
-[gd_scene load_steps=6 format=3 uid="uid://ck8lcta77fgyu"]
+[gd_scene load_steps=7 format=3 uid="uid://ck8lcta77fgyu"]
 
 [ext_resource type="Script" path="res://Battle/Battle.gd" id="1"]
 [ext_resource type="PackedScene" path="res://Tile/Tile.tscn" id="2"]
 [ext_resource type="PackedScene" path="res://Unit/Unit.tscn" id="3"]
 [ext_resource type="Script" path="res://Battle/SelectedUnitUI.gd" id="4"]
 [ext_resource type="Script" path="res://Battle/SelectedTileUI.gd" id="5_r7yql"]
+[ext_resource type="PackedScene" uid="uid://c6hno6l0pc2sq" path="res://Battle/UI/BattleUI.tscn" id="6_ig2hg"]
 
 [node name="Node2D" type="Node2D"]
 script = ExtResource("1")
 tile_scene = ExtResource("2")
 unit_scene = ExtResource("3")
 
+[node name="BattleUI" parent="." instance=ExtResource("6_ig2hg")]
+anchors_preset = 0
+anchor_right = 0.0
+offset_right = 151.0
+offset_bottom = 0.0
+grow_horizontal = 1
+
 [node name="SelectedUnitUI" type="VBoxContainer" parent="."]
+visible = false
 offset_left = 450.0
 offset_right = 490.0
 offset_bottom = 40.0
@@ -46,6 +55,7 @@ layout_mode = 2
 text = "Skip Turn"
 
 [node name="SelectedTileUI" type="VBoxContainer" parent="."]
+visible = false
 offset_left = 556.0
 offset_top = 6.0
 offset_right = 707.0

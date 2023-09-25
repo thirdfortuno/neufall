@@ -7,6 +7,8 @@ extends Node2D
 @onready var AI = preload("AI.gd")
 
 const TILE_SIZE = 32
+const TILE_OFFSET_X = 150
+const TILE_OFFSET_Y = 34
 
 """
 var grid_input = [
@@ -169,8 +171,8 @@ func _init_tiles(grid_tile_states):
 			tile.y = y
 			tile.state = grid_tile_states.get_value(x,y)
 			tile.position = Vector2(
-					x*TILE_SIZE + TILE_SIZE/2,
-					y*TILE_SIZE + TILE_SIZE/2
+				x*TILE_SIZE + TILE_SIZE/2 + TILE_OFFSET_X,
+				y*TILE_SIZE + TILE_SIZE/2 + TILE_OFFSET_Y
 			)
 
 			tile.connect("selected", Callable(self, "_on_tile_select"))
@@ -194,8 +196,8 @@ func _init_units():
 		unit.y = y
 		unit.team = team
 		unit.position = Vector2(
-				x*TILE_SIZE + TILE_SIZE/2,
-				y*TILE_SIZE + TILE_SIZE/2
+			x*TILE_SIZE + TILE_SIZE/2 + TILE_OFFSET_X,
+			y*TILE_SIZE + TILE_SIZE/2 + TILE_OFFSET_Y
 		)
 		
 		unit.type = u["data"]["type"]
@@ -446,7 +448,7 @@ func _handle_ability_button_pressed(ability):
 	
 	_check_if_turn_done()
 
-func _on_MoveButton_pressed():
+func _on_battle_ui_move_button_pressed():
 	ability_selected = null
 	if unit_selected:
 		if !_is_unit_selected_active_and_on_team():
@@ -460,14 +462,11 @@ func _on_MoveButton_pressed():
 func _on_Ability1Button_pressed():
 	_handle_ability_button_pressed(unit_selected["abilities"][0])
 
-
 func _on_Ability2Button_pressed():
 	_handle_ability_button_pressed(unit_selected["abilities"][1])
 
-
 func _on_Ability3Button_pressed():
 	_handle_ability_button_pressed(unit_selected["abilities"][2])
-
 
 func _on_Ability4Button_pressed():
 	_handle_ability_button_pressed(unit_selected["abilities"][3])

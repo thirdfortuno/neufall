@@ -5,6 +5,10 @@ extends Node2D
 signal killed(unit)
 signal damaged(unit)
 
+var TILE_SIZE
+var TILE_OFFSET_X
+var TILE_OFFSET_Y
+
 var x
 var y
 var team
@@ -43,7 +47,10 @@ func move_to(x_new, y_new, into_self = false):
 	y = y_new
 	moves_available = moves_available - 1
 	
-	self.global_position = Vector2(x*32 + 16, y*32 + 16)
+	self.global_position = Vector2(
+		x * TILE_SIZE + TILE_OFFSET_X + TILE_SIZE/2,
+		y * TILE_SIZE + TILE_OFFSET_Y + TILE_SIZE/2
+	)
 	
 	if into_self:
 		var body
@@ -71,7 +78,10 @@ func move_to(x_new, y_new, into_self = false):
 
 func update_body_positions(grid_units):
 	for body in bodies:
-		body.global_position = Vector2(body.x*32 + 16, body.y*32 + 16)
+		body.global_position = Vector2(
+			body.x * TILE_SIZE + TILE_OFFSET_X + TILE_SIZE/2,
+			body.y * TILE_SIZE + TILE_OFFSET_Y + TILE_SIZE/2
+		)
 		body.update_sprite(grid_units, self)
 
 # Called when the node enters the scene tree for the first time.
@@ -84,6 +94,10 @@ func _ready():
 	bodies.append(body)
 	
 	moves_available = moves_max
+	
+	TILE_SIZE = get_parent().TILE_SIZE
+	TILE_OFFSET_X = get_parent().TILE_OFFSET_X
+	TILE_OFFSET_Y = get_parent().TILE_OFFSET_Y
 	
 	# Temporary so it's easier to know the enemy unit when testing
 	if team == "ai":
