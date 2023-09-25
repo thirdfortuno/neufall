@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://Battle/Battle.gd" id="1"]
 [ext_resource type="PackedScene" path="res://Tile/Tile.tscn" id="2"]
 [ext_resource type="PackedScene" path="res://Unit/Unit.tscn" id="3"]
-[ext_resource type="Script" path="res://Battle/SelectedTileUI.gd" id="5_r7yql"]
+[ext_resource type="Script" path="res://Battle/UI/SelectedTileUI.gd" id="5_yqxcu"]
 [ext_resource type="PackedScene" uid="uid://c6hno6l0pc2sq" path="res://Battle/UI/BattleUI.tscn" id="6_ig2hg"]
 
 [node name="Node2D" type="Node2D"]
@@ -11,20 +11,13 @@ script = ExtResource("1")
 tile_scene = ExtResource("2")
 unit_scene = ExtResource("3")
 
-[node name="BattleUI" parent="." instance=ExtResource("6_ig2hg")]
-anchors_preset = 0
-anchor_right = 0.0
-offset_right = 151.0
-offset_bottom = 0.0
-grow_horizontal = 1
-
 [node name="SelectedTileUI" type="VBoxContainer" parent="."]
 visible = false
 offset_left = 556.0
 offset_top = 6.0
 offset_right = 707.0
 offset_bottom = 46.0
-script = ExtResource("5_r7yql")
+script = ExtResource("5_yqxcu")
 
 [node name="TileCoords" type="Label" parent="SelectedTileUI"]
 layout_mode = 2
@@ -32,10 +25,18 @@ layout_mode = 2
 [node name="TileState" type="Label" parent="SelectedTileUI"]
 layout_mode = 2
 
+[node name="BattleUI" parent="." instance=ExtResource("6_ig2hg")]
+anchors_preset = 0
+anchor_right = 0.0
+offset_right = 684.0
+offset_bottom = 404.0
+grow_horizontal = 1
+size_flags_horizontal = 0
+metadata/_edit_use_anchors_ = true
+
 [connection signal="ability_1_button_pressed" from="BattleUI" to="." method="_on_Ability1Button_pressed"]
 [connection signal="ability_2_button_pressed" from="BattleUI" to="." method="_on_Ability2Button_pressed"]
 [connection signal="ability_3_button_pressed" from="BattleUI" to="." method="_on_Ability3Button_pressed"]
 [connection signal="ability_4_button_pressed" from="BattleUI" to="." method="_on_Ability4Button_pressed"]
-[connection signal="end_turn_button_pressed" from="BattleUI" to="." method="_on_EndTurnButton_pressed"]
-[connection signal="move_button_pressed" from="BattleUI" to="." method="_on_MoveButton_pressed"]
 [connection signal="move_button_pressed" from="BattleUI" to="." method="_on_battle_ui_move_button_pressed"]
+[connection signal="skip_button_pressed" from="BattleUI" to="." method="_on_SkipButton_pressed"]

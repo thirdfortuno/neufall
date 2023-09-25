@@ -7,6 +7,8 @@ extends Node2D
 @onready var AI = preload("AI.gd")
 
 const TILE_SIZE = 32
+const TILE_OFFSET_X = 150
+const TILE_OFFSET_Y = 34
 
 """
 var grid_input = [
@@ -169,8 +171,8 @@ func _init_tiles(grid_tile_states):
 			tile.y = y
 			tile.state = grid_tile_states.get_value(x,y)
 			tile.position = Vector2(
-					x*TILE_SIZE + TILE_SIZE/2,
-					y*TILE_SIZE + TILE_SIZE/2
+				x*TILE_SIZE + TILE_SIZE/2 + TILE_OFFSET_X,
+				y*TILE_SIZE + TILE_SIZE/2 + TILE_OFFSET_Y
 			)
 
 			tile.connect("selected", Callable(self, "_on_tile_select"))
@@ -194,8 +196,8 @@ func _init_units():
 		unit.y = y
 		unit.team = team
 		unit.position = Vector2(
-				x*TILE_SIZE + TILE_SIZE/2,
-				y*TILE_SIZE + TILE_SIZE/2
+			x*TILE_SIZE + TILE_SIZE/2 + TILE_OFFSET_X,
+			y*TILE_SIZE + TILE_SIZE/2 + TILE_OFFSET_Y
 		)
 		
 		unit.type = u["data"]["type"]
@@ -221,7 +223,7 @@ func _init_units():
 ####################
 
 func _hud_show_unit():
-	$SelectedUnitUI.show_unit(unit_selected)
+	$BattleUI.show_unit(unit_selected)
 
 func _hud_show_tile():
 	$SelectedTileUI.show_tile(tile_selected)
@@ -295,6 +297,7 @@ func _handle_unit_ability(tile, unit, ability):
 			target_unit.damage(ability_selected["damage"])
 			
 			unit.active = false
+			_check_if_turn_done()
 
 func _handle_unit_damaged(unit):
 	_clear_unit_from_grid(unit)
@@ -328,6 +331,7 @@ func _player_handle_unit_move(tile, unit):
 	tile_selected.deselect()
 	tile_selected = tile
 	tile_selected.select()
+	_hud_show_unit()
 
 func _handle_unit_move(tile, unit):
 	var x = tile.x
@@ -460,19 +464,16 @@ func _on_MoveButton_pressed():
 func _on_Ability1Button_pressed():
 	_handle_ability_button_pressed(unit_selected["abilities"][0])
 
-
 func _on_Ability2Button_pressed():
 	_handle_ability_button_pressed(unit_selected["abilities"][1])
-
 
 func _on_Ability3Button_pressed():
 	_handle_ability_button_pressed(unit_selected["abilities"][2])
 
-
 func _on_Ability4Button_pressed():
 	_handle_ability_button_pressed(unit_selected["abilities"][3])
 
-func _on_SkipButton_pressed():
+func _on_EndTurnButton_pressed():
 	if unit_selected:
 		unit_selected.active = false
 	_clear_tile_tags()
