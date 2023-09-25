@@ -1,9 +1,8 @@
-[gd_scene load_steps=7 format=3 uid="uid://ck8lcta77fgyu"]
+[gd_scene load_steps=6 format=3 uid="uid://ck8lcta77fgyu"]
 
 [ext_resource type="Script" path="res://Battle/Battle.gd" id="1"]
 [ext_resource type="PackedScene" path="res://Tile/Tile.tscn" id="2"]
 [ext_resource type="PackedScene" path="res://Unit/Unit.tscn" id="3"]
-[ext_resource type="Script" path="res://Battle/SelectedUnitUI.gd" id="4"]
 [ext_resource type="Script" path="res://Battle/SelectedTileUI.gd" id="5_r7yql"]
 [ext_resource type="PackedScene" uid="uid://c6hno6l0pc2sq" path="res://Battle/UI/BattleUI.tscn" id="6_ig2hg"]
 
@@ -19,41 +18,6 @@ offset_right = 151.0
 offset_bottom = 0.0
 grow_horizontal = 1
 
-[node name="SelectedUnitUI" type="VBoxContainer" parent="."]
-visible = false
-offset_left = 450.0
-offset_right = 490.0
-offset_bottom = 40.0
-script = ExtResource("4")
-
-[node name="UnitName" type="Label" parent="SelectedUnitUI"]
-layout_mode = 2
-
-[node name="MoveButton" type="Button" parent="SelectedUnitUI"]
-visible = false
-layout_mode = 2
-text = "Move"
-
-[node name="Ability1Button" type="Button" parent="SelectedUnitUI"]
-visible = false
-layout_mode = 2
-
-[node name="Ability2Button" type="Button" parent="SelectedUnitUI"]
-visible = false
-layout_mode = 2
-
-[node name="Ability3Button" type="Button" parent="SelectedUnitUI"]
-visible = false
-layout_mode = 2
-
-[node name="Ability4Button" type="Button" parent="SelectedUnitUI"]
-visible = false
-layout_mode = 2
-
-[node name="SkipButton" type="Button" parent="SelectedUnitUI"]
-layout_mode = 2
-text = "Skip Turn"
-
 [node name="SelectedTileUI" type="VBoxContainer" parent="."]
 visible = false
 offset_left = 556.0
@@ -68,9 +32,10 @@ layout_mode = 2
 [node name="TileState" type="Label" parent="SelectedTileUI"]
 layout_mode = 2
 
-[connection signal="pressed" from="SelectedUnitUI/MoveButton" to="." method="_on_MoveButton_pressed"]
-[connection signal="pressed" from="SelectedUnitUI/Ability1Button" to="." method="_on_Ability1Button_pressed"]
-[connection signal="pressed" from="SelectedUnitUI/Ability2Button" to="." method="_on_Ability2Button_pressed"]
-[connection signal="pressed" from="SelectedUnitUI/Ability3Button" to="." method="_on_Ability3Button_pressed"]
-[connection signal="pressed" from="SelectedUnitUI/Ability4Button" to="." method="_on_Ability4Button_pressed"]
-[connection signal="pressed" from="SelectedUnitUI/SkipButton" to="." method="_on_SkipButton_pressed"]
+[connection signal="ability_1_button_pressed" from="BattleUI" to="." method="_on_Ability1Button_pressed"]
+[connection signal="ability_2_button_pressed" from="BattleUI" to="." method="_on_Ability2Button_pressed"]
+[connection signal="ability_3_button_pressed" from="BattleUI" to="." method="_on_Ability3Button_pressed"]
+[connection signal="ability_4_button_pressed" from="BattleUI" to="." method="_on_Ability4Button_pressed"]
+[connection signal="end_turn_button_pressed" from="BattleUI" to="." method="_on_EndTurnButton_pressed"]
+[connection signal="move_button_pressed" from="BattleUI" to="." method="_on_MoveButton_pressed"]
+[connection signal="move_button_pressed" from="BattleUI" to="." method="_on_battle_ui_move_button_pressed"]

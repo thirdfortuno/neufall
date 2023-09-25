@@ -223,7 +223,7 @@ func _init_units():
 ####################
 
 func _hud_show_unit():
-	$SelectedUnitUI.show_unit(unit_selected)
+	$BattleUI.show_unit(unit_selected)
 
 func _hud_show_tile():
 	$SelectedTileUI.show_tile(tile_selected)
@@ -297,6 +297,7 @@ func _handle_unit_ability(tile, unit, ability):
 			target_unit.damage(ability_selected["damage"])
 			
 			unit.active = false
+			_check_if_turn_done()
 
 func _handle_unit_damaged(unit):
 	_clear_unit_from_grid(unit)
@@ -330,6 +331,7 @@ func _player_handle_unit_move(tile, unit):
 	tile_selected.deselect()
 	tile_selected = tile
 	tile_selected.select()
+	_hud_show_unit()
 
 func _handle_unit_move(tile, unit):
 	var x = tile.x
@@ -448,7 +450,7 @@ func _handle_ability_button_pressed(ability):
 	
 	_check_if_turn_done()
 
-func _on_battle_ui_move_button_pressed():
+func _on_MoveButton_pressed():
 	ability_selected = null
 	if unit_selected:
 		if !_is_unit_selected_active_and_on_team():
@@ -471,7 +473,7 @@ func _on_Ability3Button_pressed():
 func _on_Ability4Button_pressed():
 	_handle_ability_button_pressed(unit_selected["abilities"][3])
 
-func _on_SkipButton_pressed():
+func _on_EndTurnButton_pressed():
 	if unit_selected:
 		unit_selected.active = false
 	_clear_tile_tags()

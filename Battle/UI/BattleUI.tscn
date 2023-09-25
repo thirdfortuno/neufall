@@ -86,7 +86,7 @@ layout_mode = 2
 texture = ExtResource("5_o1s7s")
 stretch_mode = 2
 
-[node name="Name" type="Label" parent="VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/UnitInfo"]
+[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/UnitInfo"]
 layout_mode = 0
 offset_left = 10.0
 offset_top = -2.0
@@ -94,14 +94,36 @@ offset_right = 76.0
 offset_bottom = 24.0
 text = "unit.info"
 
+[node name="Name" type="Label" parent="VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/UnitInfo"]
+layout_mode = 0
+offset_left = 6.0
+offset_top = 28.0
+offset_right = 46.0
+offset_bottom = 51.0
+
+[node name="Move" type="Label" parent="VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/UnitInfo"]
+layout_mode = 0
+offset_left = 6.0
+offset_top = 52.0
+offset_right = 57.0
+offset_bottom = 78.0
+
+[node name="Size" type="Label" parent="VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/UnitInfo"]
+layout_mode = 0
+offset_left = 7.0
+offset_top = 76.0
+offset_right = 47.0
+offset_bottom = 99.0
+
 [node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/UnitInfo"]
 layout_mode = 0
-offset_left = 42.0
-offset_top = 116.0
-offset_right = 82.0
-offset_bottom = 156.0
+offset_left = 1.0
+offset_top = 104.0
+offset_right = 130.0
+offset_bottom = 218.0
 
 [node name="MoveButton" type="Button" parent="VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/UnitInfo/VBoxContainer"]
+visible = false
 layout_mode = 2
 text = "Move"
 
@@ -121,7 +143,8 @@ layout_mode = 2
 visible = false
 layout_mode = 2
 
-[node name="SkipButton" type="Button" parent="VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/UnitInfo/VBoxContainer"]
+[node name="EndTurnButton" type="Button" parent="VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/UnitInfo/VBoxContainer"]
+visible = false
 layout_mode = 2
 text = "Skip Turn"
 
@@ -130,4 +153,4 @@ text = "Skip Turn"
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/UnitInfo/VBoxContainer/Ability2Button" to="." method="_on_ability_2_button_pressed"]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/UnitInfo/VBoxContainer/Ability3Button" to="." method="_on_ability_3_button_pressed"]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/UnitInfo/VBoxContainer/Ability4Button" to="." method="_on_ability_4_button_pressed"]
-[connection signal="pressed" from="VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/UnitInfo/VBoxContainer/SkipButton" to="." method="_on_skip_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/UnitInfo/VBoxContainer/EndTurnButton" to="." method="_on_end_turn_button_pressed"]
