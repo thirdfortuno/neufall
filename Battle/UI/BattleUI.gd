@@ -16,6 +16,7 @@ signal end_turn_button_pressed
 @onready var Ability3Button = $VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/UnitInfo/VBoxContainer/Ability3Button
 @onready var Ability4Button = $VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/UnitInfo/VBoxContainer/Ability4Button
 @onready var EndTurnButton = $VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/UnitInfo/VBoxContainer/EndTurnButton
+@onready var AbilityButtonList = [Ability1Button, Ability2Button, Ability3Button, Ability4Button]
 
 func show_unit(unit):
 	_clear_unit_info()
@@ -31,19 +32,20 @@ func show_unit(unit):
 		else:
 			MoveButton.disabled = true
 		
-		var ability_size = unit.abilities.size()
-		if ability_size >= 1:
-			if ability_size >= 2:
-				if ability_size >= 3:
-					if ability_size == 4:
-						Ability4Button.text = unit.abilities[3].ability_name
-						Ability4Button.visible = true
-					Ability3Button.text = unit.abilities[2].ability_name
-					Ability3Button.visible = true
-				Ability2Button.text = unit.abilities[1].ability_name
-				Ability2Button.visible = true
-			Ability1Button.text = unit.abilities[0].ability_name
-			Ability1Button.visible = true
+		var i = 0
+		for ability in unit.abilities:
+			AbilityButtonList[i].text = ability.ability_name
+			AbilityButtonList[i].visible = true
+			if ability.has('size_requirement'):
+				if unit.bodies.size() < ability.size_requirement:
+					AbilityButtonList[i].disabled = true
+				else:
+					AbilityButtonList[i].disabled = false
+			else:
+				AbilityButtonList[i].disabled = false
+			if unit.active == false:
+				AbilityButtonList[i].disabled = true
+			i = i + 1
 
 func _clear_unit_info():
 	UnitInfoName.text = ""
