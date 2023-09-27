@@ -18,12 +18,7 @@ func get_adjacent_values(x, y):
 	return values
 
 func get_adjacent_values_dict(x, y):
-	var values = {
-		"up": null,
-		"right": null,
-		"down": null,
-		"left": null
-	}
+	var values = {}
 	if x != 0:
 		values["left"] = get_value(x-1, y)
 	if x < width - 1:

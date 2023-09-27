@@ -68,13 +68,14 @@ var unit_input = [
 			"moves_max": 5,
 			"abilities": [
 				{
-					"ability_name": "Slice",
-					"damage": 2,
+					"ability_name": "Steroids",
+					"hp_max_add": 2,
+					"moves_max_add": 2,
 					"ability_range": 1
 				},
 				{
-					"ability_name": "Dice",
-					"damage": 2,
+					"ability_name": "Heal",
+					"heal": 5,
 					"ability_range": 2
 				}
 			]
@@ -85,7 +86,7 @@ var unit_input = [
 		"y": 3,
 		"team": "ai",
 		"data": {
-			"type": "Hack",
+			"type": "Security Camera",
 			"hp_max": 3,
 			"moves_max": 3,
 			"abilities": [
@@ -193,6 +194,7 @@ func _init_units():
 		
 		unit.connect("damaged", Callable(self, "_handle_unit_damaged"))
 		unit.connect("killed", Callable(self, "_handle_unit_killed"))
+		unit.connect("healed", Callable(self, "_handle_unit_healed"))
 		
 		unit.x = x
 		unit.y = y
@@ -296,7 +298,18 @@ func _handle_unit_ability(tile, unit, ability):
 	if ability_range["immediate"].has(tile):
 		var target_unit = grid_units.get_value(tile.x, tile.y)
 		if target_unit:
-			target_unit.damage(ability_selected["damage"])
+			if ability.has('damage'):
+				target_unit.damage(ability_selected["damage"])
+				
+			if ability.has('heal'):
+				target_unit.heal(ability_selected['heal'])
+				
+			if ability.has('hp_max_add'):
+				target_unit.hp_max = target_unit.hp_max + ability.hp_max_add
+			
+			if ability.has('moves_max_add'):
+				target_unit.moves_max = target_unit.moves_max
+				+ ability.moves_max_add
 			
 			unit.active = false
 			
@@ -310,6 +323,14 @@ func _handle_unit_damaged(unit):
 	
 	for body in unit.bodies:
 		grid_units.set_value(body.x, body.y, unit)
+
+func _handle_unit_healed(unit):
+	_clear_unit_from_grid(unit)
+	
+	for body in unit.bodies:
+		grid_units.set_value(body.x, body.y, unit)
+	
+	unit.update_body_positions(grid_units)
 
 func _handle_unit_killed(unit):
 	if unit_selected == unit:
