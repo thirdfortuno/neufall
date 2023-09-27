@@ -4,6 +4,7 @@ extends Node2D
 
 signal killed(unit)
 signal damaged(unit)
+signal healed(unit)
 
 var TILE_SIZE
 var TILE_OFFSET_X
@@ -41,6 +42,37 @@ func damage(amount):
 		self.queue_free()
 	else:
 		emit_signal("damaged", self)
+
+func heal(amount):
+	var iterations = 0
+	while bodies.size() < hp_max && iterations < amount:
+		for x in bodies.size():
+			var body = bodies[-x-1]
+			var adj_units = get_parent().grid_units.get_adjacent_values_dict(
+				body.x,
+				body.y
+			)
+			var adj_tiles = get_parent().grid_tiles.get_adjacent_values_dict(
+				body.x,
+				body.y
+			)
+			var keys = adj_tiles.keys()
+			var valid_tiles = []
+			for key in keys:
+				if (adj_tiles[key].state == 1 && adj_units[key] == null):
+					valid_tiles.append(adj_tiles[key])
+			valid_tiles.shuffle()
+			if valid_tiles.size() != 0:
+				var tile = valid_tiles[0]
+				var new_body = body_scene.instantiate()
+				new_body.x = tile.x
+				new_body.y = tile.y
+
+				add_child(new_body)
+				bodies.push_back(new_body)
+				break
+		iterations = iterations + 1
+	emit_signal("healed", self)
 
 func move_to(x_new, y_new, into_self = false):
 	x = x_new
