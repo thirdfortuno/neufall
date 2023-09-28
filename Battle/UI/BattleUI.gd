@@ -26,6 +26,8 @@ func show_unit(unit):
 		UnitInfoSize.text = "Size: %d / %d" % [unit.bodies.size(), unit.hp_max]
 		
 		EndTurnButton.visible = true
+		EndTurnButton.disabled = !unit.active
+		
 		MoveButton.visible = true
 		if unit.moves_available && unit.active:
 			MoveButton.disabled = false

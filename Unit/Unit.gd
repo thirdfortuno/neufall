@@ -116,6 +116,17 @@ func update_body_positions(grid_units):
 		)
 		body.update_sprite(grid_units, self)
 
+func deselect():
+	for body in bodies:
+		body.clean_animations()
+
+func moveable():
+	for body in bodies:
+		body.clean_animations()
+		
+	if bodies.size() == hp_max:
+		bodies[hp_max - 1].movement_blink()
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	var body = body_scene.instantiate()
