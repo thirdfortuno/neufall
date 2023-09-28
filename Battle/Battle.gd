@@ -350,6 +350,8 @@ func _player_handle_unit_move(tile, unit):
 		unit.moves_available
 	)
 	
+	unit.moveable()
+	
 	_clear_tile_tags()
 	
 	for moveable_tile in legal_range["all"]:
@@ -487,6 +489,7 @@ func _on_MoveButton_pressed():
 		if !_is_unit_selected_active_and_on_team():
 			return
 		click_state = "unit_move"
+		unit_selected.moveable()
 		for tile in _unit_move_get_legal_range(
 				unit_selected, unit_selected.moves_available
 		)["all"]:
@@ -507,6 +510,12 @@ func _on_Ability4Button_pressed():
 func _on_EndTurnButton_pressed():
 	if unit_selected:
 		unit_selected.active = false
+		unit_selected.deselect()
+		unit_selected = null
+		click_state = "default"
+		if tile_selected:
+			tile_selected.deselect()
+		tile_selected = null
 	_clear_tile_tags()
 	_hud_show_unit()
 	_check_if_turn_done()
@@ -523,7 +532,11 @@ func _input(_ev):
 		if tile_selected:
 			tile_selected.deselect()
 		tile_selected = null
+		
+		if unit_selected:
+			unit_selected.deselect()
 		unit_selected = null
+		
 		ability_selected = null
 
 		click_state = "default"

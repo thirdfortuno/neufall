@@ -38,6 +38,12 @@ func update_sprite(grid_units, unit):
 	
 	$Sprite2D.texture = SPR_ARRAY[index]
 
+func clean_animations():
+	$AnimationPlayer.current_animation = "[stop]"
+
+func movement_blink():
+	$AnimationPlayer.current_animation = "movement_blink"
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	$Sprite2D.texture = SPR_ARRAY[0]
