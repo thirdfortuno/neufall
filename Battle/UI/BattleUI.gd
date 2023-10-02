@@ -31,7 +31,7 @@ func show_unit(unit):
 		EndTurnButton.disabled = !unit.active
 		
 		UndoMoveButton.visible = true
-		UndoMoveButton.disabled = !unit.moved
+		UndoMoveButton.disabled = !unit.moved || !unit.active
 		
 		MoveButton.visible = true
 		if unit.moves_available && unit.active:
