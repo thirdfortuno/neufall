@@ -143,6 +143,8 @@ var units_live_ai = []
 
 var ai_handler
 
+var player_move_undo_redo = UndoRedo.new()
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	var grid_tile_states = Grid.new(grid_input)
@@ -483,11 +485,52 @@ func _handle_ability_button_pressed(ability):
 	
 	_check_if_turn_done()
 
+func _clear_unit_move():
+	_clear_unit_from_grid(unit_selected)
+	for body in unit_selected.bodies:
+		grid_units.set_value(
+			body.x,
+			body.y,
+			unit_selected
+		)
+
 func _on_MoveButton_pressed():
 	ability_selected = null
 	if unit_selected:
 		if !_is_unit_selected_active_and_on_team():
 			return
+			
+		unit_selected.prep_premove()
+		player_move_undo_redo.clear_history(false)
+		player_move_undo_redo.create_action("Move Unit")
+		player_move_undo_redo.add_undo_property(
+			unit_selected,
+			"x",
+			unit_selected.x
+		)
+		player_move_undo_redo.add_undo_property(
+			unit_selected,
+			"y",
+			unit_selected.y
+		)
+		player_move_undo_redo.add_undo_property(
+			unit_selected,
+			"position",
+			unit_selected.position
+		)
+		player_move_undo_redo.add_undo_property(
+			unit_selected,
+			"moves_available",
+			unit_selected.moves_available
+		)
+		player_move_undo_redo.add_undo_method(
+			unit_selected.undo_move
+		)
+		player_move_undo_redo.add_undo_method(
+			_clear_unit_move
+		)
+		player_move_undo_redo.commit_action()
+		
 		click_state = "unit_move"
 		unit_selected.moveable()
 		for tile in _unit_move_get_legal_range(
@@ -519,6 +562,17 @@ func _on_EndTurnButton_pressed():
 	_clear_tile_tags()
 	_hud_show_unit()
 	_check_if_turn_done()
+
+func _on_UndoMoveButton_pressed():
+	if click_state == "unit_move" and player_move_undo_redo.has_undo:
+		player_move_undo_redo.undo()
+		unit_selected.update_body_positions(grid_units)
+		_clear_tile_tags()
+		tile_selected.deselect()
+		tile_selected = grid_tiles.get_value(unit_selected.x, unit_selected.y)
+		tile_selected.select()
+		_hud_show_unit()
+		_on_MoveButton_pressed()
 
 #########
 # INPUT #

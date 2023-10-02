@@ -6,6 +6,7 @@ signal ability_2_button_pressed
 signal ability_3_button_pressed
 signal ability_4_button_pressed
 signal end_turn_button_pressed
+signal undo_move_button_pressed
 
 @onready var UnitInfoName = $VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/UnitInfo/Name
 @onready var UnitInfoMove = $VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/UnitInfo/Move
@@ -16,6 +17,7 @@ signal end_turn_button_pressed
 @onready var Ability3Button = $VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/UnitInfo/VBoxContainer/Ability3Button
 @onready var Ability4Button = $VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/UnitInfo/VBoxContainer/Ability4Button
 @onready var EndTurnButton = $VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/UnitInfo/VBoxContainer/EndTurnButton
+@onready var UndoMoveButton = $VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/UnitInfo/UndoMoveButton
 @onready var AbilityButtonList = [Ability1Button, Ability2Button, Ability3Button, Ability4Button]
 
 func show_unit(unit):
@@ -27,6 +29,9 @@ func show_unit(unit):
 		
 		EndTurnButton.visible = true
 		EndTurnButton.disabled = !unit.active
+		
+		UndoMoveButton.visible = true
+		UndoMoveButton.disabled = !unit.moved || !unit.active
 		
 		MoveButton.visible = true
 		if unit.moves_available && unit.active:
@@ -59,6 +64,7 @@ func _clear_unit_info():
 	Ability3Button.visible = false
 	Ability4Button.visible = false
 	EndTurnButton.visible = false
+	UndoMoveButton.visible = false
 
 func _on_move_button_pressed():
 	move_button_pressed.emit()
@@ -77,3 +83,6 @@ func _on_ability_3_button_pressed():
 
 func _on_ability_4_button_pressed():
 	ability_4_button_pressed.emit()
+
+func _on_undo_move_button_pressed():
+	undo_move_button_pressed.emit()
