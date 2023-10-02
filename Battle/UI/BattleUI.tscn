@@ -148,9 +148,19 @@ visible = false
 layout_mode = 2
 text = "Skip Turn"
 
+[node name="UndoMoveButton" type="Button" parent="VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/UnitInfo"]
+visible = false
+layout_mode = 2
+offset_left = 1.0
+offset_top = 317.0
+offset_right = 130.0
+offset_bottom = 348.0
+text = "Undo Move"
+
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/UnitInfo/VBoxContainer/MoveButton" to="." method="_on_move_button_pressed"]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/UnitInfo/VBoxContainer/Ability1Button" to="." method="_on_ability_1_button_pressed"]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/UnitInfo/VBoxContainer/Ability2Button" to="." method="_on_ability_2_button_pressed"]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/UnitInfo/VBoxContainer/Ability3Button" to="." method="_on_ability_3_button_pressed"]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/UnitInfo/VBoxContainer/Ability4Button" to="." method="_on_ability_4_button_pressed"]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/UnitInfo/VBoxContainer/EndTurnButton" to="." method="_on_end_turn_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/HBoxContainer/MarginContainer/VBoxContainer/UnitInfo/UndoMoveButton" to="." method="_on_undo_move_button_pressed"]

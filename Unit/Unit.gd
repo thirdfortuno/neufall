@@ -21,6 +21,9 @@ var bodies = []
 var moves_max
 var moves_available
 
+var premove_bodies = []
+var moved = false
+
 var active = true
 
 var abilities
@@ -75,6 +78,7 @@ func heal(amount):
 	emit_signal("healed", self)
 
 func move_to(x_new, y_new, into_self = false):
+	moved = true
 	x = x_new
 	y = y_new
 	moves_available = moves_available - 1
@@ -126,6 +130,41 @@ func moveable():
 		
 	if bodies.size() == hp_max:
 		bodies[hp_max - 1].movement_blink()
+
+func prep_premove():
+	moved = false
+	for pre_body in premove_bodies:
+		pre_body.queue_free()
+	
+	premove_bodies.clear()
+	
+	for body in bodies:
+		var pre_body = body_scene.instantiate()
+		pre_body.x = body.x
+		pre_body.y = body.y
+		
+		add_child(pre_body)
+		premove_bodies.append(pre_body)
+
+func undo_move():
+	moved = false
+	for body in bodies:
+		body.queue_free()
+	
+	bodies.clear()
+	
+	for pre_body in premove_bodies:
+		var body = body_scene.instantiate()
+		body.x = pre_body.x
+		body.y = pre_body.y
+		
+		add_child(body)
+		bodies.append(body)
+	
+	for pre_body in premove_bodies:
+		pre_body.queue_free()
+	
+	premove_bodies.clear()
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
