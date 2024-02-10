@@ -82,6 +82,48 @@ var unit_input = [
 		}
 	},
 	{
+		"x": 4,
+		"y": 4,
+		"team": "ai",
+		"data": {
+			"type": "Security Camera",
+			"hp_max": 3,
+			"moves_max": 3,
+			"abilities": [
+				{
+					"ability_name": "Slice",
+					"damage": 2,
+					"ability_range": 1
+				}
+			]
+		},
+		"behavior": {
+			"version": 1,
+			"search": [
+				{
+					"range": 15,
+					"method": "absolute"
+				}
+			],
+			"peace": [
+				{
+					"method": "roam"
+				}
+			],
+			"war": [
+				{
+					"method": "nearest"
+				},
+				{
+					"method": "weakest"
+				},
+				{
+					"method": "random"
+				}
+			]
+		}
+	},
+	{
 		"x": 3,
 		"y": 3,
 		"team": "ai",
@@ -278,10 +320,11 @@ func _swap_active_player():
 
 func _ai_decisions():
 	if active_player == "ai":
+		print("AI TURN")
 		for unit in units_live_ai:
 			if unit.active:
 				unit_selected = unit
-				ai_handler.handle_unit(unit)
+				await ai_handler.handle_unit(unit)
 				unit.active = false
 	_check_if_turn_done()
 
@@ -620,7 +663,7 @@ func _on_tile_select(tile):
 
 			var unit = grid_units.get_value(tile.x, tile.y)
 
-			if unit:
+			if unit and active_player == "player":
 				click_state = "unit_select"
 				_handle_unit_select(unit)
 		"unit_ability":

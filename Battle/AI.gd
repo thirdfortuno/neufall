@@ -2,6 +2,8 @@ extends Node
 
 @onready var Grid = preload("Grid.gd")
 
+var DELAY_MOVE = 0.5
+
 var height
 var width
 
@@ -13,6 +15,7 @@ var units_live_ai = []
 
 func handle_unit(unit):
 	_update_state()
+	print(unit)
 	if unit.behavior.version == 1:
 		var units_in_range = []
 		var target_unit
@@ -30,8 +33,10 @@ func handle_unit(unit):
 					unit
 				)
 				var path = _path_to_target(grid_distance, unit)
-				_move_along_path(path, unit)
-				_use_ability_on_target(unit.abilities[0], target_unit, unit)
+				print(path)
+				await _move_along_path(path, unit)
+				await _use_ability_on_target(unit.abilities[0], target_unit, unit)
+				print(unit, "moved")
 
 func _unit_search(unit):
 	for search in unit.behavior.search:
@@ -80,7 +85,6 @@ func _unit_war(unit, units_in_range):
 				var weakest = unit_to_target[0].bodies.size()
 				var units_to_check = unit_to_target.duplicate()
 				for target_unit in units_to_check:
-					print(target_unit, target_unit.bodies.size())
 					if target_unit.bodies.size() > weakest:
 						unit_to_target.erase(target_unit)
 					elif target_unit.bodies.size() < weakest:
@@ -238,7 +242,9 @@ func _move_along_path(path, unit):
 		moveable_path.resize(unit.moves_available)
 	
 	for tile in moveable_path:
+		await get_tree().create_timer(DELAY_MOVE).timeout
 		get_parent()._handle_unit_move(tile, unit)
+		
 
 func _use_ability_on_target(ability, target, unit):
 	get_parent().ability_selected = ability
@@ -249,6 +255,7 @@ func _use_ability_on_target(ability, target, unit):
 			unit.x,
 			unit.y
 		) <= ability.ability_range:
+			await get_tree().create_timer(DELAY_MOVE).timeout
 			get_parent()._handle_unit_ability(grid_tiles.get_value(
 				body.x,
 				body.y
