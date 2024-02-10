@@ -9,6 +9,7 @@ signal healed(unit)
 var TILE_SIZE
 var TILE_OFFSET_X
 var TILE_OFFSET_Y
+var DELAY_DAMAGE = 0.2
 
 var x
 var y
@@ -36,6 +37,7 @@ var spr_shadow = preload("Sprites/SecurityCam/security_cam_shadow.png")
 func damage(amount):
 	var iterations = 0
 	while bodies.size() > 0 && iterations < amount:
+		await get_tree().create_timer(DELAY_DAMAGE).timeout
 		var body = bodies.pop_back()
 		body.queue_free()
 		iterations = iterations + 1
@@ -66,6 +68,7 @@ func heal(amount):
 					valid_tiles.append(adj_tiles[key])
 			valid_tiles.shuffle()
 			if valid_tiles.size() != 0:
+				await get_tree().create_timer(DELAY_DAMAGE).timeout
 				var tile = valid_tiles[0]
 				var new_body = body_scene.instantiate()
 				new_body.x = tile.x
@@ -73,9 +76,9 @@ func heal(amount):
 
 				add_child(new_body)
 				bodies.push_back(new_body)
+				emit_signal("healed", self)
 				break
 		iterations = iterations + 1
-	emit_signal("healed", self)
 
 func move_to(x_new, y_new, into_self = false):
 	moved = true
