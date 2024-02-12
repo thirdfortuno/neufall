@@ -126,7 +126,7 @@ func update_body_positions(grid_units):
 		)
 		body.update_sprite(grid_units, self)
 
-func deselect():
+func clean_body_animations():
 	for body in bodies:
 		body.clean_animations()
 
