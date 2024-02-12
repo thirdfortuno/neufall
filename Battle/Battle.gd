@@ -534,6 +534,8 @@ func _handle_ability_button_pressed(ability):
 		if ability.size_requirement > unit_selected.bodies.size():
 			return
 	
+	unit_selected.clean_body_animations()
+	
 	ability_selected = ability
 	click_state = "unit_ability"
 	
@@ -615,7 +617,7 @@ func _on_Ability4Button_pressed():
 func _on_EndTurnButton_pressed():
 	if unit_selected:
 		unit_selected.active = false
-		unit_selected.deselect()
+		unit_selected.clean_body_animations()
 		unit_selected = null
 		click_state = "default"
 		if tile_selected:
@@ -650,7 +652,7 @@ func _input(_ev):
 		tile_selected = null
 		
 		if unit_selected:
-			unit_selected.deselect()
+			unit_selected.clean_body_animations()
 		unit_selected = null
 		
 		ability_selected = null
