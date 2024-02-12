@@ -6,6 +6,8 @@ extends Node2D
 @onready var Grid = preload("Grid.gd")
 @onready var AI = preload("AI.gd")
 
+signal animation_done
+
 const TILE_SIZE = 32
 const TILE_OFFSET_X = 150
 const TILE_OFFSET_Y = 34
@@ -184,6 +186,7 @@ var units_live_player = []
 var units_live_ai = []
 
 var ai_handler
+var ai_waiting = false
 
 var player_move_undo_redo = UndoRedo.new()
 
@@ -239,6 +242,7 @@ func _init_units():
 		unit.connect("damaged", Callable(self, "_handle_unit_damaged"))
 		unit.connect("killed", Callable(self, "_handle_unit_killed"))
 		unit.connect("healed", Callable(self, "_handle_unit_healed"))
+		unit.connect("animation", Callable(self, "_ai_wait_animation"))
 		
 		unit.x = x
 		unit.y = y
@@ -324,9 +328,18 @@ func _ai_decisions():
 		for unit in units_live_ai:
 			if unit.active:
 				unit_selected = unit
+				await _ai_await_move()
 				await ai_handler.handle_unit(unit)
 				unit.active = false
 	_check_if_turn_done()
+
+func _ai_await_move():
+	if ai_waiting:
+		await animation_done
+		ai_waiting = false
+
+func _ai_wait_animation():
+	ai_waiting = true
 
 #################
 # UNIT HANDLING #
@@ -368,6 +381,8 @@ func _handle_unit_damaged(unit):
 	
 	for body in unit.bodies:
 		grid_units.set_value(body.x, body.y, unit)
+	
+	emit_signal("animation_done")
 
 func _handle_unit_healed(unit):
 	_clear_unit_from_grid(unit)
@@ -376,6 +391,8 @@ func _handle_unit_healed(unit):
 		grid_units.set_value(body.x, body.y, unit)
 	
 	unit.update_body_positions(grid_units)
+	
+	emit_signal("animation_done")
 
 func _handle_unit_killed(unit):
 	if unit_selected == unit:
@@ -385,6 +402,8 @@ func _handle_unit_killed(unit):
 	units_live_player.erase(unit)
 	units_live_ai.erase(unit)
 	_clear_unit_from_grid(unit)
+	
+	emit_signal("animation_done")
 
 func _player_handle_unit_move(tile, unit):
 	if unit.moves_available:
