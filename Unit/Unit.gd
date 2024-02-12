@@ -5,6 +5,7 @@ extends Node2D
 signal killed(unit)
 signal damaged(unit)
 signal healed(unit)
+signal animation()
 
 var TILE_SIZE
 var TILE_OFFSET_X
@@ -35,6 +36,7 @@ var spr_main = preload("Sprites/SecurityCam/security_cam.png")
 var spr_shadow = preload("Sprites/SecurityCam/security_cam_shadow.png")
 
 func damage(amount):
+	emit_signal("animation")
 	var iterations = 0
 	while bodies.size() > 0 && iterations < amount:
 		await get_tree().create_timer(DELAY_DAMAGE).timeout
@@ -49,6 +51,7 @@ func damage(amount):
 		emit_signal("damaged", self)
 
 func heal(amount):
+	emit_signal("animation")
 	var iterations = 0
 	while bodies.size() < hp_max && iterations < amount:
 		for x in bodies.size():
@@ -73,7 +76,7 @@ func heal(amount):
 				var new_body = body_scene.instantiate()
 				new_body.x = tile.x
 				new_body.y = tile.y
-
+				
 				add_child(new_body)
 				bodies.push_back(new_body)
 				emit_signal("healed", self)
