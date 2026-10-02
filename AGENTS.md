@@ -94,10 +94,17 @@ done differently, say so and ask rather than silently writing it your way.
 - Untyped GDScript throughout (no `: int`, `-> void` annotations). Match
   this; don't introduce static typing piecemeal into files that don't use
   it.
-- Dictionaries with string keys (`u["data"]["type"]`, `ability.has('damage')`)
+- Dictionaries with string keys (`data["hp_max"]`, `ability["targets"]`)
   are the default data shape for unit/ability definitions, not Resources
   or custom classes. Keep new unit/ability data in this shape unless asked
-  to refactor it.
+  to refactor it. Abilities list their `targets` (`enemy`/`ally`/`self`) and an
+  `effects` list; each effect `type` maps to a handler in
+  `Battle.gd`'s `effect_handlers` table, so a new effect type is one new
+  `_effect_*` function plus one table entry. Range shape is optional:
+  `targeting` is `manhattan` (default), `rook`, `bishop` or `queen`, and
+  `blockers` is a list of `tile` (void tiles) and/or `unit` (other units) that
+  stop a shot past them (default none). Range is computed in
+  `Battle.gd`'s `_ability_get_range_from`, which the AI also uses.
 - Section-divider comments (`#################\n# SECTION NAME #\n#################`)
   are used in `Battle.gd` to break up large files — follow that convention
   if a file grows to need it, rather than splitting into new files

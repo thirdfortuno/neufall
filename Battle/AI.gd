@@ -31,7 +31,7 @@ func handle_unit(unit):
 				target_unit = _unit_war(unit, units_in_range)
 				var grid_distance = _get_distance_from_target(
 					target_unit,
-					unit.abilities[0].ability_range,
+					unit.abilities[0],
 					unit
 				)
 				var path = _path_to_target(grid_distance, unit)
@@ -52,6 +52,8 @@ func _unit_peace(unit):
 			while unit.moves_available:
 				await get_tree().create_timer(DELAY_MOVE).timeout
 				var legal_tiles = _unit_max_mobility(unit).adjacent
+				if legal_tiles.size() == 0:
+					break
 				legal_tiles.shuffle()
 				get_parent()._handle_unit_move(legal_tiles[0], unit)
 				_show_move_range(unit)
@@ -131,42 +133,29 @@ func _unit_search_absolute(unit, search_range):
 	
 	return units_in_range
 
-func _get_distance_from_target(target, ability_range, unit):
+func _get_distance_from_target(target, ability, unit):
 	var grid_distance = Grid.new(width, height)
-	var tiles_to_explore_curr = []
-	var tiles_to_explore_next = []
-	var tiles_explored = []
-	var tiles_in_range = []
-	var distance = 0
+	var target_tiles = []
 	for body in target.bodies:
-		tiles_to_explore_next.append(grid_tiles.get_value(body.x, body.y))
+		target_tiles.append(grid_tiles.get_value(body.x, body.y))
 	
-	while distance <= ability_range:
-		tiles_to_explore_curr = tiles_to_explore_next.duplicate()
-		tiles_explored.append_array(tiles_to_explore_curr)
-		tiles_to_explore_next.clear()
-		
-		for tile in tiles_to_explore_curr:
-			var x = tile.x
-			var y = tile.y
+	for x in width:
+		for y in height:
+			if grid_tiles.get_value(x, y).state == 0:
+				continue
+			if grid_units.get_value(x, y) != unit and grid_units.get_value(x, y) != null:
+				continue
 			
-			if distance <= ability_range:
-				grid_distance.set_value(x, y, 0)
-				tiles_in_range.append(grid_tiles.get_value(x,y))
-
-			for tile_next in grid_tiles.get_adjacent_values(x, y):
-				if tiles_explored.find(tile_next) == -1:
-					tiles_to_explore_next.append(tile_next)
-		
-		distance = distance + 1
-	
-	for tile in tiles_in_range:
-		var x = tile.x
-		var y = tile.y
-		if grid_tiles.get_value(x, y).state == 0:
-			grid_distance.set_value(x, y, null)
-		if grid_units.get_value(x, y) != unit and grid_units.get_value(x, y) != null:
-			grid_distance.set_value(x, y, null)
+			var tiles_in_range = get_parent()._ability_get_range_from(
+				x,
+				y,
+				unit,
+				ability
+			)
+			for target_tile in target_tiles:
+				if tiles_in_range.has(target_tile):
+					grid_distance.set_value(x, y, 0)
+					break
 	
 	return grid_distance
 
@@ -178,7 +167,7 @@ func _path_to_target(grid_distance, unit):
 	for x in width:
 		for y in height:
 			if grid_distance.get_value(x, y) == 0:
-				if grid_units.get_value(x, y) == unit:
+				if x == unit.x and y == unit.y:
 					return []
 				grid_parent.set_value(x, y, 0)
 				grid_visited.set_value(x, y, true)
@@ -210,7 +199,7 @@ func _path_to_target(grid_distance, unit):
 			grid_visited.set_value(neighbor.x, neighbor.y, true)
 			grid_parent.set_value(neighbor.x, neighbor.y, tile_to_visit)
 
-			if grid_units.get_value(neighbor.x, neighbor.y) == unit:
+			if neighbor.x == unit.x and neighbor.y == unit.y:
 				target_found = true
 				break
 
@@ -249,17 +238,14 @@ func _use_ability_on_target(ability, target, unit):
 	await get_tree().create_timer(DELAY_TARGET).timeout
 	_show_ability_range(unit, ability)
 	await get_tree().create_timer(DELAY_ATTACK).timeout
+	var tiles_in_range = get_parent()._unit_ability_get_legal_range(
+		unit,
+		ability
+	)["immediate"]
 	for body in target.bodies:
-		if grid_units.get_distance(
-			body.x,
-			body.y,
-			unit.x,
-			unit.y
-		) <= ability.ability_range:
-			get_parent()._handle_unit_ability(grid_tiles.get_value(
-				body.x,
-				body.y
-			), unit, ability)
+		var tile = grid_tiles.get_value(body.x, body.y)
+		if tiles_in_range.has(tile):
+			get_parent()._handle_unit_ability(tile, unit, ability)
 			break
 	get_parent()._clear_tile_tags()
 

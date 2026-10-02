@@ -14,6 +14,12 @@ const TILE_SIZE = 32
 const TILE_OFFSET_X = 150
 const TILE_OFFSET_Y = 34
 
+const TARGETING_DIRECTIONS = {
+	"rook": [[1, 0], [-1, 0], [0, 1], [0, -1]],
+	"bishop": [[1, 1], [1, -1], [-1, 1], [-1, -1]],
+	"queen": [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1]]
+}
+
 # Temporary until squad select exists
 const DEFAULT_MISSION = "training_node"
 const DEFAULT_SQUAD = ["hack", "hack_support"]
@@ -41,6 +47,8 @@ var ai_handler
 var ai_waiting = false
 var DELAY_AI_UNIT = 0.5
 
+var effect_handlers
+
 var player_move_undo_redo = UndoRedo.new()
 
 # Called when the node enters the scene tree for the first time.
@@ -62,6 +70,13 @@ func _ready():
 	_init_units()
 	
 	connect("animation_done", Callable(self, "_ai_animation_done"))
+	
+	effect_handlers = {
+		"damage": Callable(self, "_effect_damage"),
+		"heal": Callable(self, "_effect_heal"),
+		"hp_max_add": Callable(self, "_effect_hp_max_add"),
+		"moves_max_add": Callable(self, "_effect_moves_max_add")
+	}
 
 	ai_handler = AI.new()
 	add_child(ai_handler)
@@ -239,20 +254,11 @@ func _handle_unit_ability(tile, unit, ability):
 	
 	if ability_range["immediate"].has(tile):
 		var target_unit = grid_units.get_value(tile.x, tile.y)
-		if target_unit:
+		if target_unit && _is_valid_ability_target(unit, target_unit, ability):
 			unit.animate_ability(target_unit, ability)
-
-			if ability.has('damage'):
-				target_unit.damage(ability["damage"])
-
-			if ability.has('heal'):
-				target_unit.heal(ability['heal'])
-				
-			if ability.has('hp_max_add'):
-				target_unit.hp_max = target_unit.hp_max + ability.hp_max_add
 			
-			if ability.has('moves_max_add'):
-				target_unit.moves_max = target_unit.moves_max + ability.moves_max_add
+			for effect in ability["effects"]:
+				effect_handlers[effect["type"]].call(effect, target_unit)
 			
 			unit.active = false
 			
@@ -260,6 +266,27 @@ func _handle_unit_ability(tile, unit, ability):
 				unit.damage(ability.size_cost)
 			
 			_check_if_turn_done()
+
+func _is_valid_ability_target(unit, target_unit, ability):
+	var relation = "enemy"
+	if target_unit == unit:
+		relation = "self"
+	elif target_unit.team == unit.team:
+		relation = "ally"
+	
+	return ability["targets"].has(relation)
+
+func _effect_damage(effect, target_unit):
+	target_unit.damage(effect["amount"])
+
+func _effect_heal(effect, target_unit):
+	target_unit.heal(effect["amount"])
+
+func _effect_hp_max_add(effect, target_unit):
+	target_unit.hp_max = target_unit.hp_max + effect["amount"]
+
+func _effect_moves_max_add(effect, target_unit):
+	target_unit.moves_max = target_unit.moves_max + effect["amount"]
 
 func _handle_unit_damaged(unit):
 	_clear_unit_from_grid(unit)
@@ -334,36 +361,86 @@ func _handle_unit_select(unit):
 	_hud_show_unit()
 	
 func _unit_ability_get_legal_range(unit, ability):
-	var curr_tile = grid_tiles.get_value(unit.x, unit.y)
-	var tiles_to_explore_curr = []
-	var tiles_to_explore_next = []
-	var tiles_immediate = []
 	# TODO: Show all possible tiles within range when using movement
 	#var tiles_postmove = []
 	
-	var immediate_range = ability["ability_range"]
+	return {
+		"immediate": _ability_get_range_from(unit.x, unit.y, unit, ability)
+	}
+
+func _ability_get_range_from(x, y, unit, ability):
+	var targeting = "manhattan"
+	if ability.has("targeting"):
+		targeting = ability["targeting"]
 	
-	tiles_to_explore_next.append(curr_tile)
+	var blockers = []
+	if ability.has("blockers"):
+		blockers = ability["blockers"]
 	
-	for depth in immediate_range + 1:
+	var origin = grid_tiles.get_value(x, y)
+	
+	if targeting == "manhattan":
+		return _range_manhattan(origin, unit, ability["ability_range"], blockers)
+	
+	return _range_lines(
+		origin,
+		unit,
+		ability["ability_range"],
+		blockers,
+		TARGETING_DIRECTIONS[targeting]
+	)
+
+func _range_manhattan(origin, unit, ability_range, blockers):
+	var tiles = []
+	var visited = [origin]
+	var tiles_to_explore_curr = []
+	var tiles_to_explore_next = [origin]
+	
+	for depth in ability_range:
 		tiles_to_explore_curr = tiles_to_explore_next.duplicate()
 		tiles_to_explore_next.clear()
 		
 		for tile in tiles_to_explore_curr:
-			var x = tile.x
-			var y = tile.y
+			if tile != origin && _is_shot_blocker(tile, unit, blockers):
+				continue
 			
-			if !tiles_immediate.has(tile):
-				tiles_immediate.append(tile)
-		
-			for tile_next in grid_tiles.get_adjacent_values(x, y):
-				tiles_to_explore_next.append(tile_next)
-		
-	tiles_immediate.erase(curr_tile)
+			for tile_next in grid_tiles.get_adjacent_values(tile.x, tile.y):
+				if !visited.has(tile_next):
+					visited.append(tile_next)
+					tiles.append(tile_next)
+					tiles_to_explore_next.append(tile_next)
 	
-	return {
-		"immediate": tiles_immediate
-	}
+	return tiles
+
+func _range_lines(origin, unit, ability_range, blockers, directions):
+	var tiles = []
+	
+	for direction in directions:
+		for step in range(1, ability_range + 1):
+			var x = origin.x + direction[0] * step
+			var y = origin.y + direction[1] * step
+			
+			if x < 0 || y < 0 || x >= width || y >= height:
+				break
+			
+			var tile = grid_tiles.get_value(x, y)
+			tiles.append(tile)
+			
+			if _is_shot_blocker(tile, unit, blockers):
+				break
+	
+	return tiles
+
+func _is_shot_blocker(tile, unit, blockers):
+	if blockers.has("tile") && tile.state == 0:
+		return true
+	
+	if blockers.has("unit"):
+		var unit_on_tile = grid_units.get_value(tile.x, tile.y)
+		if unit_on_tile != null && unit_on_tile != unit:
+			return true
+	
+	return false
 
 func _unit_move_get_legal_range(unit, move_range):
 	var curr_tile = grid_tiles.get_value(unit.x, unit.y)

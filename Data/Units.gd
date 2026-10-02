@@ -10,13 +10,25 @@ const UNITS = {
 		"abilities": [
 			{
 				"ability_name": "Slice",
-				"damage": 2,
-				"ability_range": 1
+				"ability_range": 1,
+				"targets": ["enemy"],
+				"effects": [
+					{
+						"type": "damage",
+						"amount": 2
+					}
+				]
 			},
 			{
 				"ability_name": "Dice",
-				"damage": 2,
 				"ability_range": 2,
+				"targets": ["enemy"],
+				"effects": [
+					{
+						"type": "damage",
+						"amount": 2
+					}
+				],
 				"size_requirement": 2,
 				"size_cost": 1
 			}
@@ -33,14 +45,29 @@ const UNITS = {
 		"abilities": [
 			{
 				"ability_name": "Steroids",
-				"hp_max_add": 2,
-				"moves_max_add": 2,
-				"ability_range": 1
+				"ability_range": 1,
+				"targets": ["ally", "self"],
+				"effects": [
+					{
+						"type": "hp_max_add",
+						"amount": 2
+					},
+					{
+						"type": "moves_max_add",
+						"amount": 2
+					}
+				]
 			},
 			{
 				"ability_name": "Heal",
-				"heal": 5,
-				"ability_range": 2
+				"ability_range": 2,
+				"targets": ["ally", "self"],
+				"effects": [
+					{
+						"type": "heal",
+						"amount": 5
+					}
+				]
 			}
 		]
 	},
@@ -55,8 +82,14 @@ const UNITS = {
 		"abilities": [
 			{
 				"ability_name": "Slice",
-				"damage": 2,
-				"ability_range": 1
+				"ability_range": 1,
+				"targets": ["enemy"],
+				"effects": [
+					{
+						"type": "damage",
+						"amount": 2
+					}
+				]
 			}
 		]
 	}
