@@ -47,7 +47,7 @@ choice for GDScript — but none exists yet, so don't assume it's installed.
   (from a 2D input array, or from explicit width/height) dispatched manually
   in `_init` since GDScript has no overloading.
 - **`Battle/AI.gd`** — enemy turn logic: search → peace/war decision →
-  target selection → pathfinding (Dijkstra-ish, see `_path_to_target`) →
+  target selection → pathfinding (multi-source BFS, see `_path_to_target`) →
   move → use ability. Driven by a per-unit `behavior` dict (see
   `unit_input` in `Battle.gd` for the shape: `search`/`peace`/`war` method
   lists, versioned via `behavior.version`).
@@ -66,16 +66,29 @@ children to `Battle.gd`. When adding new interactions, follow the existing
 pattern (signal up, direct call down) rather than introducing a new
 pattern (autoload singleton, event bus, etc.) unless asked.
 
-## Code style (match existing code exactly)
+## Code style — match the author's style, not your own default
+
+**Hard rule: when editing this codebase, mimic the surrounding code's
+style exactly, even where it conflicts with "best practice" or whatever
+style an agent would otherwise default to.** This is a small, single-author
+project — stylistic consistency with the existing code matters more than
+any individual stylistic improvement. If you think something should be
+done differently, say so and ask rather than silently writing it your way.
 
 - **Indentation: tabs**, not spaces. Every `.gd` file in this repo uses
   tabs — don't let an editor silently convert them.
 - `snake_case` for variables/functions, `PascalCase` only for class names
   (`class_name Grid`) and node references (`$BattleUI`).
-- Godot 4 syntax: `@export`, `@onready`, `Callable(self, "method")` for
-  signal connections (this repo does not use the newer `unit.damaged.connect(_on_damaged)`
-  callable-literal style — stay consistent with what's there unless doing a
-  deliberate cleanup pass).
+- Godot 4 syntax: `@export`, `@onready`.
+- **Signal connection/emission style is not uniform across the repo —
+  match the file you're editing, not a repo-wide rule**: older gameplay
+  code (`Battle.gd`, `Unit.gd`, `Tile.gd`) uses the Godot-3-holdover style
+  (`.connect("selected", Callable(self, "_on_tile_select"))`,
+  `emit_signal("damaged", self)`), while newer UI code (`BattleUI.gd`)
+  uses the modern Godot 4 callable-literal style (`move_button_pressed.emit()`).
+  Extending an existing file: follow that file's existing style. Writing a
+  brand new file: the modern style (`signal_name.emit()`, direct
+  `node.signal_name.connect(method)`) is preferred, but ask if unsure.
 - Untyped GDScript throughout (no `: int`, `-> void` annotations). Match
   this; don't introduce static typing piecemeal into files that don't use
   it.
@@ -89,6 +102,11 @@ pattern (autoload singleton, event bus, etc.) unless asked.
   unprompted.
 - Leave `# TODO:` comments as markers of known gaps rather than silently
   "fixing" them with unrelated scope creep.
+- Before writing new code in a file, skim a sibling file (or the rest of
+  the same file) for the pattern you're about to use — this codebase has
+  some genuine drift between older and newer files (see signal style
+  above), so "what does this specific file already do" beats "what did I
+  see elsewhere in the repo."
 
 ## Git workflow
 

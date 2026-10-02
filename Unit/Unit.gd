@@ -35,12 +35,19 @@ var behavior
 var spr_main = preload("Sprites/SecurityCam/security_cam.png")
 var spr_shadow = preload("Sprites/SecurityCam/security_cam_shadow.png")
 
+func animate_ability(target, ability):
+	pass
+
+func animate_damage(body):
+	pass
+
 func damage(amount):
 	emit_signal("animation")
 	var iterations = 0
 	while bodies.size() > 0 && iterations < amount:
 		await get_tree().create_timer(DELAY_DAMAGE).timeout
 		var body = bodies.pop_back()
+		animate_damage(body)
 		body.queue_free()
 		iterations = iterations + 1
 	
@@ -82,6 +89,8 @@ func heal(amount):
 				emit_signal("healed", self)
 				break
 		iterations = iterations + 1
+
+	emit_signal("healed", self)
 
 func move_to(x_new, y_new, into_self = false):
 	moved = true

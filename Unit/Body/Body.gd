@@ -44,6 +44,12 @@ func clean_animations():
 func movement_blink():
 	$AnimationPlayer.current_animation = "movement_blink"
 
+# Hook for a future damage-taken animation. No-op for now; Unit.damage()
+# already paces body removal with DELAY_DAMAGE, so this just needs an
+# AnimationPlayer clip wired in later.
+func damage_blink():
+	pass
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	$Sprite2D.texture = SPR_ARRAY[0]

@@ -187,6 +187,7 @@ var units_live_ai = []
 
 var ai_handler
 var ai_waiting = false
+var DELAY_AI_UNIT = 0.5
 
 var player_move_undo_redo = UndoRedo.new()
 
@@ -203,6 +204,8 @@ func _ready():
 
 	_init_units()
 	
+	connect("animation_done", Callable(self, "_ai_animation_done"))
+
 	ai_handler = AI.new()
 	add_child(ai_handler)
 
@@ -331,15 +334,18 @@ func _ai_decisions():
 				await _ai_await_move()
 				await ai_handler.handle_unit(unit)
 				unit.active = false
+				await get_tree().create_timer(DELAY_AI_UNIT).timeout
 	_check_if_turn_done()
 
 func _ai_await_move():
 	if ai_waiting:
 		await animation_done
-		ai_waiting = false
 
 func _ai_wait_animation():
 	ai_waiting = true
+
+func _ai_animation_done():
+	ai_waiting = false
 
 #################
 # UNIT HANDLING #
@@ -356,11 +362,13 @@ func _handle_unit_ability(tile, unit, ability):
 	if ability_range["immediate"].has(tile):
 		var target_unit = grid_units.get_value(tile.x, tile.y)
 		if target_unit:
+			unit.animate_ability(target_unit, ability)
+
 			if ability.has('damage'):
-				target_unit.damage(ability_selected["damage"])
-				
+				target_unit.damage(ability["damage"])
+
 			if ability.has('heal'):
-				target_unit.heal(ability_selected['heal'])
+				target_unit.heal(ability['heal'])
 				
 			if ability.has('hp_max_add'):
 				target_unit.hp_max = target_unit.hp_max + ability.hp_max_add
@@ -437,11 +445,11 @@ func _handle_unit_move(tile, unit):
 	else: 
 		return
 
-	_clear_unit_from_grid(unit_selected)
-	
-	for body in unit_selected.bodies:
-		grid_units.set_value(body.x, body.y, unit_selected)
-	
+	_clear_unit_from_grid(unit)
+
+	for body in unit.bodies:
+		grid_units.set_value(body.x, body.y, unit)
+
 	unit.update_body_positions(grid_units)
 
 func _handle_unit_select(unit):
