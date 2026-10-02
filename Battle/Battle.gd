@@ -5,6 +5,8 @@ extends Node2D
 
 @onready var Grid = preload("Grid.gd")
 @onready var AI = preload("AI.gd")
+@onready var MissionData = preload("res://Data/Missions.gd")
+@onready var UnitData = preload("res://Data/Units.gd")
 
 signal animation_done
 
@@ -12,162 +14,12 @@ const TILE_SIZE = 32
 const TILE_OFFSET_X = 150
 const TILE_OFFSET_Y = 34
 
-"""
-var grid_input = [
-	[1,1,1,1],
-	[1,1,1,1],
-	[1,1,1,0],
-	[1,1,1,1]
-]
+# Temporary until squad select exists
+const DEFAULT_MISSION = "training_node"
+const DEFAULT_SQUAD = ["hack", "hack_support"]
 
-"""
-var grid_input = [
-	[1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-	[1,1,1,1,1,1,1,0,1,1,1,1,1,1],
-	[1,1,1,1,1,1,0,0,1,1,1,1,1,1],
-	[1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-	[1,0,1,0,1,0,0,0,1,1,1,1,1,1],
-	[1,0,1,1,1,0,0,0,1,1,1,1,1,1],
-	[1,0,0,0,0,0,0,0,1,1,1,1,1,1],
-	[1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-	[1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-	[1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-	[1,1,1,1,1,1,1,1,1,1,1,1,1,1]
-]
-
-var unit_input = [
-	{
-		"x": 1,
-		"y": 1,
-		"team": "player",
-		"data": {
-			"type": "Hack",
-			"hp_max": 3,
-			"moves_max": 5,
-			"abilities": [
-				{
-					"ability_name": "Slice",
-					"damage": 2,
-					"ability_range": 1
-				},
-				{
-					"ability_name": "Dice",
-					"damage": 2,
-					"ability_range": 2,
-					"size_requirement": 2,
-					"size_cost": 1
-				}
-			]
-		}
-	},
-	{
-		"x": 2,
-		"y": 2,
-		"team": "player",
-		"data": {
-			"type": "Hack",
-			"hp_max": 3,
-			"moves_max": 5,
-			"abilities": [
-				{
-					"ability_name": "Steroids",
-					"hp_max_add": 2,
-					"moves_max_add": 2,
-					"ability_range": 1
-				},
-				{
-					"ability_name": "Heal",
-					"heal": 5,
-					"ability_range": 2
-				}
-			]
-		}
-	},
-	{
-		"x": 4,
-		"y": 4,
-		"team": "ai",
-		"data": {
-			"type": "Security Camera",
-			"hp_max": 3,
-			"moves_max": 3,
-			"abilities": [
-				{
-					"ability_name": "Slice",
-					"damage": 2,
-					"ability_range": 1
-				}
-			]
-		},
-		"behavior": {
-			"version": 1,
-			"search": [
-				{
-					"range": 15,
-					"method": "absolute"
-				}
-			],
-			"peace": [
-				{
-					"method": "roam"
-				}
-			],
-			"war": [
-				{
-					"method": "nearest"
-				},
-				{
-					"method": "weakest"
-				},
-				{
-					"method": "random"
-				}
-			]
-		}
-	},
-	{
-		"x": 3,
-		"y": 3,
-		"team": "ai",
-		"data": {
-			"type": "Security Camera",
-			"hp_max": 3,
-			"moves_max": 3,
-			"abilities": [
-				{
-					"ability_name": "Slice",
-					"damage": 2,
-					"ability_range": 1
-				}
-			]
-		},
-		"behavior": {
-			"version": 1,
-			"search": [
-				{
-					"range": 15,
-					"method": "absolute"
-				}
-			],
-			"peace": [
-				{
-					"method": "roam"
-				}
-			],
-			"war": [
-				{
-					"method": "nearest"
-				},
-				{
-					"method": "weakest"
-				},
-				{
-					"method": "random"
-				}
-			]
-		}
-	},
-]
+var mission
+var squad
 
 var height
 var width
@@ -193,7 +45,12 @@ var player_move_undo_redo = UndoRedo.new()
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	var grid_tile_states = Grid.new(grid_input)
+	if mission == null:
+		mission = MissionData.MISSIONS[DEFAULT_MISSION]
+	if squad == null:
+		squad = DEFAULT_SQUAD
+	
+	var grid_tile_states = Grid.new(mission["grid"])
 
 	var grid_size = grid_tile_states.get_size()
 	
@@ -236,8 +93,27 @@ func _init_tiles(grid_tile_states):
 func _init_units():
 	grid_units = Grid.new(width, height)
 	
-	for u in unit_input:
+	var placements = []
+	for i in squad.size():
+		var spawn = mission["spawn_tiles"][i]
+		placements.append({
+			"x": spawn[0],
+			"y": spawn[1],
+			"team": "player",
+			"unit": squad[i]
+		})
+	for enemy in mission["enemies"]:
+		placements.append({
+			"x": enemy["x"],
+			"y": enemy["y"],
+			"team": "ai",
+			"unit": enemy["unit"],
+			"behavior": enemy["behavior"]
+		})
+	
+	for u in placements:
 		var unit = unit_scene.instantiate()
+		var data = UnitData.UNITS[u["unit"]]
 		var x = u["x"]
 		var y = u["y"]
 		var team = u["team"]
@@ -255,14 +131,16 @@ func _init_units():
 			y*TILE_SIZE + TILE_SIZE/2 + TILE_OFFSET_Y
 		)
 		
-		unit.type = u["data"]["type"]
+		unit.type = data["name"]
+		unit.sprite_main = data["sprite_main"]
+		unit.sprite_shadow = data["sprite_shadow"]
 		
-		unit.hp_max = u["data"]["hp_max"]
-		unit.moves_max = u["data"]["moves_max"]
+		unit.hp_max = data["hp_max"]
+		unit.moves_max = data["moves_max"]
 		
-		unit.abilities = u["data"]["abilities"]
+		unit.abilities = data["abilities"].duplicate(true)
 		if u["team"] == "ai":
-			unit.behavior = u["behavior"]
+			unit.behavior = u["behavior"].duplicate(true)
 		
 		add_child(unit)
 		grid_units.set_value(x,y,unit)
@@ -374,8 +252,7 @@ func _handle_unit_ability(tile, unit, ability):
 				target_unit.hp_max = target_unit.hp_max + ability.hp_max_add
 			
 			if ability.has('moves_max_add'):
-				target_unit.moves_max = target_unit.moves_max
-				+ ability.moves_max_add
+				target_unit.moves_max = target_unit.moves_max + ability.moves_max_add
 			
 			unit.active = false
 			

@@ -22,8 +22,10 @@ There is no CLI build or test suite. To verify a change:
 1. Open the project in the Godot 4.1 editor (`project.godot`), or run it
    headless: `godot --path . ` (if the `godot` binary is on PATH).
 2. The main scene is `Battle/Battle.tscn` (`run/main_scene` in
-   `project.godot`), which boots straight into a hardcoded battle defined by
-   `grid_input` / `unit_input` in [Battle/Battle.gd](Battle/Battle.gd).
+   `project.godot`), which boots straight into a default mission
+   (`DEFAULT_MISSION` / `DEFAULT_SQUAD` in [Battle/Battle.gd](Battle/Battle.gd)),
+   defined in [Data/Missions.gd](Data/Missions.gd) and
+   [Data/Units.gd](Data/Units.gd).
 3. Manually exercise the golden path (select unit → move → use ability →
    end turn → AI turn) and any edge case your change touches. There is no
    automated regression coverage, so say so explicitly rather than claiming
@@ -49,8 +51,8 @@ choice for GDScript — but none exists yet, so don't assume it's installed.
 - **`Battle/AI.gd`** — enemy turn logic: search → peace/war decision →
   target selection → pathfinding (multi-source BFS, see `_path_to_target`) →
   move → use ability. Driven by a per-unit `behavior` dict (see
-  `unit_input` in `Battle.gd` for the shape: `search`/`peace`/`war` method
-  lists, versioned via `behavior.version`).
+  `CAMERA_BEHAVIOR` in `Data/Missions.gd` for the shape: `search`/`peace`/`war`
+  method lists, versioned via `behavior.version`).
 - **`Unit/Unit.gd`** — a unit is a collection of `Body` nodes
   ([Unit/Body/Body.gd](Unit/Body/Body.gd)); damage/heal pop/push bodies
   rather than decrementing an HP int. Movement, ability costs, and
