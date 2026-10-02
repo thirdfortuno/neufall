@@ -7,6 +7,8 @@ extends Node2D
 @onready var AI = preload("AI.gd")
 @onready var MissionData = preload("res://Data/Missions.gd")
 @onready var UnitData = preload("res://Data/Units.gd")
+@onready var BattleTracker = preload("BattleTracker.gd")
+@onready var ResultsScene = preload("res://Battle/UI/ResultsUI.tscn")
 
 signal animation_done
 
@@ -49,6 +51,9 @@ var DELAY_AI_UNIT = 0.5
 
 var effect_handlers
 
+var tracker
+var battle_over = false
+
 var player_move_undo_redo = UndoRedo.new()
 
 # Called when the node enters the scene tree for the first time.
@@ -80,6 +85,10 @@ func _ready():
 
 	ai_handler = AI.new()
 	add_child(ai_handler)
+	
+	tracker = BattleTracker.new()
+	add_child(tracker)
+	tracker.connect("battle_finished", Callable(self, "_on_battle_finished"))
 
 #################
 # INITALIZATION #
@@ -194,6 +203,8 @@ func _clear_unit_from_grid(unit):
 # BATTLE HANDLING #
 ###################
 func _check_if_turn_done():
+	if battle_over:
+		return
 	if active_player == "player":
 		for unit in units_live_player:
 			if unit.active:
@@ -222,9 +233,13 @@ func _ai_decisions():
 	if active_player == "ai":
 		print("AI TURN")
 		for unit in units_live_ai:
+			if battle_over:
+				break
 			if unit.active:
 				unit_selected = unit
 				await _ai_await_move()
+				if battle_over:
+					break
 				await ai_handler.handle_unit(unit)
 				unit.active = false
 				await get_tree().create_timer(DELAY_AI_UNIT).timeout
@@ -315,7 +330,20 @@ func _handle_unit_killed(unit):
 	units_live_ai.erase(unit)
 	_clear_unit_from_grid(unit)
 	
+	tracker.check()
+	
 	emit_signal("animation_done")
+
+func _on_battle_finished(result):
+	battle_over = true
+	unit_selected = null
+	click_state = "default"
+	_clear_tile_tags()
+	_hud_show_unit()
+	
+	var results_ui = ResultsScene.instantiate()
+	add_child(results_ui)
+	results_ui.show_result(result)
 
 func _player_handle_unit_move(tile, unit):
 	if unit.moves_available:
@@ -605,6 +633,9 @@ func _on_UndoMoveButton_pressed():
 #########
 
 func _input(_ev):
+	if battle_over:
+		return
+	
 	if (
 			Input.is_key_pressed(KEY_Q) ||
 			Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT)
@@ -636,6 +667,9 @@ func _input(_ev):
 			print(click_state)
 
 func _on_tile_select(tile):
+	if battle_over:
+		return
+	
 	match click_state:
 		"default":
 			if tile_selected:

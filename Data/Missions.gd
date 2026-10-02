@@ -44,6 +44,9 @@ const MISSIONS = {
 			[1, 1],
 			[2, 2]
 		],
+		"victory": {
+			"type": "eliminate_all"
+		},
 		"enemies": [
 			{
 				"unit": "security_camera",

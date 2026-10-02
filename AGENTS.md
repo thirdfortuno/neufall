@@ -53,6 +53,11 @@ choice for GDScript — but none exists yet, so don't assume it's installed.
   move → use ability. Driven by a per-unit `behavior` dict (see
   `CAMERA_BEHAVIOR` in `Data/Missions.gd` for the shape: `search`/`peace`/`war`
   method lists, versioned via `behavior.version`).
+- **`Battle/BattleTracker.gd`** — child of the battle node. `Battle.gd` calls
+  `tracker.check()` when a unit dies; it checks defeat (no player units) and
+  the mission's `victory` type (table of checks, `eliminate_all` for now),
+  then emits `battle_finished(result)`. `Battle.gd` sets `battle_over`, stops
+  the AI loop and input, and shows `Battle/UI/ResultsUI.tscn`.
 - **`Unit/Unit.gd`** — a unit is a collection of `Body` nodes
   ([Unit/Body/Body.gd](Unit/Body/Body.gd)); damage/heal pop/push bodies
   rather than decrementing an HP int. Movement, ability costs, and
