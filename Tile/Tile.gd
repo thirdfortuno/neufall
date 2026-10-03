@@ -11,6 +11,7 @@ var x
 var y
 var state
 var state_ui = 'unselected'
+var spr_base
 
 func set_ui(sprite):
 	match(sprite):
@@ -20,6 +21,13 @@ func set_ui(sprite):
 			$SpriteTag.texture = spr_tile_moveable
 		_:
 			$SpriteTag.texture = null
+
+func set_state(new_state):
+	state = new_state
+	if state == 0:
+		$SpriteBase.texture = null
+	else:
+		$SpriteBase.texture = spr_base
 
 func select():
 	state_ui = 'selected'
@@ -31,6 +39,7 @@ func deselect():
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	spr_base = $SpriteBase.texture
 	if state == 0:
 		$SpriteBase.texture = null
 

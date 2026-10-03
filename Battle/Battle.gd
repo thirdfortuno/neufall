@@ -80,7 +80,9 @@ func _ready():
 		"damage": Callable(self, "_effect_damage"),
 		"heal": Callable(self, "_effect_heal"),
 		"hp_max_add": Callable(self, "_effect_hp_max_add"),
-		"moves_max_add": Callable(self, "_effect_moves_max_add")
+		"moves_max_add": Callable(self, "_effect_moves_max_add"),
+		"drain": Callable(self, "_effect_drain"),
+		"tile_set": Callable(self, "_effect_tile_set")
 	}
 
 	ai_handler = AI.new()
@@ -156,8 +158,9 @@ func _init_units():
 		)
 		
 		unit.type = data["name"]
-		unit.sprite_main = data["sprite_main"]
-		unit.sprite_shadow = data["sprite_shadow"]
+		unit.abbr = data["abbr"]
+		unit.sprite_main = data.get("sprite_main")
+		unit.sprite_shadow = data.get("sprite_shadow")
 		
 		unit.hp_max = data["hp_max"]
 		unit.moves_max = data["moves_max"]
@@ -269,11 +272,11 @@ func _handle_unit_ability(tile, unit, ability):
 	
 	if ability_range["immediate"].has(tile):
 		var target_unit = grid_units.get_value(tile.x, tile.y)
-		if target_unit && _is_valid_ability_target(unit, target_unit, ability):
+		if _is_valid_ability_target(unit, target_unit, ability):
 			unit.animate_ability(target_unit, ability)
 			
 			for effect in ability["effects"]:
-				effect_handlers[effect["type"]].call(effect, target_unit)
+				effect_handlers[effect["type"]].call(effect, tile, target_unit, unit)
 			
 			unit.active = false
 			
@@ -284,24 +287,42 @@ func _handle_unit_ability(tile, unit, ability):
 
 func _is_valid_ability_target(unit, target_unit, ability):
 	var relation = "enemy"
-	if target_unit == unit:
+	if target_unit == null:
+		relation = "tile"
+	elif target_unit == unit:
 		relation = "self"
 	elif target_unit.team == unit.team:
 		relation = "ally"
 	
 	return ability["targets"].has(relation)
 
-func _effect_damage(effect, target_unit):
-	target_unit.damage(effect["amount"])
+func _effect_damage(effect, tile, target_unit, source):
+	if target_unit:
+		target_unit.damage(effect["amount"])
 
-func _effect_heal(effect, target_unit):
-	target_unit.heal(effect["amount"])
+func _effect_heal(effect, tile, target_unit, source):
+	if target_unit:
+		target_unit.heal(effect["amount"])
 
-func _effect_hp_max_add(effect, target_unit):
-	target_unit.hp_max = target_unit.hp_max + effect["amount"]
+func _effect_hp_max_add(effect, tile, target_unit, source):
+	if target_unit:
+		target_unit.hp_max = target_unit.hp_max + effect["amount"]
 
-func _effect_moves_max_add(effect, target_unit):
-	target_unit.moves_max = target_unit.moves_max + effect["amount"]
+func _effect_moves_max_add(effect, tile, target_unit, source):
+	if target_unit:
+		target_unit.moves_max = target_unit.moves_max + effect["amount"]
+
+func _effect_drain(effect, tile, target_unit, source):
+	if target_unit:
+		var drained = min(effect["amount"], target_unit.bodies.size())
+		target_unit.damage(effect["amount"])
+		if drained > 0:
+			source.heal(drained)
+
+func _effect_tile_set(effect, tile, target_unit, source):
+	if effect["state"] == 0 && grid_units.get_value(tile.x, tile.y) != null:
+		return
+	tile.set_state(effect["state"])
 
 func _handle_unit_damaged(unit):
 	_clear_unit_from_grid(unit)

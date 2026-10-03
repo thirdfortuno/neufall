@@ -31,6 +31,7 @@ var active = true
 var abilities
 var behavior
 
+var abbr
 var sprite_main
 var sprite_shadow
 
@@ -195,8 +196,25 @@ func _ready():
 	TILE_OFFSET_X = get_parent().TILE_OFFSET_X
 	TILE_OFFSET_Y = get_parent().TILE_OFFSET_Y
 	
-	$SpriteMain.texture = load(sprite_main)
-	$SpriteShadow.texture = load(sprite_shadow)
+	if sprite_main:
+		$SpriteMain.texture = load(sprite_main)
+		$SpriteShadow.texture = load(sprite_shadow)
+	else:
+		$SpriteMain.texture = null
+		$SpriteShadow.texture = null
+		_add_abbr_label()
+
+func _add_abbr_label():
+	var label = Label.new()
+	label.text = abbr
+	label.size = Vector2(TILE_SIZE, TILE_SIZE)
+	label.position = Vector2(-TILE_SIZE / 2, -TILE_SIZE / 2)
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	label.add_theme_font_size_override("font_size", 10)
+	label.z_index = 2
+	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(label)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):

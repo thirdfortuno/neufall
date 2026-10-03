@@ -102,10 +102,12 @@ done differently, say so and ask rather than silently writing it your way.
 - Dictionaries with string keys (`data["hp_max"]`, `ability["targets"]`)
   are the default data shape for unit/ability definitions, not Resources
   or custom classes. Keep new unit/ability data in this shape unless asked
-  to refactor it. Abilities list their `targets` (`enemy`/`ally`/`self`) and an
+  to refactor it. Abilities list their `targets` (`enemy`/`ally`/`self`, or
+  `tile` for an empty tile) and an
   `effects` list; each effect `type` maps to a handler in
   `Battle.gd`'s `effect_handlers` table, so a new effect type is one new
-  `_effect_*` function plus one table entry. Range shape is optional:
+  `_effect_*` function plus one table entry (current types: `damage`, `heal`,
+  `hp_max_add`, `moves_max_add`, `drain`, `tile_set`). Range shape is optional:
   `targeting` is `manhattan` (default), `rook`, `bishop` or `queen`, and
   `blockers` is a list of `tile` (void tiles) and/or `unit` (other units) that
   stop a shot past them (default none). Range is computed in
@@ -121,6 +123,14 @@ done differently, say so and ask rather than silently writing it your way.
   some genuine drift between older and newer files (see signal style
   above), so "what does this specific file already do" beats "what did I
   see elsewhere in the repo."
+
+## Art
+
+**Never create or edit art assets** (sprites, textures, icons, animations).
+The author does all art. Units without sprites show a small text label from
+their `abbr` field instead, so new placeholder units need no art. Unit
+definitions also carry `side` (`player` or `enemy`, the default side only: any
+unit can be placed on either side).
 
 ## Git workflow
 

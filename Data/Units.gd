@@ -1,6 +1,8 @@
 const UNITS = {
 	"hack": {
 		"name": "Hack",
+		"abbr": "HAK",
+		"side": "player",
 		"generation": 1,
 		"tags": ["hack"],
 		"hp_max": 3,
@@ -36,6 +38,8 @@ const UNITS = {
 	},
 	"hack_support": {
 		"name": "Hack",
+		"abbr": "HAK",
+		"side": "player",
 		"generation": 1,
 		"tags": ["hack", "support"],
 		"hp_max": 3,
@@ -73,6 +77,8 @@ const UNITS = {
 	},
 	"security_camera": {
 		"name": "Security Camera",
+		"abbr": "CAM",
+		"side": "enemy",
 		"generation": 1,
 		"tags": ["camera"],
 		"hp_max": 3,
