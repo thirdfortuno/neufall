@@ -19,6 +19,10 @@ run/main_scene="res://Battle/Battle.tscn"
 config/features=PackedStringArray("4.6")
 config/icon="res://icon.png"
 
+[autoload]
+
+Game="*res://Game/Game.gd"
+
 [display]
 
 window/size/viewport_width=960

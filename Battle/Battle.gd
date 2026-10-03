@@ -27,6 +27,7 @@ const TARGETING_DIRECTIONS = {
 const DEFAULT_MISSION = "training_node"
 
 var mission
+var mission_id
 
 var height
 var width
@@ -62,7 +63,8 @@ var player_move_undo_redo = UndoRedo.new()
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	if mission == null:
-		mission = MissionData.MISSIONS[DEFAULT_MISSION]
+		mission_id = DEFAULT_MISSION
+		mission = MissionData.MISSIONS[mission_id]
 	
 	var grid_tile_states = Grid.new(mission["grid"])
 
@@ -151,6 +153,7 @@ func _spawn_unit(u):
 		y*TILE_SIZE + TILE_SIZE/2 + TILE_OFFSET_Y
 	)
 	
+	unit.unit_id = u["unit"]
 	unit.type = data["name"]
 	unit.abbr = data["abbr"]
 	unit.sprite_main = data.get("sprite_main")
@@ -186,6 +189,7 @@ func _init_deploy():
 	deploy_ui.connect("unit_chosen", Callable(self, "_on_deploy_unit_chosen"))
 	deploy_ui.connect("start_pressed", Callable(self, "_on_deploy_start_pressed"))
 	deploy_ui.show_roster(roster, UnitData.UNITS, mission["spawn_tiles"].size())
+	deploy_ui.show_challenges(mission["challenges"], Game.completed_challenges(mission_id))
 
 ##############
 # DEPLOYMENT #
@@ -229,6 +233,12 @@ func _on_deploy_unit_chosen(unit_id):
 func _on_deploy_start_pressed():
 	if units_live_player.size() == 0:
 		return
+	
+	var squad = []
+	for unit in units_live_player:
+		squad.append(unit.unit_id)
+	tracker.start_battle(squad)
+	tracker.turn_started()
 	
 	deploying = false
 	deploy_unit_id = null
@@ -285,6 +295,7 @@ func _swap_active_player():
 		_ai_decisions()
 	elif active_player == "ai":
 		active_player = "player"
+		tracker.turn_started()
 		for unit in units_live_player:
 			unit.active = true
 			unit.moves_available = unit.moves_max
@@ -408,7 +419,7 @@ func _handle_unit_killed(unit):
 	units_live_ai.erase(unit)
 	_clear_unit_from_grid(unit)
 	
-	tracker.check()
+	tracker.unit_killed(unit)
 	
 	emit_signal("animation_done")
 
@@ -418,6 +429,9 @@ func _on_battle_finished(result):
 	click_state = "default"
 	_clear_tile_tags()
 	_hud_show_unit()
+	
+	if result["outcome"] == "victory":
+		result["summary"] = Game.record_victory(mission_id, mission, result["challenges_met"])
 	
 	var results_ui = ResultsScene.instantiate()
 	add_child(results_ui)

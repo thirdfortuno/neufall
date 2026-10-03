@@ -59,10 +59,19 @@ choice for GDScript — but none exists yet, so don't assume it's installed.
   roster is every `side: "player"` unit with `generation` at or below the
   mission's `max_generation`. Clicking a placed unit removes it. "Start
   Battle" ends deployment.
+- **`Game/Game.gd`** — the one autoload (`Game`, registered in
+  `project.godot`). Holds the saved `profile` (`resources`, `cleared_missions`,
+  `completed_challenges`), saves to `user://save.dat` with `store_var`, and
+  `record_victory` grants the first-clear reward plus any newly completed
+  challenge rewards (each only once). Resources are a dict of type to amount
+  (placeholder types `data` and `bandwidth`). Keep it free of node references.
 - **`Battle/BattleTracker.gd`** — child of the battle node. `Battle.gd` calls
   `tracker.check()` when a unit dies; it checks defeat (no player units) and
   the mission's `victory` type (table of checks, `eliminate_all` for now),
-  then emits `battle_finished(result)`. `Battle.gd` sets `battle_over`, stops
+  then emits `battle_finished(result)`. It also counts turns and player units
+  lost, records the deployed squad, and on a win checks the mission's
+  `challenges` (table of checks: `win_within_turns`, `no_unit_lost`,
+  `max_generation`, `max_units`, `only_tag`, `require_tag`). `Battle.gd` sets `battle_over`, stops
   the AI loop and input, and shows `Battle/UI/ResultsUI.tscn`.
 - **`Unit/Unit.gd`** — a unit is a collection of `Body` nodes
   ([Unit/Body/Body.gd](Unit/Body/Body.gd)); damage/heal pop/push bodies

@@ -31,6 +31,7 @@ var active = true
 var abilities
 var behavior
 
+var unit_id
 var abbr
 var sprite_main
 var sprite_shadow

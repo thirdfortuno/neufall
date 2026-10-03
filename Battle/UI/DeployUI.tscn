@@ -22,6 +22,11 @@ layout_mode = 2
 [node name="Roster" type="VBoxContainer" parent="VBox"]
 layout_mode = 2
 
+[node name="Goals" type="Label" parent="VBox"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+autowrap_mode = 3
+
 [node name="Hint" type="Label" parent="VBox"]
 custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
