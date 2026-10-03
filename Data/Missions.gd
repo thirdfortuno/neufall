@@ -51,50 +51,7 @@ const MISSIONS = {
 		"first_clear_reward": {
 			"data": 2
 		},
-		"challenges": [
-			{
-				"id": "fast",
-				"description": "Win within 6 turns",
-				"type": "win_within_turns",
-				"params": {
-					"turns": 6
-				},
-				"reward": {
-					"data": 3
-				}
-			},
-			{
-				"id": "no_losses",
-				"description": "Win without losing a unit",
-				"type": "no_unit_lost",
-				"params": {},
-				"reward": {
-					"bandwidth": 1
-				}
-			},
-			{
-				"id": "lone_unit",
-				"description": "Win with a single unit",
-				"type": "max_units",
-				"params": {
-					"count": 1
-				},
-				"reward": {
-					"data": 2
-				}
-			},
-			{
-				"id": "hack_only",
-				"description": "Win using only Hack units",
-				"type": "only_tag",
-				"params": {
-					"tag": "hack"
-				},
-				"reward": {
-					"bandwidth": 1
-				}
-			}
-		],
+		"challenges": [],
 		"enemies": [
 			{
 				"unit": "security_camera",

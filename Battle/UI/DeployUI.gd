@@ -25,18 +25,9 @@ func show_roster(unit_ids, units, max_count):
 
 	set_count(0, max_count)
 
-func show_challenges(challenges, completed_ids):
-	var lines = ["Challenges:"]
-	for challenge in challenges:
-		var mark = "[ ]"
-		if completed_ids.has(challenge["id"]):
-			mark = "[x]"
-		lines.append("%s %s (%s)" % [
-			mark,
-			challenge["description"],
-			Game.resources_text(challenge["reward"], "+")
-		])
-	GoalsLabel.text = "\n".join(lines)
+func show_challenges(text):
+	GoalsLabel.visible = text != ""
+	GoalsLabel.text = text
 
 func set_count(count, max_count):
 	CountLabel.text = "Deployed: %d / %d" % [count, max_count]

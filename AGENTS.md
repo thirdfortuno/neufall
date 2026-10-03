@@ -21,10 +21,12 @@ There is no CLI build or test suite. To verify a change:
 
 1. Open the project in the Godot 4.1 editor (`project.godot`), or run it
    headless: `godot --path . ` (if the `godot` binary is on PATH).
-2. The main scene is `Battle/Battle.tscn` (`run/main_scene` in
-   `project.godot`), which boots straight into a default mission
-   (`DEFAULT_MISSION` in [Battle/Battle.gd](Battle/Battle.gd)), defined in
-   [Data/Missions.gd](Data/Missions.gd) and [Data/Units.gd](Data/Units.gd).
+2. The main scene is `MissionSelect/MissionSelect.tscn` (`run/main_scene` in
+   `project.godot`). Picking a mission sets `Game.selected_mission_id` and
+   loads `Battle/Battle.tscn`; running `Battle.tscn` directly (F6) falls back
+   to `DEFAULT_MISSION` in [Battle/Battle.gd](Battle/Battle.gd). Missions and
+   units are defined in [Data/Missions.gd](Data/Missions.gd) and
+   [Data/Units.gd](Data/Units.gd).
 3. Manually exercise the golden path (select unit → move → use ability →
    end turn → AI turn) and any edge case your change touches. There is no
    automated regression coverage, so say so explicitly rather than claiming
@@ -65,6 +67,10 @@ choice for GDScript — but none exists yet, so don't assume it's installed.
   `record_victory` grants the first-clear reward plus any newly completed
   challenge rewards (each only once). Resources are a dict of type to amount
   (placeholder types `data` and `bandwidth`). Keep it free of node references.
+- **`MissionSelect/`** — the main scene. Lists every mission in
+  `Data/Missions.gd` (disabled until the missions in its optional `requires`
+  list are cleared), shows details, and starts the chosen one through
+  `Game.start_mission`. The results screen's "Missions" button returns here.
 - **`Battle/BattleTracker.gd`** — child of the battle node. `Battle.gd` calls
   `tracker.check()` when a unit dies; it checks defeat (no player units) and
   the mission's `victory` type (table of checks, `eliminate_all` for now),

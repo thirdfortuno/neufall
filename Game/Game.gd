@@ -3,12 +3,42 @@ extends Node
 const SAVE_PATH = "user://save.dat"
 
 var profile
+var selected_mission_id
+
+func start_mission(mission_id):
+	selected_mission_id = mission_id
+	get_tree().change_scene_to_file("res://Battle/Battle.tscn")
+
+func go_to_mission_select():
+	get_tree().change_scene_to_file("res://MissionSelect/MissionSelect.tscn")
+
+func has_cleared(mission_id):
+	return profile["cleared_missions"].has(mission_id)
+
+func is_unlocked(mission):
+	for required_id in mission.get("requires", []):
+		if !has_cleared(required_id):
+			return false
+	return true
+
+func challenges_text(mission_id, mission):
+	if mission["challenges"].size() == 0:
+		return ""
+	
+	var lines = ["Challenges:"]
+	for challenge in mission["challenges"]:
+		var mark = "[ ]"
+		if has_completed(mission_id, challenge["id"]):
+			mark = "[x]"
+		lines.append("%s %s (%s)" % [
+			mark,
+			challenge["description"],
+			resources_text(challenge["reward"], "+")
+		])
+	return "\n".join(lines)
 
 func has_completed(mission_id, challenge_id):
 	return profile["completed_challenges"].get(mission_id, []).has(challenge_id)
-
-func completed_challenges(mission_id):
-	return profile["completed_challenges"].get(mission_id, [])
 
 func record_victory(mission_id, mission, met_ids):
 	var summary = {

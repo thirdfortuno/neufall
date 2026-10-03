@@ -63,7 +63,9 @@ var player_move_undo_redo = UndoRedo.new()
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	if mission == null:
-		mission_id = DEFAULT_MISSION
+		mission_id = Game.selected_mission_id
+		if mission_id == null:
+			mission_id = DEFAULT_MISSION
 		mission = MissionData.MISSIONS[mission_id]
 	
 	var grid_tile_states = Grid.new(mission["grid"])
@@ -189,7 +191,7 @@ func _init_deploy():
 	deploy_ui.connect("unit_chosen", Callable(self, "_on_deploy_unit_chosen"))
 	deploy_ui.connect("start_pressed", Callable(self, "_on_deploy_start_pressed"))
 	deploy_ui.show_roster(roster, UnitData.UNITS, mission["spawn_tiles"].size())
-	deploy_ui.show_challenges(mission["challenges"], Game.completed_challenges(mission_id))
+	deploy_ui.show_challenges(Game.challenges_text(mission_id, mission))
 
 ##############
 # DEPLOYMENT #
