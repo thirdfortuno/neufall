@@ -2,8 +2,6 @@ extends Node
 
 signal battle_finished(result)
 
-@onready var UnitData = preload("res://Data/Units.gd")
-
 var finished = false
 var victory_checks
 var challenge_checks
@@ -62,7 +60,7 @@ func _challenge_no_unit_lost(params):
 
 func _challenge_max_generation(params):
 	for unit_id in squad:
-		if UnitData.UNITS[unit_id]["generation"] > params["generation"]:
+		if Game.units[unit_id]["generation"] > params["generation"]:
 			return false
 	return true
 
@@ -71,14 +69,14 @@ func _challenge_max_units(params):
 
 func _challenge_only_tag(params):
 	for unit_id in squad:
-		if !UnitData.UNITS[unit_id]["tags"].has(params["tag"]):
+		if !Game.units[unit_id]["tags"].has(params["tag"]):
 			return false
 	return true
 
 func _challenge_require_tag(params):
 	var count = 0
 	for unit_id in squad:
-		if UnitData.UNITS[unit_id]["tags"].has(params["tag"]):
+		if Game.units[unit_id]["tags"].has(params["tag"]):
 			count = count + 1
 	return count >= params["count"]
 

@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="UnitDef" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://Data/Defs/UnitDef.gd" id="1_unit"]
+[ext_resource type="Script" path="res://Data/Defs/AbilityDef.gd" id="2_abilitydef"]
+[ext_resource type="Resource" path="res://Data/abilities/steroids.tres" id="3_steroids"]
+[ext_resource type="Resource" path="res://Data/abilities/heal.tres" id="4_heal"]
+[ext_resource type="Texture2D" path="res://Unit/Sprites/Hack/hack.png" id="5_main"]
+[ext_resource type="Texture2D" path="res://Unit/Sprites/Hack/hack_shadow.png" id="6_shadow"]
+
+[resource]
+script = ExtResource("1_unit")
+unit_name = "Hack"
+abbr = "HAK"
+side = "player"
+generation = 1
+tags = PackedStringArray("hack", "support")
+hp_max = 3
+moves_max = 5
+sprite_main = ExtResource("5_main")
+sprite_shadow = ExtResource("6_shadow")
+abilities = Array[ExtResource("2_abilitydef")]([ExtResource("3_steroids"), ExtResource("4_heal")])

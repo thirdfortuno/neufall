@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="UnitDef" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://Data/Defs/UnitDef.gd" id="1_unit"]
+[ext_resource type="Script" path="res://Data/Defs/AbilityDef.gd" id="2_abilitydef"]
+[ext_resource type="Resource" path="res://Data/abilities/slice.tres" id="3_slice"]
+[ext_resource type="Texture2D" path="res://Unit/Sprites/SecurityCam/security_cam.png" id="4_main"]
+[ext_resource type="Texture2D" path="res://Unit/Sprites/SecurityCam/security_cam_shadow.png" id="5_shadow"]
+
+[resource]
+script = ExtResource("1_unit")
+unit_name = "Security Camera"
+abbr = "CAM"
+side = "enemy"
+generation = 1
+tags = PackedStringArray("camera")
+hp_max = 3
+moves_max = 3
+sprite_main = ExtResource("4_main")
+sprite_shadow = ExtResource("5_shadow")
+abilities = Array[ExtResource("2_abilitydef")]([ExtResource("3_slice")])

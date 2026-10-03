@@ -24,9 +24,9 @@ There is no CLI build or test suite. To verify a change:
 2. The main scene is `MissionSelect/MissionSelect.tscn` (`run/main_scene` in
    `project.godot`). Picking a mission sets `Game.selected_mission_id` and
    loads `Battle/Battle.tscn`; running `Battle.tscn` directly (F6) falls back
-   to `DEFAULT_MISSION` in [Battle/Battle.gd](Battle/Battle.gd). Missions and
-   units are defined in [Data/Missions.gd](Data/Missions.gd) and
-   [Data/Units.gd](Data/Units.gd).
+   to `DEFAULT_MISSION` in [Battle/Battle.gd](Battle/Battle.gd). Missions are
+   defined in [Data/Missions.gd](Data/Missions.gd); units and abilities are
+   Resources (see Unit and ability data below).
 3. Manually exercise the golden path (select unit → move → use ability →
    end turn → AI turn) and any edge case your change touches. There is no
    automated regression coverage, so say so explicitly rather than claiming
@@ -54,6 +54,16 @@ choice for GDScript — but none exists yet, so don't assume it's installed.
   move → use ability. Driven by a per-unit `behavior` dict (see
   `CAMERA_BEHAVIOR` in `Data/Missions.gd` for the shape: `search`/`peace`/`war`
   method lists, versioned via `behavior.version`).
+- **Unit and ability data** — authored as Godot Resources edited in the
+  Inspector: `Data/units/*.tres` (`UnitDef`), `Data/abilities/*.tres`
+  (`AbilityDef`, with `EffectDef` sub-resources), listed in
+  `Data/UnitLibrary.tres`. The class scripts are in `Data/Defs/`. The unit id
+  is the file name (`hack.tres` is `"hack"`). At startup `Game.gd` converts
+  each Resource into the plain dict shape the battle code reads
+  (`Game.units[id]`), so runtime code stays dict-based. To add a unit: make a
+  `UnitDef`, drag existing abilities into its list, and add it to the library.
+  The Def scripts use typed `@export` fields so the Inspector shows pickers;
+  that is the only place typed GDScript is used.
 - **Deployment** (`Battle.gd` `_init_deploy`, `Battle/UI/DeployUI.tscn`) — a
   battle starts in a deploy phase: enemies are already placed, the mission's
   `spawn_tiles` are highlighted, and the player picks a roster unit then a
@@ -121,9 +131,8 @@ done differently, say so and ask rather than silently writing it your way.
   this; don't introduce static typing piecemeal into files that don't use
   it.
 - Dictionaries with string keys (`data["hp_max"]`, `ability["targets"]`)
-  are the default data shape for unit/ability definitions, not Resources
-  or custom classes. Keep new unit/ability data in this shape unless asked
-  to refactor it. Abilities list their `targets` (`enemy`/`ally`/`self`, or
+  are the data shape the runtime code reads (units and abilities are authored
+  as Resources and converted by `Game.gd`). Abilities list their `targets` (`enemy`/`ally`/`self`, or
   `tile` for an empty tile) and an
   `effects` list; each effect `type` maps to a handler in
   `Battle.gd`'s `effect_handlers` table, so a new effect type is one new

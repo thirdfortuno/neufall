@@ -6,7 +6,6 @@ extends Node2D
 @onready var Grid = preload("Grid.gd")
 @onready var AI = preload("AI.gd")
 @onready var MissionData = preload("res://Data/Missions.gd")
-@onready var UnitData = preload("res://Data/Units.gd")
 @onready var BattleTracker = preload("BattleTracker.gd")
 @onready var ResultsScene = preload("res://Battle/UI/ResultsUI.tscn")
 @onready var DeployScene = preload("res://Battle/UI/DeployUI.tscn")
@@ -137,7 +136,7 @@ func _init_units():
 
 func _spawn_unit(u):
 	var unit = unit_scene.instantiate()
-	var data = UnitData.UNITS[u["unit"]]
+	var data = Game.units[u["unit"]]
 	var x = u["x"]
 	var y = u["y"]
 	var team = u["team"]
@@ -181,8 +180,8 @@ func _init_deploy():
 		grid_tiles.get_value(spawn[0], spawn[1]).set_ui("moveable")
 	
 	var roster = []
-	for unit_id in UnitData.UNITS:
-		var data = UnitData.UNITS[unit_id]
+	for unit_id in Game.units:
+		var data = Game.units[unit_id]
 		if data["side"] == "player" && data["generation"] <= mission["max_generation"]:
 			roster.append(unit_id)
 	
@@ -190,7 +189,7 @@ func _init_deploy():
 	add_child(deploy_ui)
 	deploy_ui.connect("unit_chosen", Callable(self, "_on_deploy_unit_chosen"))
 	deploy_ui.connect("start_pressed", Callable(self, "_on_deploy_start_pressed"))
-	deploy_ui.show_roster(roster, UnitData.UNITS, mission["spawn_tiles"].size())
+	deploy_ui.show_roster(roster, Game.units, mission["spawn_tiles"].size())
 	deploy_ui.show_challenges(Game.challenges_text(mission_id, mission))
 
 ##############

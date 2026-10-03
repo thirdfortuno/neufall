@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="UnitLibrary" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://Data/Defs/UnitLibrary.gd" id="1_lib"]
+[ext_resource type="Script" path="res://Data/Defs/UnitDef.gd" id="2_unitdef"]
+[ext_resource type="Resource" path="res://Data/units/hack.tres" id="3_hack"]
+[ext_resource type="Resource" path="res://Data/units/hack_support.tres" id="4_support"]
+[ext_resource type="Resource" path="res://Data/units/security_camera.tres" id="5_camera"]
+
+[resource]
+script = ExtResource("1_lib")
+units = Array[ExtResource("2_unitdef")]([ExtResource("3_hack"), ExtResource("4_support"), ExtResource("5_camera")])
