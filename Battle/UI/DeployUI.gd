@@ -2,6 +2,7 @@ extends PanelContainer
 
 signal unit_chosen(unit_id)
 signal start_pressed
+signal back_pressed
 
 var roster_buttons = {}
 
@@ -46,3 +47,6 @@ func _on_roster_button_pressed(unit_id):
 
 func _on_start_button_pressed():
 	start_pressed.emit()
+
+func _on_back_button_pressed():
+	back_pressed.emit()

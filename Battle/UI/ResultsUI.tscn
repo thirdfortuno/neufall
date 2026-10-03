@@ -38,9 +38,9 @@ autowrap_mode = 3
 layout_mode = 2
 text = "Restart"
 
-[node name="MissionsButton" type="Button" parent="Center/VBox"]
+[node name="OverworldButton" type="Button" parent="Center/VBox"]
 layout_mode = 2
-text = "Missions"
+text = "Overworld"
 
 [connection signal="pressed" from="Center/VBox/RestartButton" to="." method="_on_restart_button_pressed"]
-[connection signal="pressed" from="Center/VBox/MissionsButton" to="." method="_on_missions_button_pressed"]
+[connection signal="pressed" from="Center/VBox/OverworldButton" to="." method="_on_overworld_button_pressed"]

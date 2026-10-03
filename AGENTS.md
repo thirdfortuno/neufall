@@ -21,7 +21,7 @@ There is no CLI build or test suite. To verify a change:
 
 1. Open the project in the Godot 4.1 editor (`project.godot`), or run it
    headless: `godot --path . ` (if the `godot` binary is on PATH).
-2. The main scene is `MissionSelect/MissionSelect.tscn` (`run/main_scene` in
+2. The main scene is `Overworld/Overworld.tscn` (`run/main_scene` in
    `project.godot`). Picking a mission sets `Game.selected_mission_id` and
    loads `Battle/Battle.tscn`; running `Battle.tscn` directly (F6) falls back
    to `DEFAULT_MISSION` in [Battle/Battle.gd](Battle/Battle.gd). Missions are
@@ -77,10 +77,15 @@ choice for GDScript — but none exists yet, so don't assume it's installed.
   `record_victory` grants the first-clear reward plus any newly completed
   challenge rewards (each only once). Resources are a dict of type to amount
   (placeholder types `data` and `bandwidth`). Keep it free of node references.
-- **`MissionSelect/`** — the main scene. Lists every mission in
+- **Screens** — `Overworld/` is the main scene: it lists every mission in
   `Data/Missions.gd` (disabled until the missions in its optional `requires`
   list are cleared), shows details, and starts the chosen one through
-  `Game.start_mission`. The results screen's "Missions" button returns here.
+  `Game.start_mission`. It is meant to become a pannable graph of mission
+  nodes later. The mission itself is `Battle/Battle.tscn`, and the results
+  screen's "Overworld" button returns to the overworld. `UI/TopBar.tscn` is
+  the shared bar (resource totals plus screen buttons) instanced on
+  out-of-battle screens; a screen calls `$TopBar.set_current("name")` so its
+  own button is disabled. A main menu is planned but not built.
 - **`Battle/BattleTracker.gd`** — child of the battle node. `Battle.gd` calls
   `tracker.check()` when a unit dies; it checks defeat (no player units) and
   the mission's `victory` type (table of checks: `eliminate_all`,

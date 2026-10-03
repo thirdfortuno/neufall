@@ -2,7 +2,6 @@ extends Control
 
 @onready var MissionData = preload("res://Data/Missions.gd")
 
-@onready var ResourcesLabel = $Center/VBox/Resources
 @onready var MissionList = $Center/VBox/MissionList
 @onready var Details = $Center/VBox/Details
 @onready var StartButton = $Center/VBox/StartButton
@@ -10,7 +9,7 @@ extends Control
 var selected_id
 
 func _ready():
-	ResourcesLabel.text = "Resources: %s" % Game.resources_text(Game.profile["resources"])
+	$TopBar.set_current("overworld")
 	
 	for mission_id in MissionData.MISSIONS:
 		var mission = MissionData.MISSIONS[mission_id]

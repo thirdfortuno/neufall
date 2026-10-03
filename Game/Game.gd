@@ -68,8 +68,8 @@ func start_mission(mission_id):
 	selected_mission_id = mission_id
 	get_tree().change_scene_to_file("res://Battle/Battle.tscn")
 
-func go_to_mission_select():
-	get_tree().change_scene_to_file("res://MissionSelect/MissionSelect.tscn")
+func go_to_overworld():
+	get_tree().change_scene_to_file("res://Overworld/Overworld.tscn")
 
 func has_cleared(mission_id):
 	return profile["cleared_missions"].has(mission_id)

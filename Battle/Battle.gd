@@ -203,6 +203,7 @@ func _init_deploy():
 	add_child(deploy_ui)
 	deploy_ui.connect("unit_chosen", Callable(self, "_on_deploy_unit_chosen"))
 	deploy_ui.connect("start_pressed", Callable(self, "_on_deploy_start_pressed"))
+	deploy_ui.connect("back_pressed", Callable(self, "_on_deploy_back_pressed"))
 	deploy_ui.show_objective(Game.victory_text(mission["victory"]))
 	deploy_ui.show_roster(roster, Game.units, mission["spawn_tiles"].size())
 	deploy_ui.show_challenges(Game.challenges_text(mission_id, mission))
@@ -245,6 +246,9 @@ func _on_deploy_unit_chosen(unit_id):
 	else:
 		deploy_unit_id = unit_id
 	deploy_ui.set_selected(deploy_unit_id)
+
+func _on_deploy_back_pressed():
+	Game.go_to_overworld()
 
 func _on_deploy_start_pressed():
 	if units_live_player.size() == 0:
