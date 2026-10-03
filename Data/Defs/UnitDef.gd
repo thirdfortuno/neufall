@@ -5,6 +5,7 @@ extends Resource
 @export var abbr: String = ""
 @export_enum("player", "enemy") var side: String = "player"
 @export var generation: int = 1
+@export var starts_unlocked: bool = false
 @export var tags: PackedStringArray = []
 @export var hp_max: int = 3
 @export var moves_max: int = 3

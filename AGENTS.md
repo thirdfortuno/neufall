@@ -64,12 +64,20 @@ choice for GDScript — but none exists yet, so don't assume it's installed.
   `UnitDef`, drag existing abilities into its list, and add it to the library.
   The Def scripts use typed `@export` fields so the Inspector shows pickers;
   that is the only place typed GDScript is used.
+- **Tech tree** — `Data/TechTree.tres` (`TechTreeDef`) lists nodes in
+  `Data/tech/*.tres` (`TechNodeDef`: the `unit` it unlocks, a resource `cost`
+  dict, `requires` nodes, and a graph `position`). The node id is the file
+  name. A unit with `starts_unlocked` is available from the start; any other
+  player unit needs its node researched. `Game.gd` holds `unlock_node`,
+  `node_state` (`unlocked`/`available`/`locked`), `can_afford`, and
+  `available_units(max_generation)`, which the deploy roster uses. Researched
+  nodes are saved in the profile as `unlocked_nodes`.
 - **Deployment** (`Battle.gd` `_init_deploy`, `Battle/UI/DeployUI.tscn`) — a
   battle starts in a deploy phase: enemies are already placed, the mission's
   `spawn_tiles` are highlighted, and the player picks a roster unit then a
   spawn tile to place it. The number of spawn tiles is the squad limit. The
-  roster is every `side: "player"` unit with `generation` at or below the
-  mission's `max_generation`. Clicking a placed unit removes it. "Start
+  roster is `Game.available_units(max_generation)`: unlocked `side: "player"`
+  units with `generation` at or below the mission's `max_generation`. Clicking a placed unit removes it. "Start
   Battle" ends deployment.
 - **`Game/Game.gd`** — the one autoload (`Game`, registered in
   `project.godot`). Holds the saved `profile` (`resources`, `cleared_missions`,

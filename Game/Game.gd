@@ -2,12 +2,14 @@ extends Node
 
 const SAVE_PATH = "user://save.dat"
 const UNIT_LIBRARY = "res://Data/UnitLibrary.tres"
+const TECH_TREE = "res://Data/TechTree.tres"
 const TARGET_NAMES = ["enemy", "ally", "self", "tile"]
 const BLOCKER_NAMES = ["tile", "unit"]
 
 var profile
 var selected_mission_id
 var units = {}
+var tech_nodes = {}
 
 func unit_to_dict(def):
 	var data = {
@@ -15,6 +17,7 @@ func unit_to_dict(def):
 		"abbr": def.abbr,
 		"side": def.side,
 		"generation": def.generation,
+		"starts_unlocked": def.starts_unlocked,
 		"tags": Array(def.tags),
 		"hp_max": def.hp_max,
 		"moves_max": def.moves_max,
@@ -70,6 +73,53 @@ func start_mission(mission_id):
 
 func go_to_overworld():
 	get_tree().change_scene_to_file("res://Overworld/Overworld.tscn")
+
+func is_node_unlocked(node_id):
+	return profile["unlocked_nodes"].has(node_id)
+
+func node_state(node_id):
+	if is_node_unlocked(node_id):
+		return "unlocked"
+	for required_id in tech_nodes[node_id]["requires"]:
+		if !is_node_unlocked(required_id):
+			return "locked"
+	return "available"
+
+func can_afford(cost):
+	for type in cost:
+		if profile["resources"].get(type, 0) < cost[type]:
+			return false
+	return true
+
+func unlock_node(node_id):
+	if node_state(node_id) != "available":
+		return false
+	
+	var cost = tech_nodes[node_id]["cost"]
+	if !can_afford(cost):
+		return false
+	
+	for type in cost:
+		profile["resources"][type] = profile["resources"][type] - cost[type]
+	profile["unlocked_nodes"].append(node_id)
+	save_game()
+	return true
+
+func is_unit_unlocked(unit_id):
+	if units[unit_id]["starts_unlocked"]:
+		return true
+	for node_id in profile["unlocked_nodes"]:
+		if tech_nodes.has(node_id) && tech_nodes[node_id]["unit"] == unit_id:
+			return true
+	return false
+
+func available_units(max_generation):
+	var result = []
+	for unit_id in units:
+		var data = units[unit_id]
+		if data["side"] == "player" && data["generation"] <= max_generation && is_unit_unlocked(unit_id):
+			result.append(unit_id)
+	return result
 
 func has_cleared(mission_id):
 	return profile["cleared_missions"].has(mission_id)
@@ -178,9 +228,24 @@ func _load_units():
 		var unit_id = def.resource_path.get_file().get_basename()
 		units[unit_id] = unit_to_dict(def)
 
+func _load_tech():
+	var tree = load(TECH_TREE)
+	for node in tree.nodes:
+		var requires = []
+		for required in node.requires:
+			requires.append(required.resource_path.get_file().get_basename())
+		
+		tech_nodes[node.resource_path.get_file().get_basename()] = {
+			"unit": node.unit.resource_path.get_file().get_basename(),
+			"cost": node.cost.duplicate(),
+			"requires": requires,
+			"position": node.position
+		}
+
 func _default_profile():
 	return {
 		"resources": {},
+		"unlocked_nodes": [],
 		"cleared_missions": [],
 		"completed_challenges": {}
 	}
@@ -193,3 +258,4 @@ func _ready():
 	profile = _default_profile()
 	load_game()
 	_load_units()
+	_load_tech()

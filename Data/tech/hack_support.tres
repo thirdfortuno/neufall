@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="TechNodeDef" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://Data/Defs/TechNodeDef.gd" id="1_node"]
+[ext_resource type="Resource" path="res://Data/units/hack_support.tres" id="2_unit"]
+
+[resource]
+script = ExtResource("1_node")
+unit = ExtResource("2_unit")
+cost = {
+"data": 2
+}
+requires = Array[ExtResource("1_node")]([])
+position = Vector2(100, 100)

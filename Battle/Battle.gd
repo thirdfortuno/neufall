@@ -193,11 +193,7 @@ func _init_deploy():
 	for spawn in mission["spawn_tiles"]:
 		grid_tiles.get_value(spawn[0], spawn[1]).set_ui("moveable")
 	
-	var roster = []
-	for unit_id in Game.units:
-		var data = Game.units[unit_id]
-		if data["side"] == "player" && data["generation"] <= mission["max_generation"]:
-			roster.append(unit_id)
+	var roster = Game.available_units(mission["max_generation"])
 	
 	deploy_ui = DeployScene.instantiate()
 	add_child(deploy_ui)
@@ -482,9 +478,14 @@ func _handle_unit_move(tile, unit):
 	var x = tile.x
 	var y = tile.y
 	var adjacent_tiles = grid_tiles.get_adjacent_values(unit.x, unit.y)
+	var unit_on_tile = grid_units.get_value(x, y)
 	
-	if (adjacent_tiles.has(tile)):
-		var into_self = grid_units.get_value(x, y) == unit
+	if (
+			adjacent_tiles.has(tile) &&
+			tile.state == 1 &&
+			(unit_on_tile == null || unit_on_tile == unit)
+	):
+		var into_self = unit_on_tile == unit
 		unit.move_to(x, y, into_self)
 	else: 
 		return

@@ -13,6 +13,7 @@ unit_name = "Hack"
 abbr = "HAK"
 side = "player"
 generation = 1
+starts_unlocked = true
 tags = PackedStringArray("hack")
 hp_max = 3
 moves_max = 5
