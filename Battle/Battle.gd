@@ -131,8 +131,16 @@ func _init_units():
 			"y": enemy["y"],
 			"team": "ai",
 			"unit": enemy["unit"],
+			"id": enemy.get("id"),
 			"behavior": enemy["behavior"]
 		})
+	
+	_init_objectives()
+
+func _init_objectives():
+	var victory = mission["victory"]
+	if victory["type"] == "reach_tile":
+		grid_tiles.get_value(victory["x"], victory["y"]).mark_goal("PKT")
 
 func _spawn_unit(u):
 	var unit = unit_scene.instantiate()
@@ -167,8 +175,14 @@ func _spawn_unit(u):
 	if team == "ai":
 		unit.behavior = u["behavior"].duplicate(true)
 	
+	unit.enemy_id = u.get("id")
+	
 	add_child(unit)
 	grid_units.set_value(x,y,unit)
+	
+	var victory = mission["victory"]
+	if victory["type"] == "kill_unit" && team == "ai" && unit.enemy_id == victory["enemy"]:
+		unit.mark_objective()
 	
 	if team == "player":
 		units_live_player.append(unit)
@@ -189,6 +203,7 @@ func _init_deploy():
 	add_child(deploy_ui)
 	deploy_ui.connect("unit_chosen", Callable(self, "_on_deploy_unit_chosen"))
 	deploy_ui.connect("start_pressed", Callable(self, "_on_deploy_start_pressed"))
+	deploy_ui.show_objective(Game.victory_text(mission["victory"]))
 	deploy_ui.show_roster(roster, Game.units, mission["spawn_tiles"].size())
 	deploy_ui.show_challenges(Game.challenges_text(mission_id, mission))
 
@@ -476,6 +491,8 @@ func _handle_unit_move(tile, unit):
 		grid_units.set_value(body.x, body.y, unit)
 
 	unit.update_body_positions(grid_units)
+	
+	tracker.check()
 
 func _handle_unit_select(unit):
 	unit_selected = unit

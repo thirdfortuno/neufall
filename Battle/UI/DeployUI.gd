@@ -6,6 +6,7 @@ signal start_pressed
 var roster_buttons = {}
 
 @onready var RosterList = $VBox/Roster
+@onready var ObjectiveLabel = $VBox/Objective
 @onready var CountLabel = $VBox/Count
 @onready var GoalsLabel = $VBox/Goals
 @onready var StartButton = $VBox/StartButton
@@ -24,6 +25,9 @@ func show_roster(unit_ids, units, max_count):
 		roster_buttons[unit_id] = button
 
 	set_count(0, max_count)
+
+func show_objective(text):
+	ObjectiveLabel.text = "Objective: %s" % text
 
 func show_challenges(text):
 	GoalsLabel.visible = text != ""

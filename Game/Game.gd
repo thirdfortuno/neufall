@@ -80,6 +80,16 @@ func is_unlocked(mission):
 			return false
 	return true
 
+func victory_text(victory):
+	match victory["type"]:
+		"eliminate_all":
+			return "Eliminate all enemies"
+		"reach_tile":
+			return "Reach the data packet (PKT)"
+		"kill_unit":
+			return "Defeat the TARGET enemy"
+	return victory["type"]
+
 func challenges_text(mission_id, mission):
 	if mission["challenges"].size() == 0:
 		return ""

@@ -32,6 +32,7 @@ var abilities
 var behavior
 
 var unit_id
+var enemy_id
 var abbr
 var sprite_main
 var sprite_shadow
@@ -204,6 +205,17 @@ func _ready():
 		$SpriteMain.texture = null
 		$SpriteShadow.texture = null
 		_add_abbr_label()
+
+func mark_objective():
+	var label = Label.new()
+	label.text = "TARGET"
+	label.size = Vector2(TILE_SIZE, TILE_SIZE / 2)
+	label.position = Vector2(-TILE_SIZE / 2, -TILE_SIZE)
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.add_theme_font_size_override("font_size", 8)
+	label.z_index = 2
+	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(label)
 
 func _add_abbr_label():
 	var label = Label.new()

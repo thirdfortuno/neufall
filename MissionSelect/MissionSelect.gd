@@ -32,6 +32,7 @@ func _details_text(mission_id):
 	else:
 		lines.append("First clear: %s" % Game.resources_text(mission["first_clear_reward"], "+"))
 	
+	lines.append("Objective: %s" % Game.victory_text(mission["victory"]))
 	lines.append("Squad size: %d" % mission["spawn_tiles"].size())
 	lines.append("Max generation: %d" % mission["max_generation"])
 	

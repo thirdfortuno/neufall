@@ -83,7 +83,9 @@ choice for GDScript — but none exists yet, so don't assume it's installed.
   `Game.start_mission`. The results screen's "Missions" button returns here.
 - **`Battle/BattleTracker.gd`** — child of the battle node. `Battle.gd` calls
   `tracker.check()` when a unit dies; it checks defeat (no player units) and
-  the mission's `victory` type (table of checks, `eliminate_all` for now),
+  the mission's `victory` type (table of checks: `eliminate_all`,
+  `reach_tile` with `x`/`y` for the data packet tile, `kill_unit` with `enemy`
+  matching an enemy entry's `id`; Battle also calls `check()` after each move),
   then emits `battle_finished(result)`. It also counts turns and player units
   lost, records the deployed squad, and on a win checks the mission's
   `challenges` (table of checks: `win_within_turns`, `no_unit_lost`,

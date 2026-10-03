@@ -52,6 +52,16 @@ func _finish(outcome):
 func _victory_eliminate_all(battle, victory):
 	return battle.units_live_ai.size() == 0
 
+func _victory_reach_tile(battle, victory):
+	var unit = battle.grid_units.get_value(victory["x"], victory["y"])
+	return unit != null && unit.team == "player"
+
+func _victory_kill_unit(battle, victory):
+	for unit in battle.units_live_ai:
+		if unit.enemy_id == victory["enemy"]:
+			return false
+	return true
+
 func _challenge_win_within_turns(params):
 	return turns <= params["turns"]
 
@@ -82,7 +92,9 @@ func _challenge_require_tag(params):
 
 func _ready():
 	victory_checks = {
-		"eliminate_all": Callable(self, "_victory_eliminate_all")
+		"eliminate_all": Callable(self, "_victory_eliminate_all"),
+		"reach_tile": Callable(self, "_victory_reach_tile"),
+		"kill_unit": Callable(self, "_victory_kill_unit")
 	}
 	
 	challenge_checks = {

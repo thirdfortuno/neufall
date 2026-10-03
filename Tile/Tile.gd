@@ -29,6 +29,19 @@ func set_state(new_state):
 	else:
 		$SpriteBase.texture = spr_base
 
+func mark_goal(text):
+	var tile_size = get_parent().TILE_SIZE
+	var label = Label.new()
+	label.text = text
+	label.size = Vector2(tile_size, tile_size)
+	label.position = Vector2(-tile_size / 2, -tile_size / 2)
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	label.add_theme_font_size_override("font_size", 10)
+	label.z_index = 2
+	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(label)
+
 func select():
 	state_ui = 'selected'
 	$SpriteSelection.texture = spr_tile_selected
