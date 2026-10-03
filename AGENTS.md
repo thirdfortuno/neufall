@@ -67,8 +67,9 @@ choice for GDScript — but none exists yet, so don't assume it's installed.
 - **Tech tree** — `Data/TechTree.tres` (`TechTreeDef`) lists nodes in
   `Data/tech/*.tres` (`TechNodeDef`: the `unit` it unlocks, a resource `cost`
   dict, `requires` nodes, and a graph `position`). The node id is the file
-  name. A unit with `starts_unlocked` is available from the start; any other
-  player unit needs its node researched. `Game.gd` holds `unlock_node`,
+  name. A unit with `starts_unlocked` is available from the start, and its node
+  (cost empty) shows as already unlocked, so starting units appear in the
+  graph; any other player unit needs its node researched. `Game.gd` holds `unlock_node`,
   `node_state` (`unlocked`/`available`/`locked`), `can_afford`, and
   `available_units(max_generation)`, which the deploy roster uses. Researched
   nodes are saved in the profile as `unlocked_nodes`.
@@ -93,7 +94,15 @@ choice for GDScript — but none exists yet, so don't assume it's installed.
   screen's "Overworld" button returns to the overworld. `UI/TopBar.tscn` is
   the shared bar (resource totals plus screen buttons) instanced on
   out-of-battle screens; a screen calls `$TopBar.set_current("name")` so its
-  own button is disabled. A main menu is planned but not built.
+  own button is disabled. Its "Refresh Data" button asks for confirmation, then
+  calls `Game.new_save()`: it resets the profile to a fresh save, writes it,
+  re-reads the unit library and tech tree `.tres` files from disk (bypassing
+  the resource cache), and reloads the screen. Missions are still a script and
+  need a restart to pick up edits. `TechTree/` is the tech tree screen: a pannable
+  graph (`UI/PanView.tscn`, drag empty space to pan) of one button per node
+  from `Game.tech_nodes`, with lines to prerequisites and a details panel with
+  a Research button that calls `Game.unlock_node`. A main menu is planned but
+  not built.
 - **`Battle/BattleTracker.gd`** — child of the battle node. `Battle.gd` calls
   `tracker.check()` when a unit dies; it checks defeat (no player units) and
   the mission's `victory` type (table of checks: `eliminate_all`,

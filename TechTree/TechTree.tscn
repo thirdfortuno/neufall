@@ -1,0 +1,49 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://TechTree/TechTree.gd" id="1_tech"]
+[ext_resource type="PackedScene" path="res://UI/TopBar.tscn" id="2_topbar"]
+[ext_resource type="PackedScene" path="res://UI/PanView.tscn" id="3_pan"]
+
+[node name="TechTree" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_tech")
+
+[node name="TopBar" parent="." instance=ExtResource("2_topbar")]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+grow_horizontal = 2
+
+[node name="PanView" parent="." instance=ExtResource("3_pan")]
+layout_mode = 0
+offset_top = 40.0
+offset_right = 640.0
+offset_bottom = 540.0
+
+[node name="Details" type="PanelContainer" parent="."]
+layout_mode = 0
+offset_left = 650.0
+offset_top = 40.0
+offset_right = 950.0
+offset_bottom = 530.0
+
+[node name="VBox" type="VBoxContainer" parent="Details"]
+layout_mode = 2
+
+[node name="Info" type="Label" parent="Details/VBox"]
+custom_minimum_size = Vector2(280, 0)
+layout_mode = 2
+text = "Select a node"
+autowrap_mode = 3
+
+[node name="ResearchButton" type="Button" parent="Details/VBox"]
+layout_mode = 2
+disabled = true
+text = "Research"
+
+[connection signal="pressed" from="Details/VBox/ResearchButton" to="." method="_on_research_button_pressed"]

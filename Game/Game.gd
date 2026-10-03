@@ -71,11 +71,23 @@ func start_mission(mission_id):
 	selected_mission_id = mission_id
 	get_tree().change_scene_to_file("res://Battle/Battle.tscn")
 
+func new_save():
+	profile = _default_profile()
+	save_game()
+	
+	units.clear()
+	tech_nodes.clear()
+	_load_units()
+	_load_tech()
+
 func go_to_overworld():
 	get_tree().change_scene_to_file("res://Overworld/Overworld.tscn")
 
 func is_node_unlocked(node_id):
-	return profile["unlocked_nodes"].has(node_id)
+	return (
+			profile["unlocked_nodes"].has(node_id) ||
+			units[tech_nodes[node_id]["unit"]]["starts_unlocked"]
+	)
 
 func node_state(node_id):
 	if is_node_unlocked(node_id):
@@ -120,6 +132,16 @@ func available_units(max_generation):
 		if data["side"] == "player" && data["generation"] <= max_generation && is_unit_unlocked(unit_id):
 			result.append(unit_id)
 	return result
+
+func go_to_tech_tree():
+	get_tree().change_scene_to_file("res://TechTree/TechTree.tscn")
+
+func unit_label(unit_id):
+	var data = units[unit_id]
+	var ability_names = []
+	for ability in data["abilities"]:
+		ability_names.append(ability["ability_name"])
+	return "%s: %s" % [data["name"], ", ".join(ability_names)]
 
 func has_cleared(mission_id):
 	return profile["cleared_missions"].has(mission_id)
@@ -223,13 +245,13 @@ func _flag_names(flags, names):
 	return result
 
 func _load_units():
-	var library = load(UNIT_LIBRARY)
+	var library = ResourceLoader.load(UNIT_LIBRARY, "", ResourceLoader.CACHE_MODE_REPLACE_DEEP)
 	for def in library.units:
 		var unit_id = def.resource_path.get_file().get_basename()
 		units[unit_id] = unit_to_dict(def)
 
 func _load_tech():
-	var tree = load(TECH_TREE)
+	var tree = ResourceLoader.load(TECH_TREE, "", ResourceLoader.CACHE_MODE_REPLACE_DEEP)
 	for node in tree.nodes:
 		var requires = []
 		for required in node.requires:
