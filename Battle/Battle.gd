@@ -9,6 +9,7 @@ extends Node2D
 @onready var UnitData = preload("res://Data/Units.gd")
 @onready var BattleTracker = preload("BattleTracker.gd")
 @onready var ResultsScene = preload("res://Battle/UI/ResultsUI.tscn")
+@onready var DeployScene = preload("res://Battle/UI/DeployUI.tscn")
 
 signal animation_done
 
@@ -22,12 +23,10 @@ const TARGETING_DIRECTIONS = {
 	"queen": [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1]]
 }
 
-# Temporary until squad select exists
+# Temporary until a mission picker exists
 const DEFAULT_MISSION = "training_node"
-const DEFAULT_SQUAD = ["hack", "hack_support"]
 
 var mission
-var squad
 
 var height
 var width
@@ -54,14 +53,16 @@ var effect_handlers
 var tracker
 var battle_over = false
 
+var deploying = true
+var deploy_ui
+var deploy_unit_id
+
 var player_move_undo_redo = UndoRedo.new()
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	if mission == null:
 		mission = MissionData.MISSIONS[DEFAULT_MISSION]
-	if squad == null:
-		squad = DEFAULT_SQUAD
 	
 	var grid_tile_states = Grid.new(mission["grid"])
 
@@ -91,6 +92,8 @@ func _ready():
 	tracker = BattleTracker.new()
 	add_child(tracker)
 	tracker.connect("battle_finished", Callable(self, "_on_battle_finished"))
+	
+	_init_deploy()
 
 #################
 # INITALIZATION #
@@ -119,64 +122,118 @@ func _init_tiles(grid_tile_states):
 func _init_units():
 	grid_units = Grid.new(width, height)
 	
-	var placements = []
-	for i in squad.size():
-		var spawn = mission["spawn_tiles"][i]
-		placements.append({
-			"x": spawn[0],
-			"y": spawn[1],
-			"team": "player",
-			"unit": squad[i]
-		})
 	for enemy in mission["enemies"]:
-		placements.append({
+		_spawn_unit({
 			"x": enemy["x"],
 			"y": enemy["y"],
 			"team": "ai",
 			"unit": enemy["unit"],
 			"behavior": enemy["behavior"]
 		})
+
+func _spawn_unit(u):
+	var unit = unit_scene.instantiate()
+	var data = UnitData.UNITS[u["unit"]]
+	var x = u["x"]
+	var y = u["y"]
+	var team = u["team"]
 	
-	for u in placements:
-		var unit = unit_scene.instantiate()
-		var data = UnitData.UNITS[u["unit"]]
-		var x = u["x"]
-		var y = u["y"]
-		var team = u["team"]
-		
-		unit.connect("damaged", Callable(self, "_handle_unit_damaged"))
-		unit.connect("killed", Callable(self, "_handle_unit_killed"))
-		unit.connect("healed", Callable(self, "_handle_unit_healed"))
-		unit.connect("animation", Callable(self, "_ai_wait_animation"))
-		
-		unit.x = x
-		unit.y = y
-		unit.team = team
-		unit.position = Vector2(
-			x*TILE_SIZE + TILE_SIZE/2 + TILE_OFFSET_X,
-			y*TILE_SIZE + TILE_SIZE/2 + TILE_OFFSET_Y
-		)
-		
-		unit.type = data["name"]
-		unit.abbr = data["abbr"]
-		unit.sprite_main = data.get("sprite_main")
-		unit.sprite_shadow = data.get("sprite_shadow")
-		
-		unit.hp_max = data["hp_max"]
-		unit.moves_max = data["moves_max"]
-		
-		unit.abilities = data["abilities"].duplicate(true)
-		if u["team"] == "ai":
-			unit.behavior = u["behavior"].duplicate(true)
-		
-		add_child(unit)
-		grid_units.set_value(x,y,unit)
-		
-		if team == "player":
-			units_live_player.append(unit)
-		elif team == "ai":
-			units_live_ai.append(unit)
-		
+	unit.connect("damaged", Callable(self, "_handle_unit_damaged"))
+	unit.connect("killed", Callable(self, "_handle_unit_killed"))
+	unit.connect("healed", Callable(self, "_handle_unit_healed"))
+	unit.connect("animation", Callable(self, "_ai_wait_animation"))
+	
+	unit.x = x
+	unit.y = y
+	unit.team = team
+	unit.position = Vector2(
+		x*TILE_SIZE + TILE_SIZE/2 + TILE_OFFSET_X,
+		y*TILE_SIZE + TILE_SIZE/2 + TILE_OFFSET_Y
+	)
+	
+	unit.type = data["name"]
+	unit.abbr = data["abbr"]
+	unit.sprite_main = data.get("sprite_main")
+	unit.sprite_shadow = data.get("sprite_shadow")
+	
+	unit.hp_max = data["hp_max"]
+	unit.moves_max = data["moves_max"]
+	
+	unit.abilities = data["abilities"].duplicate(true)
+	if team == "ai":
+		unit.behavior = u["behavior"].duplicate(true)
+	
+	add_child(unit)
+	grid_units.set_value(x,y,unit)
+	
+	if team == "player":
+		units_live_player.append(unit)
+	elif team == "ai":
+		units_live_ai.append(unit)
+
+func _init_deploy():
+	for spawn in mission["spawn_tiles"]:
+		grid_tiles.get_value(spawn[0], spawn[1]).set_ui("moveable")
+	
+	var roster = []
+	for unit_id in UnitData.UNITS:
+		var data = UnitData.UNITS[unit_id]
+		if data["side"] == "player" && data["generation"] <= mission["max_generation"]:
+			roster.append(unit_id)
+	
+	deploy_ui = DeployScene.instantiate()
+	add_child(deploy_ui)
+	deploy_ui.connect("unit_chosen", Callable(self, "_on_deploy_unit_chosen"))
+	deploy_ui.connect("start_pressed", Callable(self, "_on_deploy_start_pressed"))
+	deploy_ui.show_roster(roster, UnitData.UNITS, mission["spawn_tiles"].size())
+
+##############
+# DEPLOYMENT #
+##############
+
+func _is_spawn_tile(tile):
+	for spawn in mission["spawn_tiles"]:
+		if spawn[0] == tile.x && spawn[1] == tile.y:
+			return true
+	return false
+
+func _deploy_on_tile(tile):
+	if !_is_spawn_tile(tile):
+		return
+	
+	var unit_on_tile = grid_units.get_value(tile.x, tile.y)
+	if unit_on_tile:
+		units_live_player.erase(unit_on_tile)
+		_clear_unit_from_grid(unit_on_tile)
+		unit_on_tile.queue_free()
+	
+	if deploy_unit_id:
+		_spawn_unit({
+			"x": tile.x,
+			"y": tile.y,
+			"team": "player",
+			"unit": deploy_unit_id
+		})
+		deploy_unit_id = null
+		deploy_ui.set_selected(null)
+	
+	deploy_ui.set_count(units_live_player.size(), mission["spawn_tiles"].size())
+
+func _on_deploy_unit_chosen(unit_id):
+	if deploy_unit_id == unit_id:
+		deploy_unit_id = null
+	else:
+		deploy_unit_id = unit_id
+	deploy_ui.set_selected(deploy_unit_id)
+
+func _on_deploy_start_pressed():
+	if units_live_player.size() == 0:
+		return
+	
+	deploying = false
+	deploy_unit_id = null
+	deploy_ui.queue_free()
+	_clear_tile_tags()
 
 ####################
 # HEADS UP DISPLAY #
@@ -657,6 +714,15 @@ func _input(_ev):
 	if battle_over:
 		return
 	
+	if deploying:
+		if (
+				Input.is_key_pressed(KEY_Q) ||
+				Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT)
+		):
+			deploy_unit_id = null
+			deploy_ui.set_selected(null)
+		return
+	
 	if (
 			Input.is_key_pressed(KEY_Q) ||
 			Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT)
@@ -689,6 +755,10 @@ func _input(_ev):
 
 func _on_tile_select(tile):
 	if battle_over:
+		return
+	
+	if deploying:
+		_deploy_on_tile(tile)
 		return
 	
 	match click_state:

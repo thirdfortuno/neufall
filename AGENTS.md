@@ -23,9 +23,8 @@ There is no CLI build or test suite. To verify a change:
    headless: `godot --path . ` (if the `godot` binary is on PATH).
 2. The main scene is `Battle/Battle.tscn` (`run/main_scene` in
    `project.godot`), which boots straight into a default mission
-   (`DEFAULT_MISSION` / `DEFAULT_SQUAD` in [Battle/Battle.gd](Battle/Battle.gd)),
-   defined in [Data/Missions.gd](Data/Missions.gd) and
-   [Data/Units.gd](Data/Units.gd).
+   (`DEFAULT_MISSION` in [Battle/Battle.gd](Battle/Battle.gd)), defined in
+   [Data/Missions.gd](Data/Missions.gd) and [Data/Units.gd](Data/Units.gd).
 3. Manually exercise the golden path (select unit → move → use ability →
    end turn → AI turn) and any edge case your change touches. There is no
    automated regression coverage, so say so explicitly rather than claiming
@@ -53,6 +52,13 @@ choice for GDScript — but none exists yet, so don't assume it's installed.
   move → use ability. Driven by a per-unit `behavior` dict (see
   `CAMERA_BEHAVIOR` in `Data/Missions.gd` for the shape: `search`/`peace`/`war`
   method lists, versioned via `behavior.version`).
+- **Deployment** (`Battle.gd` `_init_deploy`, `Battle/UI/DeployUI.tscn`) — a
+  battle starts in a deploy phase: enemies are already placed, the mission's
+  `spawn_tiles` are highlighted, and the player picks a roster unit then a
+  spawn tile to place it. The number of spawn tiles is the squad limit. The
+  roster is every `side: "player"` unit with `generation` at or below the
+  mission's `max_generation`. Clicking a placed unit removes it. "Start
+  Battle" ends deployment.
 - **`Battle/BattleTracker.gd`** — child of the battle node. `Battle.gd` calls
   `tracker.check()` when a unit dies; it checks defeat (no player units) and
   the mission's `victory` type (table of checks, `eliminate_all` for now),
