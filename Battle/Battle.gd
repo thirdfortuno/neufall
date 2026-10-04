@@ -5,6 +5,9 @@ extends Node2D
 
 @onready var Grid = preload("Grid.gd")
 @onready var AI = preload("AI.gd")
+@onready var BattleTracker = preload("BattleTracker.gd")
+@onready var ResultsScene = preload("res://Battle/UI/ResultsUI.tscn")
+@onready var DeployScene = preload("res://Battle/UI/DeployUI.tscn")
 
 signal animation_done
 
@@ -12,162 +15,17 @@ const TILE_SIZE = 32
 const TILE_OFFSET_X = 150
 const TILE_OFFSET_Y = 34
 
-"""
-var grid_input = [
-	[1,1,1,1],
-	[1,1,1,1],
-	[1,1,1,0],
-	[1,1,1,1]
-]
+const TARGETING_DIRECTIONS = {
+	"rook": [[1, 0], [-1, 0], [0, 1], [0, -1]],
+	"bishop": [[1, 1], [1, -1], [-1, 1], [-1, -1]],
+	"queen": [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1]]
+}
 
-"""
-var grid_input = [
-	[1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-	[1,1,1,1,1,1,1,0,1,1,1,1,1,1],
-	[1,1,1,1,1,1,0,0,1,1,1,1,1,1],
-	[1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-	[1,0,1,0,1,0,0,0,1,1,1,1,1,1],
-	[1,0,1,1,1,0,0,0,1,1,1,1,1,1],
-	[1,0,0,0,0,0,0,0,1,1,1,1,1,1],
-	[1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-	[1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-	[1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-	[1,1,1,1,1,1,1,1,1,1,1,1,1,1]
-]
+# Temporary until a mission picker exists
+const DEFAULT_MISSION = "training_node"
 
-var unit_input = [
-	{
-		"x": 1,
-		"y": 1,
-		"team": "player",
-		"data": {
-			"type": "Hack",
-			"hp_max": 3,
-			"moves_max": 5,
-			"abilities": [
-				{
-					"ability_name": "Slice",
-					"damage": 2,
-					"ability_range": 1
-				},
-				{
-					"ability_name": "Dice",
-					"damage": 2,
-					"ability_range": 2,
-					"size_requirement": 2,
-					"size_cost": 1
-				}
-			]
-		}
-	},
-	{
-		"x": 2,
-		"y": 2,
-		"team": "player",
-		"data": {
-			"type": "Hack",
-			"hp_max": 3,
-			"moves_max": 5,
-			"abilities": [
-				{
-					"ability_name": "Steroids",
-					"hp_max_add": 2,
-					"moves_max_add": 2,
-					"ability_range": 1
-				},
-				{
-					"ability_name": "Heal",
-					"heal": 5,
-					"ability_range": 2
-				}
-			]
-		}
-	},
-	{
-		"x": 4,
-		"y": 4,
-		"team": "ai",
-		"data": {
-			"type": "Security Camera",
-			"hp_max": 3,
-			"moves_max": 3,
-			"abilities": [
-				{
-					"ability_name": "Slice",
-					"damage": 2,
-					"ability_range": 1
-				}
-			]
-		},
-		"behavior": {
-			"version": 1,
-			"search": [
-				{
-					"range": 15,
-					"method": "absolute"
-				}
-			],
-			"peace": [
-				{
-					"method": "roam"
-				}
-			],
-			"war": [
-				{
-					"method": "nearest"
-				},
-				{
-					"method": "weakest"
-				},
-				{
-					"method": "random"
-				}
-			]
-		}
-	},
-	{
-		"x": 3,
-		"y": 3,
-		"team": "ai",
-		"data": {
-			"type": "Security Camera",
-			"hp_max": 3,
-			"moves_max": 3,
-			"abilities": [
-				{
-					"ability_name": "Slice",
-					"damage": 2,
-					"ability_range": 1
-				}
-			]
-		},
-		"behavior": {
-			"version": 1,
-			"search": [
-				{
-					"range": 15,
-					"method": "absolute"
-				}
-			],
-			"peace": [
-				{
-					"method": "roam"
-				}
-			],
-			"war": [
-				{
-					"method": "nearest"
-				},
-				{
-					"method": "weakest"
-				},
-				{
-					"method": "random"
-				}
-			]
-		}
-	},
-]
+var mission
+var mission_id
 
 var height
 var width
@@ -187,12 +45,28 @@ var units_live_ai = []
 
 var ai_handler
 var ai_waiting = false
+var DELAY_AI_UNIT = 0.5
+
+var effect_handlers
+
+var tracker
+var battle_over = false
+
+var deploying = true
+var deploy_ui
+var deploy_unit_id
 
 var player_move_undo_redo = UndoRedo.new()
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	var grid_tile_states = Grid.new(grid_input)
+	if mission == null:
+		mission_id = Game.selected_mission_id
+		if mission_id == null:
+			mission_id = DEFAULT_MISSION
+		mission = Game.missions[mission_id]
+	
+	var grid_tile_states = Grid.new(mission["grid"])
 
 	var grid_size = grid_tile_states.get_size()
 	
@@ -203,8 +77,25 @@ func _ready():
 
 	_init_units()
 	
+	connect("animation_done", Callable(self, "_ai_animation_done"))
+	
+	effect_handlers = {
+		"damage": Callable(self, "_effect_damage"),
+		"heal": Callable(self, "_effect_heal"),
+		"hp_max_add": Callable(self, "_effect_hp_max_add"),
+		"moves_max_add": Callable(self, "_effect_moves_max_add"),
+		"drain": Callable(self, "_effect_drain"),
+		"tile_set": Callable(self, "_effect_tile_set")
+	}
+
 	ai_handler = AI.new()
 	add_child(ai_handler)
+	
+	tracker = BattleTracker.new()
+	add_child(tracker)
+	tracker.connect("battle_finished", Callable(self, "_on_battle_finished"))
+	
+	_init_deploy()
 
 #################
 # INITALIZATION #
@@ -233,42 +124,141 @@ func _init_tiles(grid_tile_states):
 func _init_units():
 	grid_units = Grid.new(width, height)
 	
-	for u in unit_input:
-		var unit = unit_scene.instantiate()
-		var x = u["x"]
-		var y = u["y"]
-		var team = u["team"]
-		
-		unit.connect("damaged", Callable(self, "_handle_unit_damaged"))
-		unit.connect("killed", Callable(self, "_handle_unit_killed"))
-		unit.connect("healed", Callable(self, "_handle_unit_healed"))
-		unit.connect("animation", Callable(self, "_ai_wait_animation"))
-		
-		unit.x = x
-		unit.y = y
-		unit.team = team
-		unit.position = Vector2(
-			x*TILE_SIZE + TILE_SIZE/2 + TILE_OFFSET_X,
-			y*TILE_SIZE + TILE_SIZE/2 + TILE_OFFSET_Y
-		)
-		
-		unit.type = u["data"]["type"]
-		
-		unit.hp_max = u["data"]["hp_max"]
-		unit.moves_max = u["data"]["moves_max"]
-		
-		unit.abilities = u["data"]["abilities"]
-		if u["team"] == "ai":
-			unit.behavior = u["behavior"]
-		
-		add_child(unit)
-		grid_units.set_value(x,y,unit)
-		
-		if team == "player":
-			units_live_player.append(unit)
-		elif team == "ai":
-			units_live_ai.append(unit)
-		
+	for enemy in mission["enemies"]:
+		_spawn_unit({
+			"x": enemy["x"],
+			"y": enemy["y"],
+			"team": "ai",
+			"unit": enemy["unit"],
+			"id": enemy.get("id"),
+			"behavior": enemy["behavior"]
+		})
+	
+	_init_objectives()
+
+func _init_objectives():
+	var victory = mission["victory"]
+	if victory["type"] == "reach_tile":
+		grid_tiles.get_value(victory["x"], victory["y"]).mark_goal("PKT")
+
+func _spawn_unit(u):
+	var unit = unit_scene.instantiate()
+	var data = Game.units[u["unit"]]
+	var x = u["x"]
+	var y = u["y"]
+	var team = u["team"]
+	
+	unit.connect("damaged", Callable(self, "_handle_unit_damaged"))
+	unit.connect("killed", Callable(self, "_handle_unit_killed"))
+	unit.connect("healed", Callable(self, "_handle_unit_healed"))
+	unit.connect("animation", Callable(self, "_ai_wait_animation"))
+	
+	unit.x = x
+	unit.y = y
+	unit.team = team
+	unit.position = Vector2(
+		x*TILE_SIZE + TILE_SIZE/2 + TILE_OFFSET_X,
+		y*TILE_SIZE + TILE_SIZE/2 + TILE_OFFSET_Y
+	)
+	
+	unit.unit_id = u["unit"]
+	unit.type = data["name"]
+	unit.abbr = data["abbr"]
+	unit.sprite_main = data.get("sprite_main")
+	unit.sprite_shadow = data.get("sprite_shadow")
+	
+	unit.hp_max = data["hp_max"]
+	unit.moves_max = data["moves_max"]
+	
+	unit.abilities = data["abilities"].duplicate(true)
+	if team == "ai":
+		unit.behavior = u["behavior"].duplicate(true)
+	
+	unit.enemy_id = u.get("id")
+	
+	add_child(unit)
+	grid_units.set_value(x,y,unit)
+	
+	var victory = mission["victory"]
+	if victory["type"] == "kill_unit" && team == "ai" && unit.enemy_id == victory["enemy"]:
+		unit.mark_objective()
+	
+	if team == "player":
+		units_live_player.append(unit)
+	elif team == "ai":
+		units_live_ai.append(unit)
+
+func _init_deploy():
+	for spawn in mission["spawn_tiles"]:
+		grid_tiles.get_value(spawn[0], spawn[1]).set_ui("moveable")
+	
+	var roster = Game.available_units(mission["max_generation"])
+	
+	deploy_ui = DeployScene.instantiate()
+	add_child(deploy_ui)
+	deploy_ui.connect("unit_chosen", Callable(self, "_on_deploy_unit_chosen"))
+	deploy_ui.connect("start_pressed", Callable(self, "_on_deploy_start_pressed"))
+	deploy_ui.connect("back_pressed", Callable(self, "_on_deploy_back_pressed"))
+	deploy_ui.show_objective(Game.victory_text(mission["victory"]))
+	deploy_ui.show_roster(roster, Game.units, mission["spawn_tiles"].size())
+	deploy_ui.show_challenges(Game.challenges_text(mission_id, mission))
+
+##############
+# DEPLOYMENT #
+##############
+
+func _is_spawn_tile(tile):
+	for spawn in mission["spawn_tiles"]:
+		if spawn[0] == tile.x && spawn[1] == tile.y:
+			return true
+	return false
+
+func _deploy_on_tile(tile):
+	if !_is_spawn_tile(tile):
+		return
+	
+	var unit_on_tile = grid_units.get_value(tile.x, tile.y)
+	if unit_on_tile:
+		units_live_player.erase(unit_on_tile)
+		_clear_unit_from_grid(unit_on_tile)
+		unit_on_tile.queue_free()
+	
+	if deploy_unit_id:
+		_spawn_unit({
+			"x": tile.x,
+			"y": tile.y,
+			"team": "player",
+			"unit": deploy_unit_id
+		})
+		deploy_unit_id = null
+		deploy_ui.set_selected(null)
+	
+	deploy_ui.set_count(units_live_player.size(), mission["spawn_tiles"].size())
+
+func _on_deploy_unit_chosen(unit_id):
+	if deploy_unit_id == unit_id:
+		deploy_unit_id = null
+	else:
+		deploy_unit_id = unit_id
+	deploy_ui.set_selected(deploy_unit_id)
+
+func _on_deploy_back_pressed():
+	Game.go_to_overworld()
+
+func _on_deploy_start_pressed():
+	if units_live_player.size() == 0:
+		return
+	
+	var squad = []
+	for unit in units_live_player:
+		squad.append(unit.unit_id)
+	tracker.start_battle(squad)
+	tracker.turn_started()
+	
+	deploying = false
+	deploy_unit_id = null
+	deploy_ui.queue_free()
+	_clear_tile_tags()
 
 ####################
 # HEADS UP DISPLAY #
@@ -298,6 +288,8 @@ func _clear_unit_from_grid(unit):
 # BATTLE HANDLING #
 ###################
 func _check_if_turn_done():
+	if battle_over:
+		return
 	if active_player == "player":
 		for unit in units_live_player:
 			if unit.active:
@@ -318,6 +310,7 @@ func _swap_active_player():
 		_ai_decisions()
 	elif active_player == "ai":
 		active_player = "player"
+		tracker.turn_started()
 		for unit in units_live_player:
 			unit.active = true
 			unit.moves_available = unit.moves_max
@@ -326,20 +319,27 @@ func _ai_decisions():
 	if active_player == "ai":
 		print("AI TURN")
 		for unit in units_live_ai:
+			if battle_over:
+				break
 			if unit.active:
 				unit_selected = unit
 				await _ai_await_move()
+				if battle_over:
+					break
 				await ai_handler.handle_unit(unit)
 				unit.active = false
+				await get_tree().create_timer(DELAY_AI_UNIT).timeout
 	_check_if_turn_done()
 
 func _ai_await_move():
 	if ai_waiting:
 		await animation_done
-		ai_waiting = false
 
 func _ai_wait_animation():
 	ai_waiting = true
+
+func _ai_animation_done():
+	ai_waiting = false
 
 #################
 # UNIT HANDLING #
@@ -355,19 +355,11 @@ func _handle_unit_ability(tile, unit, ability):
 	
 	if ability_range["immediate"].has(tile):
 		var target_unit = grid_units.get_value(tile.x, tile.y)
-		if target_unit:
-			if ability.has('damage'):
-				target_unit.damage(ability_selected["damage"])
-				
-			if ability.has('heal'):
-				target_unit.heal(ability_selected['heal'])
-				
-			if ability.has('hp_max_add'):
-				target_unit.hp_max = target_unit.hp_max + ability.hp_max_add
+		if _is_valid_ability_target(unit, target_unit, ability):
+			unit.animate_ability(target_unit, ability)
 			
-			if ability.has('moves_max_add'):
-				target_unit.moves_max = target_unit.moves_max
-				+ ability.moves_max_add
+			for effect in ability["effects"]:
+				effect_handlers[effect["type"]].call(effect, tile, target_unit, unit)
 			
 			unit.active = false
 			
@@ -375,6 +367,45 @@ func _handle_unit_ability(tile, unit, ability):
 				unit.damage(ability.size_cost)
 			
 			_check_if_turn_done()
+
+func _is_valid_ability_target(unit, target_unit, ability):
+	var relation = "enemy"
+	if target_unit == null:
+		relation = "tile"
+	elif target_unit == unit:
+		relation = "self"
+	elif target_unit.team == unit.team:
+		relation = "ally"
+	
+	return ability["targets"].has(relation)
+
+func _effect_damage(effect, tile, target_unit, source):
+	if target_unit:
+		target_unit.damage(effect["amount"])
+
+func _effect_heal(effect, tile, target_unit, source):
+	if target_unit:
+		target_unit.heal(effect["amount"])
+
+func _effect_hp_max_add(effect, tile, target_unit, source):
+	if target_unit:
+		target_unit.hp_max = target_unit.hp_max + effect["amount"]
+
+func _effect_moves_max_add(effect, tile, target_unit, source):
+	if target_unit:
+		target_unit.moves_max = target_unit.moves_max + effect["amount"]
+
+func _effect_drain(effect, tile, target_unit, source):
+	if target_unit:
+		var drained = min(effect["amount"], target_unit.bodies.size())
+		target_unit.damage(effect["amount"])
+		if drained > 0:
+			source.heal(drained)
+
+func _effect_tile_set(effect, tile, target_unit, source):
+	if effect["state"] == 0 && grid_units.get_value(tile.x, tile.y) != null:
+		return
+	tile.set_state(effect["state"])
 
 func _handle_unit_damaged(unit):
 	_clear_unit_from_grid(unit)
@@ -403,7 +434,23 @@ func _handle_unit_killed(unit):
 	units_live_ai.erase(unit)
 	_clear_unit_from_grid(unit)
 	
+	tracker.unit_killed(unit)
+	
 	emit_signal("animation_done")
+
+func _on_battle_finished(result):
+	battle_over = true
+	unit_selected = null
+	click_state = "default"
+	_clear_tile_tags()
+	_hud_show_unit()
+	
+	if result["outcome"] == "victory":
+		result["summary"] = Game.record_victory(mission_id, mission, result["challenges_met"])
+	
+	var results_ui = ResultsScene.instantiate()
+	add_child(results_ui)
+	results_ui.show_result(result)
 
 func _player_handle_unit_move(tile, unit):
 	if unit.moves_available:
@@ -430,55 +477,112 @@ func _handle_unit_move(tile, unit):
 	var x = tile.x
 	var y = tile.y
 	var adjacent_tiles = grid_tiles.get_adjacent_values(unit.x, unit.y)
+	var unit_on_tile = grid_units.get_value(x, y)
 	
-	if (adjacent_tiles.has(tile)):
-		var into_self = grid_units.get_value(x, y) == unit
+	if (
+			adjacent_tiles.has(tile) &&
+			tile.state == 1 &&
+			(unit_on_tile == null || unit_on_tile == unit)
+	):
+		var into_self = unit_on_tile == unit
 		unit.move_to(x, y, into_self)
 	else: 
 		return
 
-	_clear_unit_from_grid(unit_selected)
-	
-	for body in unit_selected.bodies:
-		grid_units.set_value(body.x, body.y, unit_selected)
-	
+	_clear_unit_from_grid(unit)
+
+	for body in unit.bodies:
+		grid_units.set_value(body.x, body.y, unit)
+
 	unit.update_body_positions(grid_units)
+	
+	tracker.check()
 
 func _handle_unit_select(unit):
 	unit_selected = unit
 	_hud_show_unit()
 	
 func _unit_ability_get_legal_range(unit, ability):
-	var curr_tile = grid_tiles.get_value(unit.x, unit.y)
-	var tiles_to_explore_curr = []
-	var tiles_to_explore_next = []
-	var tiles_immediate = []
 	# TODO: Show all possible tiles within range when using movement
 	#var tiles_postmove = []
 	
-	var immediate_range = ability["ability_range"]
+	return {
+		"immediate": _ability_get_range_from(unit.x, unit.y, unit, ability)
+	}
+
+func _ability_get_range_from(x, y, unit, ability):
+	var targeting = "manhattan"
+	if ability.has("targeting"):
+		targeting = ability["targeting"]
 	
-	tiles_to_explore_next.append(curr_tile)
+	var blockers = []
+	if ability.has("blockers"):
+		blockers = ability["blockers"]
 	
-	for depth in immediate_range + 1:
+	var origin = grid_tiles.get_value(x, y)
+	
+	if targeting == "manhattan":
+		return _range_manhattan(origin, unit, ability["ability_range"], blockers)
+	
+	return _range_lines(
+		origin,
+		unit,
+		ability["ability_range"],
+		blockers,
+		TARGETING_DIRECTIONS[targeting]
+	)
+
+func _range_manhattan(origin, unit, ability_range, blockers):
+	var tiles = []
+	var visited = [origin]
+	var tiles_to_explore_curr = []
+	var tiles_to_explore_next = [origin]
+	
+	for depth in ability_range:
 		tiles_to_explore_curr = tiles_to_explore_next.duplicate()
 		tiles_to_explore_next.clear()
 		
 		for tile in tiles_to_explore_curr:
-			var x = tile.x
-			var y = tile.y
+			if tile != origin && _is_shot_blocker(tile, unit, blockers):
+				continue
 			
-			if !tiles_immediate.has(tile):
-				tiles_immediate.append(tile)
-		
-			for tile_next in grid_tiles.get_adjacent_values(x, y):
-				tiles_to_explore_next.append(tile_next)
-		
-	tiles_immediate.erase(curr_tile)
+			for tile_next in grid_tiles.get_adjacent_values(tile.x, tile.y):
+				if !visited.has(tile_next):
+					visited.append(tile_next)
+					tiles.append(tile_next)
+					tiles_to_explore_next.append(tile_next)
 	
-	return {
-		"immediate": tiles_immediate
-	}
+	return tiles
+
+func _range_lines(origin, unit, ability_range, blockers, directions):
+	var tiles = []
+	
+	for direction in directions:
+		for step in range(1, ability_range + 1):
+			var x = origin.x + direction[0] * step
+			var y = origin.y + direction[1] * step
+			
+			if x < 0 || y < 0 || x >= width || y >= height:
+				break
+			
+			var tile = grid_tiles.get_value(x, y)
+			tiles.append(tile)
+			
+			if _is_shot_blocker(tile, unit, blockers):
+				break
+	
+	return tiles
+
+func _is_shot_blocker(tile, unit, blockers):
+	if blockers.has("tile") && tile.state == 0:
+		return true
+	
+	if blockers.has("unit"):
+		var unit_on_tile = grid_units.get_value(tile.x, tile.y)
+		if unit_on_tile != null && unit_on_tile != unit:
+			return true
+	
+	return false
 
 func _unit_move_get_legal_range(unit, move_range):
 	var curr_tile = grid_tiles.get_value(unit.x, unit.y)
@@ -643,6 +747,18 @@ func _on_UndoMoveButton_pressed():
 #########
 
 func _input(_ev):
+	if battle_over:
+		return
+	
+	if deploying:
+		if (
+				Input.is_key_pressed(KEY_Q) ||
+				Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT)
+		):
+			deploy_unit_id = null
+			deploy_ui.set_selected(null)
+		return
+	
 	if (
 			Input.is_key_pressed(KEY_Q) ||
 			Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT)
@@ -674,6 +790,13 @@ func _input(_ev):
 			print(click_state)
 
 func _on_tile_select(tile):
+	if battle_over:
+		return
+	
+	if deploying:
+		_deploy_on_tile(tile)
+		return
+	
 	match click_state:
 		"default":
 			if tile_selected:

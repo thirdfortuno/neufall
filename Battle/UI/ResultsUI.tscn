@@ -1,0 +1,46 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Battle/UI/ResultsUI.gd" id="1_results"]
+
+[node name="ResultsUI" type="CanvasLayer"]
+visible = false
+script = ExtResource("1_results")
+
+[node name="Dim" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.6)
+
+[node name="Center" type="CenterContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBox" type="VBoxContainer" parent="Center"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="Center/VBox"]
+layout_mode = 2
+horizontal_alignment = 1
+
+[node name="Summary" type="Label" parent="Center/VBox"]
+custom_minimum_size = Vector2(320, 0)
+layout_mode = 2
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="RestartButton" type="Button" parent="Center/VBox"]
+layout_mode = 2
+text = "Restart"
+
+[node name="OverworldButton" type="Button" parent="Center/VBox"]
+layout_mode = 2
+text = "Overworld"
+
+[connection signal="pressed" from="Center/VBox/RestartButton" to="." method="_on_restart_button_pressed"]
+[connection signal="pressed" from="Center/VBox/OverworldButton" to="." method="_on_overworld_button_pressed"]

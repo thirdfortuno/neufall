@@ -8,12 +8,20 @@
 
 config_version=5
 
+[animation]
+
+compatibility/default_parent_skeleton_in_mesh_instance_3d=true
+
 [application]
 
 config/name="Neufall"
-run/main_scene="res://Battle/Battle.tscn"
-config/features=PackedStringArray("4.1")
+run/main_scene="res://Overworld/Overworld.tscn"
+config/features=PackedStringArray("4.6")
 config/icon="res://icon.png"
+
+[autoload]
+
+Game="*res://Game/Game.gd"
 
 [display]
 
@@ -21,13 +29,13 @@ window/size/viewport_width=960
 window/size/viewport_height=540
 window/size/resizable=false
 
+[dotnet]
+
+project/assembly_name="Neufall"
+
 [gui]
 
 common/drop_mouse_on_gui_input_disabled=true
-
-[mono]
-
-project/assembly_name="Neufall"
 
 [physics]
 

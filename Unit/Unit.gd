@@ -31,9 +31,17 @@ var active = true
 var abilities
 var behavior
 
-# See the _ready() function for knowing what's an ai unit
-var spr_main = preload("Sprites/SecurityCam/security_cam.png")
-var spr_shadow = preload("Sprites/SecurityCam/security_cam_shadow.png")
+var unit_id
+var enemy_id
+var abbr
+var sprite_main
+var sprite_shadow
+
+func animate_ability(target, ability):
+	pass
+
+func animate_damage(body):
+	pass
 
 func damage(amount):
 	emit_signal("animation")
@@ -41,6 +49,7 @@ func damage(amount):
 	while bodies.size() > 0 && iterations < amount:
 		await get_tree().create_timer(DELAY_DAMAGE).timeout
 		var body = bodies.pop_back()
+		animate_damage(body)
 		body.queue_free()
 		iterations = iterations + 1
 	
@@ -82,6 +91,8 @@ func heal(amount):
 				emit_signal("healed", self)
 				break
 		iterations = iterations + 1
+
+	emit_signal("healed", self)
 
 func move_to(x_new, y_new, into_self = false):
 	moved = true
@@ -187,10 +198,36 @@ func _ready():
 	TILE_OFFSET_X = get_parent().TILE_OFFSET_X
 	TILE_OFFSET_Y = get_parent().TILE_OFFSET_Y
 	
-	# Temporary so it's easier to know the enemy unit when testing
-	if team == "ai":
-		$SpriteMain.texture = spr_main
-		$SpriteShadow.texture = spr_shadow
+	if sprite_main:
+		$SpriteMain.texture = load(sprite_main)
+		$SpriteShadow.texture = load(sprite_shadow)
+	else:
+		$SpriteMain.texture = null
+		$SpriteShadow.texture = null
+		_add_abbr_label()
+
+func mark_objective():
+	var label = Label.new()
+	label.text = "TARGET"
+	label.size = Vector2(TILE_SIZE, TILE_SIZE / 2)
+	label.position = Vector2(-TILE_SIZE / 2, -TILE_SIZE)
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.add_theme_font_size_override("font_size", 8)
+	label.z_index = 2
+	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(label)
+
+func _add_abbr_label():
+	var label = Label.new()
+	label.text = abbr
+	label.size = Vector2(TILE_SIZE, TILE_SIZE)
+	label.position = Vector2(-TILE_SIZE / 2, -TILE_SIZE / 2)
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	label.add_theme_font_size_override("font_size", 10)
+	label.z_index = 2
+	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(label)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):
