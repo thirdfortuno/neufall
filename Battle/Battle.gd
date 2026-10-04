@@ -5,7 +5,6 @@ extends Node2D
 
 @onready var Grid = preload("Grid.gd")
 @onready var AI = preload("AI.gd")
-@onready var MissionData = preload("res://Data/Missions.gd")
 @onready var BattleTracker = preload("BattleTracker.gd")
 @onready var ResultsScene = preload("res://Battle/UI/ResultsUI.tscn")
 @onready var DeployScene = preload("res://Battle/UI/DeployUI.tscn")
@@ -65,7 +64,7 @@ func _ready():
 		mission_id = Game.selected_mission_id
 		if mission_id == null:
 			mission_id = DEFAULT_MISSION
-		mission = MissionData.MISSIONS[mission_id]
+		mission = Game.missions[mission_id]
 	
 	var grid_tile_states = Grid.new(mission["grid"])
 

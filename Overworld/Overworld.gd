@@ -1,18 +1,21 @@
 extends Control
 
-@onready var MissionData = preload("res://Data/Missions.gd")
-
 @onready var MissionList = $Center/VBox/MissionList
 @onready var Details = $Center/VBox/Details
 @onready var StartButton = $Center/VBox/StartButton
+@onready var ErrorsLabel = $Center/VBox/Errors
 
 var selected_id
 
 func _ready():
 	$TopBar.set_current("overworld")
 	
-	for mission_id in MissionData.MISSIONS:
-		var mission = MissionData.MISSIONS[mission_id]
+	if Game.content_errors.size() > 0:
+		ErrorsLabel.visible = true
+		ErrorsLabel.text = "Content errors (also in the Output panel):" + "\n" + "\n".join(Game.content_errors)
+	
+	for mission_id in Game.missions:
+		var mission = Game.missions[mission_id]
 		
 		var button = Button.new()
 		button.text = mission["name"]
@@ -23,7 +26,7 @@ func _ready():
 		MissionList.add_child(button)
 
 func _details_text(mission_id):
-	var mission = MissionData.MISSIONS[mission_id]
+	var mission = Game.missions[mission_id]
 	var lines = [mission["name"]]
 	
 	if Game.has_cleared(mission_id):

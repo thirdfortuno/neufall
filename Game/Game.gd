@@ -3,6 +3,8 @@ extends Node
 const SAVE_PATH = "user://save.dat"
 const UNIT_LIBRARY = "res://Data/UnitLibrary.tres"
 const TECH_TREE = "res://Data/TechTree.tres"
+const CAMPAIGN = "res://Data/Campaign.tres"
+const Validator = preload("res://Data/Validator.gd")
 const TARGET_NAMES = ["enemy", "ally", "self", "tile"]
 const BLOCKER_NAMES = ["tile", "unit"]
 
@@ -10,6 +12,9 @@ var profile
 var selected_mission_id
 var units = {}
 var tech_nodes = {}
+var missions = {}
+var content_errors = []
+var validator
 
 func unit_to_dict(def):
 	var data = {
@@ -74,11 +79,106 @@ func start_mission(mission_id):
 func new_save():
 	profile = _default_profile()
 	save_game()
+	_load_content()
+
+func level_to_dict(scene):
+	var level = scene.instantiate()
+	var layer = level.get_node("Floor")
+	var rect = layer.get_used_rect()
 	
-	units.clear()
-	tech_nodes.clear()
-	_load_units()
-	_load_tech()
+	var grid = []
+	for y in rect.size.y:
+		var row = []
+		for x in rect.size.x:
+			if layer.get_cell_source_id(rect.position + Vector2i(x, y)) == -1:
+				row.append(0)
+			else:
+				row.append(1)
+		grid.append(row)
+	
+	var spawn_tiles = []
+	var enemies = []
+	var goal = null
+	for child in level.get_children():
+		if child is SpawnMarker:
+			spawn_tiles.append(marker_cell(layer, rect, child))
+		elif child is GoalMarker:
+			goal = marker_cell(layer, rect, child)
+		elif child is EnemyMarker:
+			var cell = marker_cell(layer, rect, child)
+			var enemy = {
+				"unit": child.unit.resource_path.get_file().get_basename(),
+				"x": cell[0],
+				"y": cell[1],
+				"behavior": behavior_to_dict(child.behavior)
+			}
+			if child.is_target:
+				enemy["id"] = "target"
+			enemies.append(enemy)
+	
+	var victory = {"type": level.victory_type}
+	if level.victory_type == "reach_tile":
+		victory["x"] = goal[0]
+		victory["y"] = goal[1]
+	elif level.victory_type == "kill_unit":
+		victory["enemy"] = "target"
+	
+	var challenge_list = []
+	for challenge in level.challenges:
+		challenge_list.append(challenge_to_dict(challenge))
+	
+	var data = {
+		"name": level.mission_name,
+		"max_generation": level.max_generation,
+		"grid": grid,
+		"spawn_tiles": spawn_tiles,
+		"victory": victory,
+		"first_clear_reward": level.first_clear_reward.duplicate(),
+		"challenges": challenge_list,
+		"enemies": enemies,
+		"requires": Array(level.requires)
+	}
+	
+	level.free()
+	return data
+
+func behavior_to_dict(def):
+	if def == null:
+		def = BehaviorDef.new()
+	
+	var war = []
+	for method in def.war_methods:
+		war.append({"method": method})
+	
+	return {
+		"version": 1,
+		"search": [{"range": def.search_range, "method": "absolute"}],
+		"peace": [{"method": def.peace_method}],
+		"war": war
+	}
+
+func challenge_to_dict(def):
+	var params = {}
+	match def.type:
+		"win_within_turns":
+			params["turns"] = def.value
+		"max_generation":
+			params["generation"] = def.value
+		"max_units":
+			params["count"] = def.value
+		"only_tag":
+			params["tag"] = def.tag
+		"require_tag":
+			params["tag"] = def.tag
+			params["count"] = def.value
+	
+	return {
+		"id": def.id,
+		"description": def.description,
+		"type": def.type,
+		"params": params,
+		"reward": def.reward.duplicate()
+	}
 
 func go_to_overworld():
 	get_tree().change_scene_to_file("res://Overworld/Overworld.tscn")
@@ -247,22 +347,116 @@ func _flag_names(flags, names):
 func _load_units():
 	var library = ResourceLoader.load(UNIT_LIBRARY, "", ResourceLoader.CACHE_MODE_REPLACE_DEEP)
 	for def in library.units:
-		var unit_id = def.resource_path.get_file().get_basename()
-		units[unit_id] = unit_to_dict(def)
+		if def == null:
+			_report_errors(["UnitLibrary: a unit slot is empty"])
+			continue
+		
+		var unit_id = _resource_id(def)
+		var errors = validator.unit_errors(unit_id, def)
+		if units.has(unit_id):
+			errors.append("Unit %s: listed twice in the UnitLibrary" % unit_id)
+		
+		if errors.size() > 0:
+			_report_errors(errors)
+		else:
+			units[unit_id] = unit_to_dict(def)
+
+func marker_cell(layer, rect, marker):
+	var cell = layer.local_to_map((marker.position - layer.position) / layer.scale) - rect.position
+	return [cell.x, cell.y]
+
+func _load_content():
+	units.clear()
+	tech_nodes.clear()
+	missions.clear()
+	content_errors.clear()
+	validator = Validator.new()
+	_load_units()
+	_load_tech()
+	_load_missions()
+
+func _load_missions():
+	var campaign = ResourceLoader.load(CAMPAIGN, "", ResourceLoader.CACHE_MODE_REPLACE_DEEP)
+	
+	var level_ids = []
+	for scene in campaign.levels:
+		if scene != null:
+			level_ids.append(_resource_id(scene))
+	
+	for scene in campaign.levels:
+		if scene == null:
+			_report_errors(["Campaign: a level slot is empty"])
+			continue
+		
+		var level_id = _resource_id(scene)
+		var errors = validator.level_errors(level_id, scene, units.keys(), level_ids)
+		if missions.has(level_id):
+			errors.append("Level %s: listed twice in the Campaign" % level_id)
+		
+		if errors.size() > 0:
+			_report_errors(errors)
+		else:
+			missions[level_id] = level_to_dict(scene)
 
 func _load_tech():
 	var tree = ResourceLoader.load(TECH_TREE, "", ResourceLoader.CACHE_MODE_REPLACE_DEEP)
+	
+	var node_ids = []
+	var requires_by_id = {}
 	for node in tree.nodes:
+		if node == null:
+			_report_errors(["TechTree: a node slot is empty"])
+			continue
+		
+		node_ids.append(_resource_id(node))
 		var requires = []
 		for required in node.requires:
-			requires.append(required.resource_path.get_file().get_basename())
+			if required != null:
+				requires.append(_resource_id(required))
+		requires_by_id[_resource_id(node)] = requires
+	
+	var in_cycle = validator.tech_cycle_ids(requires_by_id)
+	
+	for node in tree.nodes:
+		if node == null:
+			continue
 		
-		tech_nodes[node.resource_path.get_file().get_basename()] = {
-			"unit": node.unit.resource_path.get_file().get_basename(),
+		var node_id = _resource_id(node)
+		var errors = validator.tech_errors(node_id, node, node_ids, units.keys())
+		if in_cycle.has(node_id):
+			errors.append("Tech node %s: is part of a requires cycle" % node_id)
+		if tech_nodes.has(node_id):
+			errors.append("Tech node %s: listed twice in the TechTree" % node_id)
+		
+		if errors.size() > 0:
+			_report_errors(errors)
+			continue
+		
+		tech_nodes[node_id] = {
+			"unit": _resource_id(node.unit),
 			"cost": node.cost.duplicate(),
-			"requires": requires,
+			"requires": requires_by_id[node_id],
 			"position": node.position
 		}
+	
+	var changed = true
+	while changed:
+		changed = false
+		for node_id in tech_nodes.keys():
+			for required_id in tech_nodes[node_id]["requires"]:
+				if !tech_nodes.has(required_id):
+					_report_errors(["Tech node %s: requires %s, which has errors" % [node_id, required_id]])
+					tech_nodes.erase(node_id)
+					changed = true
+					break
+
+func _resource_id(resource):
+	return resource.resource_path.get_file().get_basename()
+
+func _report_errors(errors):
+	for error in errors:
+		content_errors.append(error)
+		push_error(error)
 
 func _default_profile():
 	return {
@@ -279,5 +473,4 @@ func _add_resources(target, added):
 func _ready():
 	profile = _default_profile()
 	load_game()
-	_load_units()
-	_load_tech()
+	_load_content()

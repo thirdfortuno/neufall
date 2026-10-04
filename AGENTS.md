@@ -25,8 +25,8 @@ There is no CLI build or test suite. To verify a change:
    `project.godot`). Picking a mission sets `Game.selected_mission_id` and
    loads `Battle/Battle.tscn`; running `Battle.tscn` directly (F6) falls back
    to `DEFAULT_MISSION` in [Battle/Battle.gd](Battle/Battle.gd). Missions are
-   defined in [Data/Missions.gd](Data/Missions.gd); units and abilities are
-   Resources (see Unit and ability data below).
+   level scenes in `Levels/` listed in `Data/Campaign.tres`; units and abilities
+   are Resources (see Unit and ability data below).
 3. Manually exercise the golden path (select unit → move → use ability →
    end turn → AI turn) and any edge case your change touches. There is no
    automated regression coverage, so say so explicitly rather than claiming
@@ -52,8 +52,8 @@ choice for GDScript — but none exists yet, so don't assume it's installed.
 - **`Battle/AI.gd`** — enemy turn logic: search → peace/war decision →
   target selection → pathfinding (multi-source BFS, see `_path_to_target`) →
   move → use ability. Driven by a per-unit `behavior` dict (see
-  `CAMERA_BEHAVIOR` in `Data/Missions.gd` for the shape: `search`/`peace`/`war`
-  method lists, versioned via `behavior.version`).
+  `Game.behavior_to_dict`, built from a `BehaviorDef` in `Data/behaviors/`:
+  `search`/`peace`/`war` method lists, versioned via `behavior.version`).
 - **Unit and ability data** — authored as Godot Resources edited in the
   Inspector: `Data/units/*.tres` (`UnitDef`), `Data/abilities/*.tres`
   (`AbilityDef`, with `EffectDef` sub-resources), listed in
@@ -64,6 +64,29 @@ choice for GDScript — but none exists yet, so don't assume it's installed.
   `UnitDef`, drag existing abilities into its list, and add it to the library.
   The Def scripts use typed `@export` fields so the Inspector shows pickers;
   that is the only place typed GDScript is used.
+- **Levels** — each mission is a scene in `Levels/` (file name = mission id)
+  listed in `Data/Campaign.tres` (its order is the overworld order). The root
+  node uses `LevelDef` (name, `max_generation`, `victory_type`,
+  `first_clear_reward`, `requires`, `challenges`). A child `Floor`
+  `TileMapLayer` is the map: painted cells are floor, empty cells are void; it
+  uses `Levels/floor_tileset.tres` (64px tiles) at scale 0.5 so cells are 32px
+  like the battle grid, and the floor node stays at the origin. Direct
+  children `SpawnMarker` (player spawn tiles, their count is the squad size),
+  `EnemyMarker` (`unit`, `behavior` (defaults to a plain `BehaviorDef` if left empty), `is_target`) and `GoalMarker` (the
+  `reach_tile` victory tile) are placed inside the cell they mean. A scene is
+  converted by `Game.level_to_dict` into the same mission dict the battle code
+  reads (`Game.missions`).
+- **Validator** — `Data/Validator.gd`, run by `Game._load_content` on every
+  load. It checks units and abilities (empty names, no abilities, no effects,
+  unknown effect types, zero range, tile-only abilities without a `tile_set`
+  effect), tech nodes (missing or unlisted unit, bad cost, missing or cyclic
+  `requires`) and levels (needs a `Floor` with tiles, spawn and enemy markers,
+  markers on void or sharing a tile, an enemy marker with no unit, `reach_tile`
+  needing exactly one `GoalMarker`, `kill_unit` needing an `is_target` enemy,
+  challenge ids, values and tags, `requires`). Anything with errors is skipped
+  rather than loaded, each error goes to `push_error` and `Game.content_errors`,
+  and the Overworld shows them in red. Add a check here when adding a content
+  rule.
 - **Tech tree** — `Data/TechTree.tres` (`TechTreeDef`) lists nodes in
   `Data/tech/*.tres` (`TechNodeDef`: the `unit` it unlocks, a resource `cost`
   dict, `requires` nodes, and a graph `position`). The node id is the file
@@ -87,8 +110,8 @@ choice for GDScript — but none exists yet, so don't assume it's installed.
   challenge rewards (each only once). Resources are a dict of type to amount
   (placeholder types `data` and `bandwidth`). Keep it free of node references.
 - **Screens** — `Overworld/` is the main scene: it lists every mission in
-  `Data/Missions.gd` (disabled until the missions in its optional `requires`
-  list are cleared), shows details, and starts the chosen one through
+  `Game.missions` (disabled until the missions in its `requires` list are
+  cleared), shows details, and starts the chosen one through
   `Game.start_mission`. It is meant to become a pannable graph of mission
   nodes later. The mission itself is `Battle/Battle.tscn`, and the results
   screen's "Overworld" button returns to the overworld. `UI/TopBar.tscn` is

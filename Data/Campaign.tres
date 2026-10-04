@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="CampaignDef" format=3 uid="uid://cy5vn5fl1pc0b"]
+
+[ext_resource type="Script" uid="uid://bsv40ybpn6cwg" path="res://Data/Defs/CampaignDef.gd" id="1_campaign"]
+[ext_resource type="PackedScene" path="res://Levels/training_node.tscn" id="2_level"]
+
+[resource]
+script = ExtResource("1_campaign")
+levels = Array[PackedScene]([ExtResource("2_level")])
