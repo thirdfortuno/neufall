@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="UnitDef" format=3 uid="uid://ddhy010773rvi"]
+
+[ext_resource type="Script" uid="uid://8eoy375x8x7p" path="res://Data/Defs/AbilityDef.gd" id="1_smalx"]
+[ext_resource type="Script" uid="uid://blqqqqy2ad1a0" path="res://Data/Defs/UnitDef.gd" id="2_s678f"]
+[ext_resource type="Resource" uid="uid://b5xk7htt1jor4" path="res://Data/abilities/plink.tres" id="2_utjq6"]
+
+[resource]
+script = ExtResource("2_s678f")
+unit_name = "BB"
+description = "Classic ranged attack program"
+abbr = "bb"
+starts_unlocked = true
+hp_max = 2
+moves_max = 2
+abilities = Array[ExtResource("1_smalx")]([ExtResource("2_utjq6")])
+metadata/_custom_type_script = "uid://blqqqqy2ad1a0"

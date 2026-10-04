@@ -1,10 +1,9 @@
-[gd_resource type="Resource" script_class="TechTreeDef" load_steps=5 format=3]
+[gd_resource type="Resource" script_class="TechTreeDef" load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://Data/Defs/TechTreeDef.gd" id="1_tree"]
 [ext_resource type="Script" path="res://Data/Defs/TechNodeDef.gd" id="2_nodedef"]
-[ext_resource type="Resource" path="res://Data/tech/hack_support.tres" id="3_support"]
 [ext_resource type="Resource" path="res://Data/tech/hack.tres" id="4_hack"]
 
 [resource]
 script = ExtResource("1_tree")
-nodes = Array[ExtResource("2_nodedef")]([ExtResource("4_hack"), ExtResource("3_support")])
+nodes = Array[ExtResource("2_nodedef")]([ExtResource("4_hack")])

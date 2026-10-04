@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="AbilityDef" format=3 uid="uid://b5xk7htt1jor4"]
+
+[ext_resource type="Script" uid="uid://snibrfoceuqv" path="res://Data/Defs/EffectDef.gd" id="1_711ib"]
+[ext_resource type="Script" uid="uid://8eoy375x8x7p" path="res://Data/Defs/AbilityDef.gd" id="2_u7wbm"]
+
+[sub_resource type="Resource" id="Resource_711ib"]
+script = ExtResource("1_711ib")
+metadata/_custom_type_script = "uid://snibrfoceuqv"
+
+[resource]
+script = ExtResource("2_u7wbm")
+ability_name = "Plink"
+description = "Delete 1 sector from the target"
+effects = Array[ExtResource("1_711ib")]([SubResource("Resource_711ib")])
+metadata/_custom_type_script = "uid://8eoy375x8x7p"
