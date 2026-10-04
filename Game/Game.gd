@@ -98,6 +98,7 @@ func level_to_dict(scene):
 		grid.append(row)
 	
 	var spawn_tiles = []
+	var fixed_units = []
 	var enemies = []
 	var goal = null
 	for child in level.get_children():
@@ -105,12 +106,21 @@ func level_to_dict(scene):
 			spawn_tiles.append(marker_cell(layer, rect, child))
 		elif child is GoalMarker:
 			goal = marker_cell(layer, rect, child)
+		elif child is FixedUnitMarker:
+			var cell = marker_cell(layer, rect, child)
+			fixed_units.append({
+				"unit": child.unit.resource_path.get_file().get_basename(),
+				"x": cell[0],
+				"y": cell[1],
+				"bodies": ordered_body_cells(layer, rect, child)
+			})
 		elif child is EnemyMarker:
 			var cell = marker_cell(layer, rect, child)
 			var enemy = {
 				"unit": child.unit.resource_path.get_file().get_basename(),
 				"x": cell[0],
 				"y": cell[1],
+				"bodies": ordered_body_cells(layer, rect, child),
 				"behavior": behavior_to_dict(child.behavior)
 			}
 			if child.is_target:
@@ -134,6 +144,7 @@ func level_to_dict(scene):
 		"max_generation": level.max_generation,
 		"grid": grid,
 		"spawn_tiles": spawn_tiles,
+		"fixed_units": fixed_units,
 		"victory": victory,
 		"first_clear_reward": level.first_clear_reward.duplicate(),
 		"challenges": challenge_list,
@@ -376,8 +387,37 @@ func _load_units():
 			units[unit_id] = unit_to_dict(def)
 
 func marker_cell(layer, rect, marker):
-	var cell = layer.local_to_map((marker.position - layer.position) / layer.scale) - rect.position
+	return position_cell(layer, rect, marker.position)
+
+func position_cell(layer, rect, position):
+	var cell = layer.local_to_map((position - layer.position) / layer.scale) - rect.position
 	return [cell.x, cell.y]
+
+func body_cells(layer, rect, marker):
+	var cells = []
+	for child in marker.get_children():
+		if child is BodyMarker:
+			cells.append(position_cell(layer, rect, marker.position + child.position))
+	return cells
+
+func ordered_body_cells(layer, rect, marker):
+	var head = marker_cell(layer, rect, marker)
+	var remaining = body_cells(layer, rect, marker)
+	var ordered = []
+	var frontier = [head]
+	
+	while frontier.size() > 0 && remaining.size() > 0:
+		var next = []
+		for cell in frontier:
+			for other in remaining.duplicate():
+				if abs(other[0] - cell[0]) + abs(other[1] - cell[1]) == 1:
+					remaining.erase(other)
+					ordered.append(other)
+					next.append(other)
+		frontier = next
+	
+	ordered.append_array(remaining)
+	return ordered
 
 func _load_content():
 	units.clear()

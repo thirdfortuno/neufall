@@ -72,8 +72,15 @@ choice for GDScript — but none exists yet, so don't assume it's installed.
   uses `Levels/floor_tileset.tres` (64px tiles) at scale 0.5 so cells are 32px
   like the battle grid, and the floor node stays at the origin. Direct
   children `SpawnMarker` (player spawn tiles, their count is the squad size),
-  `EnemyMarker` (`unit`, `behavior` (defaults to a plain `BehaviorDef` if left empty), `is_target`) and `GoalMarker` (the
-  `reach_tile` victory tile) are placed inside the cell they mean. A scene is
+  `FixedUnitMarker` (a set player `unit` that starts on its tile and cannot
+  be changed or removed in the deploy phase; it counts as part of the squad
+  for challenges), `EnemyMarker` (`unit`, `behavior` (defaults to a plain
+  `BehaviorDef` if left empty), `is_target`) and `GoalMarker` (the
+  `reach_tile` victory tile) are placed inside the cell they mean. A unit
+  marker can have `BodyMarker` children that give the unit extra starting body
+  tiles: they must form an adjacent chain from the unit's tile, sit on floor
+  tiles of their own, and total (with the head) no more than the unit's
+  `hp_max`. A scene is
   converted by `Game.level_to_dict` into the same mission dict the battle code
   reads (`Game.missions`); the dict keeps the level's `scene` path so
   cosmetics (tile art variants, a background node) can later be shown in the
@@ -84,7 +91,8 @@ choice for GDScript — but none exists yet, so don't assume it's installed.
   unknown effect types, zero range, tile-only abilities without a `tile_set`
   effect), tech nodes (missing or unlisted unit, bad cost, missing or cyclic
   `requires`) and levels (needs a `Floor` with tiles, spawn and enemy markers,
-  markers on void or sharing a tile, an enemy marker with no unit, `reach_tile`
+  markers (including body markers) on void or sharing a tile, disconnected
+  body markers, a unit marker with no unit, `reach_tile`
   needing exactly one `GoalMarker`, `kill_unit` needing an `is_target` enemy,
   challenge ids, values and tags, `requires`). Anything with errors is skipped
   rather than loaded, each error goes to `push_error` and `Game.content_errors`,

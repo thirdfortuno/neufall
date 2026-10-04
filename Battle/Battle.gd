@@ -53,6 +53,7 @@ var tracker
 var battle_over = false
 
 var deploying = true
+var fixed_count = 0
 var deploy_ui
 var deploy_unit_id
 
@@ -124,6 +125,16 @@ func _init_tiles(grid_tile_states):
 func _init_units():
 	grid_units = Grid.new(width, height)
 	
+	for fixed in mission["fixed_units"]:
+		_spawn_unit({
+			"x": fixed["x"],
+			"y": fixed["y"],
+			"team": "player",
+			"unit": fixed["unit"],
+			"bodies": fixed["bodies"]
+		})
+		fixed_count = fixed_count + 1
+	
 	for enemy in mission["enemies"]:
 		_spawn_unit({
 			"x": enemy["x"],
@@ -131,6 +142,7 @@ func _init_units():
 			"team": "ai",
 			"unit": enemy["unit"],
 			"id": enemy.get("id"),
+			"bodies": enemy["bodies"],
 			"behavior": enemy["behavior"]
 		})
 	
@@ -179,6 +191,13 @@ func _spawn_unit(u):
 	add_child(unit)
 	grid_units.set_value(x,y,unit)
 	
+	var extra_bodies = u.get("bodies", [])
+	for cell in extra_bodies:
+		unit.add_body(cell[0], cell[1])
+		grid_units.set_value(cell[0], cell[1], unit)
+	if extra_bodies.size() > 0:
+		unit.update_body_positions(grid_units)
+	
 	var victory = mission["victory"]
 	if victory["type"] == "kill_unit" && team == "ai" && unit.enemy_id == victory["enemy"]:
 		unit.mark_objective()
@@ -201,6 +220,7 @@ func _init_deploy():
 	deploy_ui.connect("back_pressed", Callable(self, "_on_deploy_back_pressed"))
 	deploy_ui.show_objective(Game.victory_text(mission["victory"]))
 	deploy_ui.show_roster(roster, Game.units, mission["spawn_tiles"].size())
+	deploy_ui.set_count(0, mission["spawn_tiles"].size(), fixed_count > 0)
 	deploy_ui.show_challenges(Game.challenges_text(mission_id, mission))
 
 ##############
@@ -233,7 +253,11 @@ func _deploy_on_tile(tile):
 		deploy_unit_id = null
 		deploy_ui.set_selected(null)
 	
-	deploy_ui.set_count(units_live_player.size(), mission["spawn_tiles"].size())
+	deploy_ui.set_count(
+		units_live_player.size() - fixed_count,
+		mission["spawn_tiles"].size(),
+		units_live_player.size() > 0
+	)
 
 func _on_deploy_unit_chosen(unit_id):
 	if deploy_unit_id == unit_id:

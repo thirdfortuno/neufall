@@ -27,7 +27,6 @@ func show_roster(unit_ids, units, max_count):
 		roster_buttons[unit_id] = button
 
 	RosterScroll.fit(RosterList)
-	set_count(0, max_count)
 
 func show_objective(text):
 	ObjectiveLabel.text = "Objective: %s" % text
@@ -36,9 +35,9 @@ func show_challenges(text):
 	GoalsLabel.visible = text != ""
 	GoalsLabel.text = text
 
-func set_count(count, max_count):
+func set_count(count, max_count, can_start):
 	CountLabel.text = "Deployed: %d / %d" % [count, max_count]
-	StartButton.disabled = count == 0
+	StartButton.disabled = !can_start
 
 func set_selected(unit_id):
 	for id in roster_buttons:
