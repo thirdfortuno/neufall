@@ -20,6 +20,7 @@ var validator
 func unit_to_dict(def):
 	var data = {
 		"name": def.unit_name,
+		"description": def.description,
 		"abbr": def.abbr,
 		"side": def.side,
 		"generation": def.generation,
@@ -47,6 +48,7 @@ func ability_to_dict(def):
 	
 	var data = {
 		"ability_name": def.ability_name,
+		"description": def.description,
 		"ability_range": def.ability_range,
 		"targeting": def.targeting,
 		"blockers": _flag_names(def.blockers, BLOCKER_NAMES),
@@ -253,6 +255,21 @@ func available_units(max_generation):
 
 func go_to_tech_tree():
 	get_tree().change_scene_to_file("res://TechTree/TechTree.tscn")
+
+func unit_details_text(unit_id):
+	var data = units[unit_id]
+	var lines = []
+	
+	if data["description"] != "":
+		lines.append(data["description"])
+	
+	for ability in data["abilities"]:
+		var line = "%s (range %d)" % [ability["ability_name"], ability["ability_range"]]
+		if ability["description"] != "":
+			line = line + ": " + ability["description"]
+		lines.append(line)
+	
+	return "\n".join(lines)
 
 func unit_label(unit_id):
 	var data = units[unit_id]

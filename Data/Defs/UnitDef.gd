@@ -2,6 +2,7 @@ class_name UnitDef
 extends Resource
 
 @export var unit_name: String = ""
+@export_multiline var description: String = ""
 @export var abbr: String = ""
 @export_enum("player", "enemy") var side: String = "player"
 @export var generation: int = 1

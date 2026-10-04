@@ -42,6 +42,7 @@ func show_unit(unit):
 		var i = 0
 		for ability in unit.abilities:
 			AbilityButtonList[i].text = ability.ability_name
+			AbilityButtonList[i].tooltip_text = ability.description
 			AbilityButtonList[i].visible = true
 			if ability.has('size_requirement'):
 				if unit.bodies.size() < ability.size_requirement:

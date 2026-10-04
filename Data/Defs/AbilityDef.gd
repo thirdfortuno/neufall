@@ -2,6 +2,7 @@ class_name AbilityDef
 extends Resource
 
 @export var ability_name: String = ""
+@export_multiline var description: String = ""
 @export var ability_range: int = 1
 @export_enum("manhattan", "rook", "bishop", "queen") var targeting: String = "manhattan"
 @export_flags("tile", "unit") var blockers: int = 0

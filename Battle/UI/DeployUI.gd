@@ -21,6 +21,7 @@ func show_roster(unit_ids, units, max_count):
 
 		var button = Button.new()
 		button.toggle_mode = true
+		button.tooltip_text = Game.unit_details_text(unit_id)
 		button.text = "%s: %s" % [units[unit_id]["name"], ", ".join(ability_names)]
 		button.pressed.connect(_on_roster_button_pressed.bind(unit_id))
 		RosterList.add_child(button)
