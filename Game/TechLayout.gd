@@ -5,11 +5,13 @@ const MARGIN = Vector2(20, 20)
 const SWEEPS = 4
 
 func layout(tech_nodes):
-	var ids = tech_nodes.keys()
+	return layout_parents(_parents(tech_nodes))
+
+func layout_parents(parents):
+	var ids = parents.keys()
 	if ids.size() == 0:
 		return {}
 
-	var parents = _parents(tech_nodes)
 	var depth = _depths(ids, parents)
 	var layers = _ordered_layers(ids, parents, depth)
 	return _positions(layers)

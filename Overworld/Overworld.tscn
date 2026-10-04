@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://Overworld/Overworld.gd" id="1_select"]
 [ext_resource type="PackedScene" path="res://UI/TopBar.tscn" id="2_topbar"]
-[ext_resource type="Script" path="res://UI/CappedScroll.gd" id="3_scroll"]
+[ext_resource type="PackedScene" path="res://UI/PanView.tscn" id="3_pan"]
 
 [node name="Overworld" type="Control"]
 layout_mode = 3
@@ -19,54 +19,47 @@ anchors_preset = 10
 anchor_right = 1.0
 grow_horizontal = 2
 
-[node name="Center" type="CenterContainer" parent="."]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
+[node name="PanView" parent="." instance=ExtResource("3_pan")]
+layout_mode = 0
+offset_top = 40.0
+offset_right = 640.0
+offset_bottom = 540.0
 
-[node name="VBox" type="VBoxContainer" parent="Center"]
+[node name="Details" type="PanelContainer" parent="."]
+layout_mode = 0
+offset_left = 650.0
+offset_top = 40.0
+offset_right = 950.0
+offset_bottom = 530.0
+
+[node name="VBox" type="VBoxContainer" parent="Details"]
 layout_mode = 2
 
-[node name="Title" type="Label" parent="Center/VBox"]
+[node name="InfoScroll" type="ScrollContainer" parent="Details/VBox"]
 layout_mode = 2
-text = "Missions"
-horizontal_alignment = 1
-
-[node name="MissionScroll" type="ScrollContainer" parent="Center/VBox"]
-layout_mode = 2
+size_flags_vertical = 3
 horizontal_scroll_mode = 0
-script = ExtResource("3_scroll")
-max_height = 200
 
-[node name="MissionList" type="VBoxContainer" parent="Center/VBox/MissionScroll"]
+[node name="InfoBox" type="VBoxContainer" parent="Details/VBox/InfoScroll"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="DetailsScroll" type="ScrollContainer" parent="Center/VBox"]
-custom_minimum_size = Vector2(400, 130)
+[node name="Info" type="Label" parent="Details/VBox/InfoScroll/InfoBox"]
+custom_minimum_size = Vector2(270, 0)
 layout_mode = 2
-horizontal_scroll_mode = 0
-
-[node name="Details" type="Label" parent="Center/VBox/DetailsScroll"]
-custom_minimum_size = Vector2(380, 0)
-layout_mode = 2
-size_flags_horizontal = 3
+text = "Select a mission"
 autowrap_mode = 3
 
-[node name="StartButton" type="Button" parent="Center/VBox"]
-layout_mode = 2
-disabled = true
-text = "Start"
-
-[node name="Errors" type="Label" parent="Center/VBox"]
+[node name="Errors" type="Label" parent="Details/VBox/InfoScroll/InfoBox"]
 visible = false
-custom_minimum_size = Vector2(700, 0)
+custom_minimum_size = Vector2(270, 0)
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.4, 0.4, 1)
 autowrap_mode = 3
 
-[connection signal="pressed" from="Center/VBox/StartButton" to="." method="_on_start_button_pressed"]
+[node name="StartButton" type="Button" parent="Details/VBox"]
+layout_mode = 2
+disabled = true
+text = "Start"
+
+[connection signal="pressed" from="Details/VBox/StartButton" to="." method="_on_start_button_pressed"]

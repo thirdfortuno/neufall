@@ -119,11 +119,12 @@ choice for GDScript — but none exists yet, so don't assume it's installed.
   `record_victory` grants the first-clear reward plus any newly completed
   challenge rewards (each only once). Resources are a dict of type to amount
   (placeholder types `data` and `bandwidth`). Keep it free of node references.
-- **Screens** — `Overworld/` is the main scene: it lists every mission in
-  `Game.missions` (disabled until the missions in its `requires` list are
-  cleared), shows details, and starts the chosen one through
-  `Game.start_mission`. It is meant to become a pannable graph of mission
-  nodes later. The mission itself is `Battle/Battle.tscn`, and the results
+- **Screens** — `Overworld/` is the main scene: a pannable graph of mission
+  nodes (the same `UI/PanView.tscn` and automatic layout as the tech tree,
+  with `Game/TechLayout.gd` placing missions by their `requires` list). Nodes
+  are green when cleared, white when available and grey when locked (a mission
+  is locked until every mission in its `requires` is cleared); selecting one
+  shows details, and Start runs it through `Game.start_mission`. The mission itself is `Battle/Battle.tscn`, and the results
   screen's "Overworld" button returns to the overworld. `UI/TopBar.tscn` is
   the shared bar (resource totals plus screen buttons) instanced on
   out-of-battle screens; a screen calls `$TopBar.set_current("name")` so its
