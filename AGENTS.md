@@ -62,6 +62,9 @@ choice for GDScript — but none exists yet, so don't assume it's installed.
   each Resource into the plain dict shape the battle code reads
   (`Game.units[id]`), so runtime code stays dict-based. To add a unit: make a
   `UnitDef`, drag existing abilities into its list, and add it to the library.
+  Units and abilities both have an optional `description` (shown in the tech
+  tree details panel and as tooltips on deploy roster buttons and the battle
+  action buttons).
   The Def scripts use typed `@export` fields so the Inspector shows pickers;
   that is the only place typed GDScript is used.
 - **Levels** — each mission is a scene in `Levels/` (file name = mission id)

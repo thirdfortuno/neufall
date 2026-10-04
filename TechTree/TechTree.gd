@@ -110,6 +110,11 @@ func _show_details():
 			mark = "[x]"
 		lines.append("%s %s" % [mark, Game.unit_label(unit_id)])
 
+	var details = Game.unit_details_text(node["unit"])
+	if details != "":
+		lines.append("")
+		lines.append(details)
+	
 	Info.text = "\n".join(lines)
 	ResearchButton.disabled = state != "available" || !Game.can_afford(node["cost"])
 
