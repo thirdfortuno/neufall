@@ -92,8 +92,15 @@ choice for GDScript — but none exists yet, so don't assume it's installed.
   rule.
 - **Tech tree** — `Data/TechTree.tres` (`TechTreeDef`) lists nodes in
   `Data/tech/*.tres` (`TechNodeDef`: the `unit` it unlocks, a resource `cost`
-  dict, `requires` nodes, and a graph `position`). The node id is the file
-  name. A unit with `starts_unlocked` is available from the start, and its node
+  dict and `required_units` (units that must already be unlocked) with a
+  `requires_mode` of `all` or `any`). The node id is the file name, and only
+  one node may unlock a given unit. Node positions are not authored: after
+  loading, `Game/TechLayout.gd` lays the graph out top to bottom (a node's
+  row is one below its deepest prerequisite, and nodes in a row are ordered by
+  their prerequisites' positions to limit crossings). The graph draws a solid
+  line from a prerequisite unit's node for ALL, a dashed line for ANY (green
+  once that prerequisite is unlocked), and shows "Needs ALL/ANY of N" on the
+  node. A unit with `starts_unlocked` is available from the start, and its node
   (cost empty) shows as already unlocked, so starting units appear in the
   graph; any other player unit needs its node researched. `Game.gd` holds `unlock_node`,
   `node_state` (`unlocked`/`available`/`locked`), `can_afford`, and
@@ -125,7 +132,9 @@ choice for GDScript — but none exists yet, so don't assume it's installed.
   re-reads the unit library and tech tree `.tres` files from disk (bypassing
   the resource cache), and reloads the screen. Missions are still a script and
   need a restart to pick up edits. `TechTree/` is the tech tree screen: a pannable
-  graph (`UI/PanView.tscn`, drag empty space to pan) of one button per node
+  graph (`UI/PanView.tscn`: drag empty space or use the mouse wheel, shift
+  for sideways, to pan; it stays within the graph's bounds and has a Recenter
+  button) of one button per node
   from `Game.tech_nodes`, with lines to prerequisites and a details panel with
   a Research button that calls `Game.unlock_node`. A main menu is planned but
   not built.

@@ -30,29 +30,35 @@ func unit_errors(unit_id, def):
 
 	return errors
 
-func tech_errors(node_id, def, node_ids, unit_ids):
+func tech_errors(node_id, def, unit_ids, obtainable_unit_ids):
 	var errors = []
 	var label = "Tech node %s" % node_id
-
+	var own_unit_id = ""
+	
 	if def.unit == null:
 		errors.append("%s: has no unit" % label)
-	elif !unit_ids.has(def.unit.resource_path.get_file().get_basename()):
-		errors.append("%s: unit %s is not a valid unit in the UnitLibrary" % [label, def.unit.resource_path.get_file().get_basename()])
-
+	else:
+		own_unit_id = def.unit.resource_path.get_file().get_basename()
+		if !unit_ids.has(own_unit_id):
+			errors.append("%s: unit %s is not a valid unit in the UnitLibrary" % [label, own_unit_id])
+	
 	for type in def.cost:
 		if typeof(def.cost[type]) != TYPE_INT || def.cost[type] < 0:
 			errors.append("%s: cost for '%s' must be a whole number of 0 or more" % [label, type])
-
-	for required in def.requires:
+	
+	for required in def.required_units:
 		if required == null:
-			errors.append("%s: a requires slot is empty" % label)
+			errors.append("%s: a required_units slot is empty" % label)
 			continue
+		
 		var required_id = required.resource_path.get_file().get_basename()
-		if required_id == node_id:
-			errors.append("%s: requires itself" % label)
-		elif !node_ids.has(required_id):
-			errors.append("%s: requires %s, which is not in the TechTree" % [label, required_id])
-
+		if required_id == own_unit_id:
+			errors.append("%s: requires its own unit" % label)
+		elif !unit_ids.has(required_id):
+			errors.append("%s: requires unit %s, which is not a valid unit in the UnitLibrary" % [label, required_id])
+		elif !obtainable_unit_ids.has(required_id):
+			errors.append("%s: requires unit %s, which no tech node unlocks and which does not start unlocked" % [label, required_id])
+	
 	return errors
 
 func tech_cycle_ids(requires_by_id):

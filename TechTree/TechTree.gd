@@ -1,6 +1,7 @@
 extends Control
 
-const NODE_SIZE = Vector2(200, 56)
+const TechLayout = preload("res://Game/TechLayout.gd")
+const NODE_SIZE = TechLayout.NODE_SIZE
 const STATE_COLORS = {
 	"unlocked": Color(0.5, 1.0, 0.5),
 	"available": Color(1.0, 1.0, 1.0),
@@ -8,19 +9,20 @@ const STATE_COLORS = {
 }
 
 @onready var Content = $PanView/Content
-@onready var Info = $Details/VBox/Info
+@onready var Info = $Details/VBox/InfoScroll/Info
 @onready var ResearchButton = $Details/VBox/ResearchButton
 
 var node_buttons = {}
 var selected_id
+var lines_canvas
 
 func _ready():
 	$TopBar.set_current("tech_tree")
 
-	var lines = Control.new()
-	lines.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	lines.draw.connect(_draw_lines.bind(lines))
-	Content.add_child(lines)
+	lines_canvas = Control.new()
+	lines_canvas.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	lines_canvas.draw.connect(_draw_lines.bind(lines_canvas))
+	Content.add_child(lines_canvas)
 
 	for node_id in Game.tech_nodes:
 		var node = Game.tech_nodes[node_id]
@@ -31,29 +33,55 @@ func _ready():
 			Game.unit_label(node["unit"]),
 			Game.resources_text(node["cost"])
 		]
+		if node["required_units"].size() > 1:
+			button.text = button.text + "\nNeeds %s of %d" % [
+				node["requires_mode"].to_upper(),
+				node["required_units"].size()
+			]
 		button.position = node["position"]
 		button.custom_minimum_size = NODE_SIZE
 		button.pressed.connect(_on_node_pressed.bind(node_id))
 		Content.add_child(button)
 		node_buttons[node_id] = button
 
+	if Game.tech_nodes.size() > 0:
+		var bounds
+		for node_id in Game.tech_nodes:
+			var rect = Rect2(Game.tech_nodes[node_id]["position"], NODE_SIZE)
+			if bounds == null:
+				bounds = rect
+			else:
+				bounds = bounds.merge(rect)
+		$PanView.set_bounds(bounds)
+		$PanView.recenter()
+
 	_refresh()
 
 func _draw_lines(canvas):
 	for node_id in Game.tech_nodes:
-		for required_id in Game.tech_nodes[node_id]["requires"]:
-			canvas.draw_line(
-				Game.tech_nodes[required_id]["position"] + NODE_SIZE / 2,
-				Game.tech_nodes[node_id]["position"] + NODE_SIZE / 2,
-				Color(0.7, 0.7, 0.7),
-				2.0
-			)
+		var node = Game.tech_nodes[node_id]
+		for unit_id in node["required_units"]:
+			var from_id = Game.node_for_unit(unit_id)
+			if from_id == null:
+				continue
+			
+			var color = Color(0.7, 0.7, 0.7)
+			if Game.is_unit_unlocked(unit_id):
+				color = Color(0.5, 1.0, 0.5)
+			
+			var from = Game.tech_nodes[from_id]["position"] + NODE_SIZE / 2
+			var to = node["position"] + NODE_SIZE / 2
+			if node["requires_mode"] == "any" && node["required_units"].size() > 1:
+				canvas.draw_dashed_line(from, to, color, 2.0, 8.0)
+			else:
+				canvas.draw_line(from, to, color, 2.0)
 
 func _refresh():
 	for node_id in node_buttons:
 		node_buttons[node_id].modulate = STATE_COLORS[Game.node_state(node_id)]
 		node_buttons[node_id].set_pressed_no_signal(node_id == selected_id)
 
+	lines_canvas.queue_redraw()
 	$TopBar.refresh()
 	_show_details()
 
@@ -72,11 +100,15 @@ func _show_details():
 		"Cost: %s" % Game.resources_text(node["cost"])
 	]
 
-	if node["requires"].size() > 0:
-		var names = []
-		for required_id in node["requires"]:
-			names.append(Game.unit_label(Game.tech_nodes[required_id]["unit"]))
-		lines.append("Requires: %s" % ", ".join(names))
+	if node["required_units"].size() == 1:
+		lines.append("Requires:")
+	elif node["required_units"].size() > 1:
+		lines.append("Requires %s of:" % node["requires_mode"].to_upper())
+	for unit_id in node["required_units"]:
+		var mark = "[ ]"
+		if Game.is_unit_unlocked(unit_id):
+			mark = "[x]"
+		lines.append("%s %s" % [mark, Game.unit_label(unit_id)])
 
 	Info.text = "\n".join(lines)
 	ResearchButton.disabled = state != "available" || !Game.can_afford(node["cost"])

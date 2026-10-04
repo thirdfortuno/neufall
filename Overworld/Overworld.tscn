@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://Overworld/Overworld.gd" id="1_select"]
 [ext_resource type="PackedScene" path="res://UI/TopBar.tscn" id="2_topbar"]
+[ext_resource type="Script" path="res://UI/CappedScroll.gd" id="3_scroll"]
 
 [node name="Overworld" type="Control"]
 layout_mode = 3
@@ -35,12 +36,25 @@ layout_mode = 2
 text = "Missions"
 horizontal_alignment = 1
 
-[node name="MissionList" type="VBoxContainer" parent="Center/VBox"]
+[node name="MissionScroll" type="ScrollContainer" parent="Center/VBox"]
 layout_mode = 2
+horizontal_scroll_mode = 0
+script = ExtResource("3_scroll")
+max_height = 200
 
-[node name="Details" type="Label" parent="Center/VBox"]
-custom_minimum_size = Vector2(400, 0)
+[node name="MissionList" type="VBoxContainer" parent="Center/VBox/MissionScroll"]
 layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="DetailsScroll" type="ScrollContainer" parent="Center/VBox"]
+custom_minimum_size = Vector2(400, 130)
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="Details" type="Label" parent="Center/VBox/DetailsScroll"]
+custom_minimum_size = Vector2(380, 0)
+layout_mode = 2
+size_flags_horizontal = 3
 autowrap_mode = 3
 
 [node name="StartButton" type="Button" parent="Center/VBox"]

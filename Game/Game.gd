@@ -5,6 +5,7 @@ const UNIT_LIBRARY = "res://Data/UnitLibrary.tres"
 const TECH_TREE = "res://Data/TechTree.tres"
 const CAMPAIGN = "res://Data/Campaign.tres"
 const Validator = preload("res://Data/Validator.gd")
+const TechLayout = preload("res://Game/TechLayout.gd")
 const TARGET_NAMES = ["enemy", "ally", "self", "tile"]
 const BLOCKER_NAMES = ["tile", "unit"]
 
@@ -193,10 +194,15 @@ func is_node_unlocked(node_id):
 func node_state(node_id):
 	if is_node_unlocked(node_id):
 		return "unlocked"
-	for required_id in tech_nodes[node_id]["requires"]:
-		if !is_node_unlocked(required_id):
-			return "locked"
+	if !_prerequisites_met(node_id):
+		return "locked"
 	return "available"
+
+func node_for_unit(unit_id):
+	for node_id in tech_nodes:
+		if tech_nodes[node_id]["unit"] == unit_id:
+			return node_id
+	return null
 
 func can_afford(cost):
 	for type in cost:
@@ -402,54 +408,106 @@ func _load_missions():
 func _load_tech():
 	var tree = ResourceLoader.load(TECH_TREE, "", ResourceLoader.CACHE_MODE_REPLACE_DEEP)
 	
-	var node_ids = []
-	var requires_by_id = {}
+	var node_for_unit_id = {}
+	var skipped = []
 	for node in tree.nodes:
 		if node == null:
 			_report_errors(["TechTree: a node slot is empty"])
 			continue
+		if node.unit == null:
+			continue
 		
-		node_ids.append(_resource_id(node))
-		var requires = []
-		for required in node.requires:
-			if required != null:
-				requires.append(_resource_id(required))
-		requires_by_id[_resource_id(node)] = requires
+		var unit_id = _resource_id(node.unit)
+		if node_for_unit_id.has(unit_id):
+			_report_errors(["Tech nodes %s and %s both unlock unit %s" % [node_for_unit_id[unit_id], _resource_id(node), unit_id]])
+			skipped.append(_resource_id(node))
+		else:
+			node_for_unit_id[unit_id] = _resource_id(node)
+	
+	var obtainable = node_for_unit_id.keys()
+	for unit_id in units:
+		if units[unit_id]["starts_unlocked"] && !obtainable.has(unit_id):
+			obtainable.append(unit_id)
+	
+	var requires_by_id = {}
+	for node in tree.nodes:
+		if node == null || skipped.has(_resource_id(node)):
+			continue
+		
+		var needs = []
+		if node.requires_mode == "all":
+			for required in node.required_units:
+				if required != null && node_for_unit_id.has(_resource_id(required)):
+					needs.append(node_for_unit_id[_resource_id(required)])
+		requires_by_id[_resource_id(node)] = needs
 	
 	var in_cycle = validator.tech_cycle_ids(requires_by_id)
 	
 	for node in tree.nodes:
-		if node == null:
+		if node == null || skipped.has(_resource_id(node)):
 			continue
 		
 		var node_id = _resource_id(node)
-		var errors = validator.tech_errors(node_id, node, node_ids, units.keys())
+		var errors = validator.tech_errors(node_id, node, units.keys(), obtainable)
 		if in_cycle.has(node_id):
-			errors.append("Tech node %s: is part of a requires cycle" % node_id)
-		if tech_nodes.has(node_id):
-			errors.append("Tech node %s: listed twice in the TechTree" % node_id)
+			errors.append("Tech node %s: is part of a prerequisite cycle" % node_id)
 		
 		if errors.size() > 0:
 			_report_errors(errors)
 			continue
 		
+		var required_ids = []
+		for required in node.required_units:
+			required_ids.append(_resource_id(required))
+		
 		tech_nodes[node_id] = {
 			"unit": _resource_id(node.unit),
 			"cost": node.cost.duplicate(),
-			"requires": requires_by_id[node_id],
-			"position": node.position
+			"required_units": required_ids,
+			"requires_mode": node.requires_mode
 		}
 	
 	var changed = true
 	while changed:
 		changed = false
 		for node_id in tech_nodes.keys():
-			for required_id in tech_nodes[node_id]["requires"]:
-				if !tech_nodes.has(required_id):
-					_report_errors(["Tech node %s: requires %s, which has errors" % [node_id, required_id]])
-					tech_nodes.erase(node_id)
-					changed = true
-					break
+			if !_prerequisites_obtainable(node_id):
+				_report_errors(["Tech node %s: can never be unlocked, because a prerequisite unit's node has errors" % node_id])
+				tech_nodes.erase(node_id)
+				changed = true
+	
+	var positions = TechLayout.new().layout(tech_nodes)
+	for node_id in positions:
+		tech_nodes[node_id]["position"] = positions[node_id]
+
+func _prerequisites_obtainable(node_id):
+	var node = tech_nodes[node_id]
+	var available_count = 0
+	for unit_id in node["required_units"]:
+		if units[unit_id]["starts_unlocked"] || node_for_unit(unit_id) != null:
+			available_count = available_count + 1
+	
+	if node["required_units"].size() == 0:
+		return true
+	if node["requires_mode"] == "any":
+		return available_count > 0
+	return available_count == node["required_units"].size()
+
+func _prerequisites_met(node_id):
+	var node = tech_nodes[node_id]
+	if node["required_units"].size() == 0:
+		return true
+	
+	if node["requires_mode"] == "any":
+		for unit_id in node["required_units"]:
+			if is_unit_unlocked(unit_id):
+				return true
+		return false
+	
+	for unit_id in node["required_units"]:
+		if !is_unit_unlocked(unit_id):
+			return false
+	return true
 
 func _resource_id(resource):
 	return resource.resource_path.get_file().get_basename()

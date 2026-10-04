@@ -6,7 +6,8 @@ signal back_pressed
 
 var roster_buttons = {}
 
-@onready var RosterList = $VBox/Roster
+@onready var RosterScroll = $VBox/RosterScroll
+@onready var RosterList = $VBox/RosterScroll/Roster
 @onready var ObjectiveLabel = $VBox/Objective
 @onready var CountLabel = $VBox/Count
 @onready var GoalsLabel = $VBox/Goals
@@ -25,6 +26,7 @@ func show_roster(unit_ids, units, max_count):
 		RosterList.add_child(button)
 		roster_buttons[unit_id] = button
 
+	RosterScroll.fit(RosterList)
 	set_count(0, max_count)
 
 func show_objective(text):

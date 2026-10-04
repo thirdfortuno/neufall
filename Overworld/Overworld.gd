@@ -1,7 +1,8 @@
 extends Control
 
-@onready var MissionList = $Center/VBox/MissionList
-@onready var Details = $Center/VBox/Details
+@onready var MissionScroll = $Center/VBox/MissionScroll
+@onready var MissionList = $Center/VBox/MissionScroll/MissionList
+@onready var Details = $Center/VBox/DetailsScroll/Details
 @onready var StartButton = $Center/VBox/StartButton
 @onready var ErrorsLabel = $Center/VBox/Errors
 
@@ -24,6 +25,8 @@ func _ready():
 		button.disabled = !Game.is_unlocked(mission)
 		button.pressed.connect(_on_mission_button_pressed.bind(mission_id))
 		MissionList.add_child(button)
+	
+	MissionScroll.fit(MissionList)
 
 func _details_text(mission_id):
 	var mission = Game.missions[mission_id]

@@ -3,5 +3,5 @@ extends Resource
 
 @export var unit: UnitDef
 @export var cost: Dictionary = {}
-@export var requires: Array[TechNodeDef] = []
-@export var position: Vector2 = Vector2.ZERO
+@export var required_units: Array[UnitDef] = []
+@export_enum("all", "any") var requires_mode: String = "all"
