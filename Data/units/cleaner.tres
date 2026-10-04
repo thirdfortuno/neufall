@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="UnitDef" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://Data/Defs/UnitDef.gd" id="1_unit"]
+[ext_resource type="Script" path="res://Data/Defs/AbilityDef.gd" id="2_abilitydef"]
+[ext_resource type="Resource" path="res://Data/abilities/clean.tres" id="3_clean"]
+
+[resource]
+script = ExtResource("1_unit")
+unit_name = "Cleaner"
+description = "Basic Corporate defense program"
+abbr = "CLN"
+side = "enemy"
+generation = 1
+starts_unlocked = false
+tags = PackedStringArray()
+hp_max = 3
+moves_max = 1
+abilities = Array[ExtResource("2_abilitydef")]([ExtResource("3_clean")])

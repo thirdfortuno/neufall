@@ -1,22 +1,19 @@
-[gd_resource type="Resource" script_class="UnitDef" load_steps=7 format=3]
+[gd_resource type="Resource" script_class="UnitDef" format=3 uid="uid://dyyosqmjkb3k7"]
 
-[ext_resource type="Script" path="res://Data/Defs/UnitDef.gd" id="1_unit"]
-[ext_resource type="Script" path="res://Data/Defs/AbilityDef.gd" id="2_abilitydef"]
-[ext_resource type="Resource" path="res://Data/abilities/slice.tres" id="3_slice"]
-[ext_resource type="Resource" path="res://Data/abilities/dice.tres" id="4_dice"]
-[ext_resource type="Texture2D" path="res://Unit/Sprites/Hack/hack.png" id="5_main"]
-[ext_resource type="Texture2D" path="res://Unit/Sprites/Hack/hack_shadow.png" id="6_shadow"]
+[ext_resource type="Script" uid="uid://blqqqqy2ad1a0" path="res://Data/Defs/UnitDef.gd" id="1_unit"]
+[ext_resource type="Script" uid="uid://8eoy375x8x7p" path="res://Data/Defs/AbilityDef.gd" id="2_abilitydef"]
+[ext_resource type="Resource" uid="uid://d7kqlmho5n0e" path="res://Data/abilities/slice.tres" id="3_slice"]
+[ext_resource type="Texture2D" uid="uid://squrq03uxhr0" path="res://Unit/Sprites/Hack/hack.png" id="5_main"]
+[ext_resource type="Texture2D" uid="uid://ckwiml7xxc54h" path="res://Unit/Sprites/Hack/hack_shadow.png" id="6_shadow"]
 
 [resource]
 script = ExtResource("1_unit")
 unit_name = "Hack"
+description = "Classic attack program"
 abbr = "HAK"
-side = "player"
-generation = 1
 starts_unlocked = true
-tags = PackedStringArray("hack")
-hp_max = 3
-moves_max = 5
+hp_max = 2
+moves_max = 4
 sprite_main = ExtResource("5_main")
 sprite_shadow = ExtResource("6_shadow")
-abilities = Array[ExtResource("2_abilitydef")]([ExtResource("3_slice"), ExtResource("4_dice")])
+abilities = Array[ExtResource("2_abilitydef")]([ExtResource("3_slice")])
