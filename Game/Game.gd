@@ -129,6 +129,7 @@ func level_to_dict(scene):
 	
 	var data = {
 		"name": level.mission_name,
+		"scene": scene.resource_path,
 		"max_generation": level.max_generation,
 		"grid": grid,
 		"spawn_tiles": spawn_tiles,

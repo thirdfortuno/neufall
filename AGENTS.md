@@ -75,7 +75,10 @@ choice for GDScript — but none exists yet, so don't assume it's installed.
   `EnemyMarker` (`unit`, `behavior` (defaults to a plain `BehaviorDef` if left empty), `is_target`) and `GoalMarker` (the
   `reach_tile` victory tile) are placed inside the cell they mean. A scene is
   converted by `Game.level_to_dict` into the same mission dict the battle code
-  reads (`Game.missions`).
+  reads (`Game.missions`); the dict keeps the level's `scene` path so
+  cosmetics (tile art variants, a background node) can later be shown in the
+  battle from the same scene. Until then every tile uses the default sprite
+  from `Tile/Tile.tscn`, and visuals must never change tile behavior.
 - **Validator** — `Data/Validator.gd`, run by `Game._load_content` on every
   load. It checks units and abilities (empty names, no abilities, no effects,
   unknown effect types, zero range, tile-only abilities without a `tile_set`
