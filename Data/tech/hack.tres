@@ -7,5 +7,3 @@
 script = ExtResource("1_node")
 unit = ExtResource("2_unit")
 cost = {}
-requires = Array[ExtResource("1_node")]([])
-position = Vector2(100, 20)

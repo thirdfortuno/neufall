@@ -35,9 +35,15 @@ offset_bottom = 530.0
 [node name="VBox" type="VBoxContainer" parent="Details"]
 layout_mode = 2
 
-[node name="Info" type="Label" parent="Details/VBox"]
-custom_minimum_size = Vector2(280, 0)
+[node name="InfoScroll" type="ScrollContainer" parent="Details/VBox"]
 layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="Info" type="Label" parent="Details/VBox/InfoScroll"]
+custom_minimum_size = Vector2(270, 0)
+layout_mode = 2
+size_flags_horizontal = 3
 text = "Select a node"
 autowrap_mode = 3
 

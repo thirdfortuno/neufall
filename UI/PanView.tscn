@@ -11,3 +11,17 @@ script = ExtResource("1_pan")
 [node name="Content" type="Control" parent="."]
 layout_mode = 0
 mouse_filter = 2
+
+[node name="RecenterButton" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = -36.0
+offset_right = 90.0
+offset_bottom = -8.0
+grow_vertical = 0
+text = "Recenter"
+
+[connection signal="pressed" from="RecenterButton" to="." method="_on_recenter_button_pressed"]
