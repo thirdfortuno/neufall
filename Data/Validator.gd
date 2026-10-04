@@ -112,15 +112,19 @@ func _marker_errors(label, level, layer, rect, unit_ids):
 	var errors = []
 	var occupied = {}
 	var spawns = 0
+	var fixed = 0
 	var enemies = 0
 	var targets = 0
 	var goals = 0
-
+	
 	for child in level.get_children():
 		var kind = ""
 		if child is SpawnMarker:
 			kind = "SpawnMarker"
 			spawns = spawns + 1
+		elif child is FixedUnitMarker:
+			kind = "FixedUnitMarker"
+			fixed = fixed + 1
 		elif child is EnemyMarker:
 			kind = "EnemyMarker"
 			enemies = enemies + 1
@@ -129,35 +133,76 @@ func _marker_errors(label, level, layer, rect, unit_ids):
 		elif child is GoalMarker:
 			kind = "GoalMarker"
 			goals = goals + 1
+		elif child is BodyMarker:
+			errors.append("%s: BodyMarker '%s' must be a child of a FixedUnitMarker or EnemyMarker" % [label, child.name])
+			continue
 		else:
 			continue
-
+		
 		var cell = Game.marker_cell(layer, rect, child)
-		var key = Vector2i(cell[0], cell[1])
 		var where = "%s '%s' at tile (%d, %d)" % [kind, child.name, cell[0], cell[1]]
-
-		if layer.get_cell_source_id(rect.position + key) == -1:
-			errors.append("%s: %s is on an empty (void) tile" % [label, where])
-		if occupied.has(key):
-			errors.append("%s: %s shares its tile with '%s'" % [label, where, occupied[key]])
-		occupied[key] = child.name
-
-		if child is EnemyMarker:
+		_claim_cell(errors, label, layer, rect, occupied, cell, where, child.name)
+		
+		if child is EnemyMarker || child is FixedUnitMarker:
+			var unit_id = ""
 			if child.unit == null:
 				errors.append("%s: %s has no unit" % [label, where])
-			elif !unit_ids.has(child.unit.resource_path.get_file().get_basename()):
-				errors.append("%s: %s uses unit %s, which is not a valid unit in the UnitLibrary" % [label, where, child.unit.resource_path.get_file().get_basename()])
-
-	if spawns == 0:
-		errors.append("%s: needs at least one SpawnMarker" % label)
+			else:
+				unit_id = child.unit.resource_path.get_file().get_basename()
+				if !unit_ids.has(unit_id):
+					errors.append("%s: %s uses unit %s, which is not a valid unit in the UnitLibrary" % [label, where, unit_id])
+			
+			errors.append_array(_body_errors(label, where, layer, rect, occupied, child, cell))
+			
+			if child.unit != null && 1 + Game.body_cells(layer, rect, child).size() > child.unit.hp_max:
+				errors.append("%s: %s has more bodies than its unit's hp_max (%d)" % [label, where, child.unit.hp_max])
+	
+	if spawns == 0 && fixed == 0:
+		errors.append("%s: needs at least one SpawnMarker or FixedUnitMarker" % label)
 	if enemies == 0:
 		errors.append("%s: needs at least one EnemyMarker" % label)
-
+	
 	if level.victory_type == "reach_tile" && goals != 1:
 		errors.append("%s: reach_tile victory needs exactly one GoalMarker (found %d)" % [label, goals])
 	if level.victory_type == "kill_unit" && targets == 0:
 		errors.append("%s: kill_unit victory needs at least one EnemyMarker with is_target ticked" % label)
+	
+	return errors
 
+func _claim_cell(errors, label, layer, rect, occupied, cell, where, owner_name):
+	var key = Vector2i(cell[0], cell[1])
+	if layer.get_cell_source_id(rect.position + key) == -1:
+		errors.append("%s: %s is on an empty (void) tile" % [label, where])
+	if occupied.has(key):
+		errors.append("%s: %s shares its tile with '%s'" % [label, where, occupied[key]])
+	occupied[key] = owner_name
+
+func _body_errors(label, where, layer, rect, occupied, marker, head):
+	var errors = []
+	var connected = Game.ordered_body_cells(layer, rect, marker)
+	var reachable = []
+	var frontier = [head]
+	
+	for child in marker.get_children():
+		if !(child is BodyMarker):
+			continue
+		
+		var cell = Game.position_cell(layer, rect, marker.position + child.position)
+		var body_where = "BodyMarker '%s' of %s at tile (%d, %d)" % [child.name, where, cell[0], cell[1]]
+		_claim_cell(errors, label, layer, rect, occupied, cell, body_where, child.name)
+	
+	while frontier.size() > 0:
+		var next = []
+		for cell in frontier:
+			for other in connected:
+				if !reachable.has(other) && abs(other[0] - cell[0]) + abs(other[1] - cell[1]) == 1:
+					reachable.append(other)
+					next.append(other)
+		frontier = next
+	
+	if reachable.size() < connected.size():
+		errors.append("%s: %s has a BodyMarker that is not connected to the unit's head by adjacent tiles" % [label, where])
+	
 	return errors
 
 func _challenge_errors(label, challenges):

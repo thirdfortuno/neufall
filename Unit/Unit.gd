@@ -206,6 +206,14 @@ func _ready():
 		$SpriteShadow.texture = null
 		_add_abbr_label()
 
+func add_body(body_x, body_y):
+	var body = body_scene.instantiate()
+	body.x = body_x
+	body.y = body_y
+	
+	add_child(body)
+	bodies.append(body)
+
 func mark_objective():
 	var label = Label.new()
 	label.text = "TARGET"
