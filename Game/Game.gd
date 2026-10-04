@@ -250,6 +250,13 @@ func unit_label(unit_id):
 		ability_names.append(ability["ability_name"])
 	return "%s: %s" % [data["name"], ", ".join(ability_names)]
 
+func mission_state(mission_id):
+	if has_cleared(mission_id):
+		return "cleared"
+	if !is_unlocked(missions[mission_id]):
+		return "locked"
+	return "available"
+
 func has_cleared(mission_id):
 	return profile["cleared_missions"].has(mission_id)
 
@@ -404,6 +411,18 @@ func _load_missions():
 			_report_errors(errors)
 		else:
 			missions[level_id] = level_to_dict(scene)
+	
+	var parents = {}
+	for mission_id in missions:
+		var list = []
+		for required_id in missions[mission_id]["requires"]:
+			if missions.has(required_id):
+				list.append(required_id)
+		parents[mission_id] = list
+	
+	var positions = TechLayout.new().layout_parents(parents)
+	for mission_id in positions:
+		missions[mission_id]["position"] = positions[mission_id]
 
 func _load_tech():
 	var tree = ResourceLoader.load(TECH_TREE, "", ResourceLoader.CACHE_MODE_REPLACE_DEEP)
