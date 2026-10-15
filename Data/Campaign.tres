@@ -1,8 +1,13 @@
 [gd_resource type="Resource" script_class="CampaignDef" format=3 uid="uid://cy5vn5fl1pc0b"]
 
 [ext_resource type="Script" uid="uid://bsv40ybpn6cwg" path="res://Data/Defs/CampaignDef.gd" id="1_campaign"]
-[ext_resource type="PackedScene" path="res://Levels/training_node.tscn" id="2_level"]
+[ext_resource type="PackedScene" uid="uid://dquc0uipv0mb" path="res://Levels/area1/training_node.tscn" id="1_frmfh"]
+[ext_resource type="PackedScene" uid="uid://bxkmf52ejgqyb" path="res://Levels/area1/pr_database.tscn" id="2_8jgi8"]
+[ext_resource type="PackedScene" uid="uid://dw5wi0hbrwxrk" path="res://Levels/area1/records.tscn" id="3_7u25k"]
+[ext_resource type="PackedScene" uid="uid://oxvcwru1mxfe" path="res://Levels/area1/affairs.tscn" id="4_8jgi8"]
+[ext_resource type="PackedScene" uid="uid://b2c16ywlw0kb1" path="res://Levels/area1/tower.tscn" id="5_7u25k"]
+[ext_resource type="PackedScene" uid="uid://drm3y2gdotd3p" path="res://Levels/area1/unlock.tscn" id="6_ndh8c"]
 
 [resource]
 script = ExtResource("1_campaign")
-levels = Array[PackedScene]([ExtResource("2_level")])
+levels = Array[PackedScene]([ExtResource("1_frmfh"), ExtResource("2_8jgi8"), ExtResource("3_7u25k"), ExtResource("4_8jgi8"), ExtResource("5_7u25k"), ExtResource("6_ndh8c")])

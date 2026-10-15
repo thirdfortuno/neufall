@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="AbilityDef" format=3 uid="uid://djkvirdxu2yvl"]
+
+[ext_resource type="Script" uid="uid://snibrfoceuqv" path="res://Data/Defs/EffectDef.gd" id="1_snqlb"]
+[ext_resource type="Script" uid="uid://8eoy375x8x7p" path="res://Data/Defs/AbilityDef.gd" id="2_oq6sf"]
+
+[sub_resource type="Resource" id="Resource_snqlb"]
+script = ExtResource("1_snqlb")
+amount = 2
+metadata/_custom_type_script = "uid://snibrfoceuqv"
+
+[resource]
+script = ExtResource("2_oq6sf")
+ability_name = "Seek"
+description = "Deletes 2 cells from the target"
+ability_range = 3
+effects = Array[ExtResource("1_snqlb")]([SubResource("Resource_snqlb")])
+metadata/_custom_type_script = "uid://8eoy375x8x7p"

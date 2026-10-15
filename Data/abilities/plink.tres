@@ -10,6 +10,7 @@ metadata/_custom_type_script = "uid://snibrfoceuqv"
 [resource]
 script = ExtResource("2_u7wbm")
 ability_name = "Plink"
-description = "Delete 1 sector from the target"
+description = "Delete 1 cell from the target"
+ability_range = 3
 effects = Array[ExtResource("1_711ib")]([SubResource("Resource_711ib")])
 metadata/_custom_type_script = "uid://8eoy375x8x7p"

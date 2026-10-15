@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="UnitDef" format=3 uid="uid://cthiv1vqyxv1b"]
+
+[ext_resource type="Script" uid="uid://8eoy375x8x7p" path="res://Data/Defs/AbilityDef.gd" id="1_lljox"]
+[ext_resource type="Resource" uid="uid://djp7f3cahtm13" path="res://Data/abilities/byte.tres" id="2_3m6uk"]
+[ext_resource type="Script" uid="uid://blqqqqy2ad1a0" path="res://Data/Defs/UnitDef.gd" id="2_hn54y"]
+
+[resource]
+script = ExtResource("2_hn54y")
+unit_name = "Guard Pup"
+description = "Bark worse than its byte"
+abbr = "pup"
+side = "enemy"
+hp_max = 2
+abilities = Array[ExtResource("1_lljox")]([ExtResource("2_3m6uk")])
+metadata/_custom_type_script = "uid://blqqqqy2ad1a0"

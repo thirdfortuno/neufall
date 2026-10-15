@@ -1,0 +1,66 @@
+[gd_scene format=3 uid="uid://blxd1xktefmby"]
+
+[ext_resource type="PackedScene" path="res://Battle/UI/SidePanel.tscn" id="1_panel"]
+[ext_resource type="Script" uid="uid://c63nolgyhxoae" path="res://UI/CappedScroll.gd" id="2_scroll"]
+
+[node name="RightColumn" type="VBoxContainer" unique_id=1538583217]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -212.0
+offset_top = 35.0
+offset_right = -12.0
+grow_horizontal = 0
+mouse_filter = 2
+theme_override_constants/separation = 16
+
+[node name="Objective" parent="." unique_id=1772964096 instance=ExtResource("1_panel")]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+title = "objective"
+
+[node name="Title" parent="Objective/VBox" index="0"]
+mouse_filter = 0
+flat = true
+alignment = 0
+
+[node name="MissionName" type="Label" parent="Objective/VBox/Body/Content" index="0" unique_id=1211746871]
+custom_minimum_size = Vector2(184, 0)
+layout_mode = 2
+autowrap_mode = 3
+
+[node name="Goal" type="Label" parent="Objective/VBox/Body/Content" index="1" unique_id=569041471]
+custom_minimum_size = Vector2(184, 0)
+layout_mode = 2
+autowrap_mode = 3
+
+[node name="Turn" type="Label" parent="Objective/VBox/Body/Content" index="2" unique_id=1036150515]
+custom_minimum_size = Vector2(184, 0)
+layout_mode = 2
+autowrap_mode = 3
+
+[node name="Log" parent="." unique_id=1291309152 instance=ExtResource("1_panel")]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+title = "log"
+
+[node name="Title" parent="Log/VBox" index="0"]
+mouse_filter = 0
+flat = true
+alignment = 0
+
+[node name="Scroll" type="ScrollContainer" parent="Log/VBox/Body/Content" index="0" unique_id=1750803918]
+layout_mode = 2
+horizontal_scroll_mode = 0
+script = ExtResource("2_scroll")
+max_height = 180
+
+[node name="Lines" type="VBoxContainer" parent="Log/VBox/Body/Content/Scroll" unique_id=1379787118]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[connection signal="pressed" from="Objective/VBox/Title" to="Objective" method="_on_title_pressed"]
+[connection signal="pressed" from="Log/VBox/Title" to="Log" method="_on_title_pressed"]
+
+[editable path="Objective"]
+[editable path="Log"]

@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="UnitDef" format=3 uid="uid://dyyosqmjkb3k7"]
+
+[ext_resource type="Script" uid="uid://blqqqqy2ad1a0" path="res://Data/Defs/UnitDef.gd" id="1_unit"]
+[ext_resource type="Script" uid="uid://8eoy375x8x7p" path="res://Data/Defs/AbilityDef.gd" id="2_abilitydef"]
+[ext_resource type="Resource" uid="uid://d7kqlmho5n0e" path="res://Data/abilities/slice.tres" id="3_slice"]
+[ext_resource type="Texture2D" uid="uid://squrq03uxhr0" path="res://Unit/Sprites/Hack/hack.png" id="5_main"]
+[ext_resource type="Texture2D" uid="uid://ckwiml7xxc54h" path="res://Unit/Sprites/Hack/hack_shadow.png" id="6_shadow"]
+
+[resource]
+script = ExtResource("1_unit")
+unit_name = "Hack"
+description = "Classic attack program"
+abbr = "HAK"
+starts_unlocked = true
+hp_max = 4
+moves_max = 2
+memory = 2
+sprite_main = ExtResource("5_main")
+sprite_shadow = ExtResource("6_shadow")
+abilities = Array[ExtResource("2_abilitydef")]([ExtResource("3_slice")])

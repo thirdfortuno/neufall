@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="AbilityDef" format=3 uid="uid://brow0ukkuwf61"]
+
+[ext_resource type="Script" uid="uid://snibrfoceuqv" path="res://Data/Defs/EffectDef.gd" id="1_ff1i8"]
+[ext_resource type="Script" uid="uid://8eoy375x8x7p" path="res://Data/Defs/AbilityDef.gd" id="2_8gk5j"]
+
+[sub_resource type="Resource" id="Resource_ff1i8"]
+script = ExtResource("1_ff1i8")
+type = "heal"
+amount = 2
+metadata/_custom_type_script = "uid://snibrfoceuqv"
+
+[resource]
+script = ExtResource("2_8gk5j")
+ability_name = "Repair"
+description = "Adds 2 cells to the target"
+targets = 6
+effects = Array[ExtResource("1_ff1i8")]([SubResource("Resource_ff1i8")])
+metadata/_custom_type_script = "uid://8eoy375x8x7p"

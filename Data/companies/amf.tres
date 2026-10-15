@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="CompanyDef" format=3 uid="uid://cf1t24c1wsdgi"]
+
+[ext_resource type="Script" uid="uid://boui8t5tupmcp" path="res://Data/Defs/CompanyDef.gd" id="1_hov88"]
+
+[resource]
+script = ExtResource("1_hov88")
+company_name = "Andrew Manuel Francis Consulting"
+tagline = "Our business is to make you money"
+language = "English"
+metadata/_custom_type_script = "uid://boui8t5tupmcp"

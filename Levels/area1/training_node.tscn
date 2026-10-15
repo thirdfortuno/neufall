@@ -1,0 +1,43 @@
+[gd_scene format=4 uid="uid://dquc0uipv0mb"]
+
+[ext_resource type="Script" uid="uid://b07rjjx3xxy1a" path="res://Data/Defs/LevelDef.gd" id="1_level"]
+[ext_resource type="TileSet" uid="uid://chuqbxkdp8gs6" path="res://Levels/floor_tileset.tres" id="2_tileset"]
+[ext_resource type="Script" uid="uid://xbsgn7svfaem" path="res://Data/Defs/SpawnMarker.gd" id="3_spawn"]
+[ext_resource type="Script" uid="uid://ch68weh071ce8" path="res://Data/Defs/EnemyMarker.gd" id="4_enemy"]
+[ext_resource type="Resource" uid="uid://bhio3xpw27eso" path="res://Data/behaviors/camera.tres" id="6_behavior"]
+[ext_resource type="Resource" path="res://Data/units/enemy/cleaner.tres" id="7_cleaner"]
+[ext_resource type="Script" uid="uid://dldsastxk5pmk" path="res://Data/Defs/ResourceAmount.gd" id="8_amount"]
+
+[sub_resource type="Resource" id="Resource_reward"]
+script = ExtResource("8_amount")
+amount = 2
+
+[node name="training_node" type="Node2D" unique_id=1995092899]
+script = ExtResource("1_level")
+mission_name = "Training Node"
+first_clear_reward = Array[ExtResource("8_amount")]([SubResource("Resource_reward")])
+
+[node name="Floor" type="TileMapLayer" parent="." unique_id=521458568]
+scale = Vector2(0.5, 0.5)
+tile_map_data = PackedByteArray("AAAEAAEAAAAAAAAAAAAFAAEAAAAAAAAAAAAIAAEAAAAAAAAAAAAJAAEAAAAAAAAAAAAKAAIAAAAAAAAAAAAJAAIAAAAAAAAAAAAIAAIAAAAAAAAAAAAHAAIAAAAAAAAAAAAGAAIAAAAAAAAAAAAFAAIAAAAAAAAAAAAEAAIAAAAAAAAAAAADAAIAAAAAAAAAAAACAAMAAAAAAAAAAAADAAMAAAAAAAAAAAAEAAMAAAAAAAAAAAAFAAMAAAAAAAAAAAAGAAMAAAAAAAAAAAAHAAMAAAAAAAAAAAAIAAMAAAAAAAAAAAAJAAMAAAAAAAAAAAAKAAMAAAAAAAAAAAALAAMAAAAAAAAAAAADAAQAAAAAAAAAAAAEAAQAAAAAAAAAAAAFAAQAAAAAAAAAAAAGAAQAAAAAAAAAAAAHAAQAAAAAAAAAAAAIAAQAAAAAAAAAAAAJAAQAAAAAAAAAAAAKAAQAAAAAAAAAAAAEAAUAAAAAAAAAAAAFAAUAAAAAAAAAAAAIAAUAAAAAAAAAAAAJAAUAAAAAAAAAAAADAAYAAAAAAAAAAAAEAAYAAAAAAAAAAAAFAAYAAAAAAAAAAAAGAAYAAAAAAAAAAAAHAAYAAAAAAAAAAAAIAAYAAAAAAAAAAAAJAAYAAAAAAAAAAAAKAAYAAAAAAAAAAAACAAcAAAAAAAAAAAADAAcAAAAAAAAAAAAEAAcAAAAAAAAAAAAFAAcAAAAAAAAAAAAGAAcAAAAAAAAAAAAHAAcAAAAAAAAAAAAIAAcAAAAAAAAAAAAJAAcAAAAAAAAAAAAKAAcAAAAAAAAAAAALAAcAAAAAAAAAAAADAAgAAAAAAAAAAAAEAAgAAAAAAAAAAAAFAAgAAAAAAAAAAAAGAAgAAAAAAAAAAAAHAAgAAAAAAAAAAAAIAAgAAAAAAAAAAAAJAAgAAAAAAAAAAAAKAAgAAAAAAAAAAAAEAAkAAAAAAAAAAAAFAAkAAAAAAAAAAAAIAAkAAAAAAAAAAAAJAAkAAAAAAAAAAAACAAQAAAAAAAAAAAACAAUAAAAAAAAAAAACAAYAAAAAAAAAAAALAAQAAAAAAAAAAAALAAUAAAAAAAAAAAALAAYAAAAAAAAAAAAMAAUAAAAAAAAAAAAMAAQAAAAAAAAAAAAMAAYAAAAAAAAAAAANAAUAAAAAAAAAAAABAAQAAAAAAAAAAAABAAUAAAAAAAAAAAABAAYAAAAAAAAAAAAAAAUAAAAAAAAAAAA=")
+tile_set = ExtResource("2_tileset")
+
+[node name="Spawn1" type="Marker2D" parent="." unique_id=369791358]
+position = Vector2(176, 304)
+script = ExtResource("3_spawn")
+
+[node name="Spawn2" type="Marker2D" parent="." unique_id=196902737]
+position = Vector2(272, 304)
+script = ExtResource("3_spawn")
+
+[node name="Enemy1" type="Marker2D" parent="." unique_id=969435577]
+position = Vector2(272, 48)
+script = ExtResource("4_enemy")
+unit = ExtResource("7_cleaner")
+behavior = ExtResource("6_behavior")
+
+[node name="Enemy2" type="Marker2D" parent="." unique_id=243184649]
+position = Vector2(176, 48)
+script = ExtResource("4_enemy")
+unit = ExtResource("7_cleaner")
+behavior = ExtResource("6_behavior")

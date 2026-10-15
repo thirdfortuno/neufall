@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="AbilityDef" format=3 uid="uid://csmdcgte8vqv8"]
+
+[ext_resource type="Script" uid="uid://snibrfoceuqv" path="res://Data/Defs/EffectDef.gd" id="1_c401k"]
+[ext_resource type="Script" uid="uid://8eoy375x8x7p" path="res://Data/Defs/AbilityDef.gd" id="2_bqm5p"]
+
+[sub_resource type="Resource" id="Resource_711ib"]
+script = ExtResource("1_c401k")
+metadata/_custom_type_script = "uid://snibrfoceuqv"
+
+[resource]
+script = ExtResource("2_bqm5p")
+ability_name = "PPlink"
+description = "Delete 1 cell from the target"
+ability_range = 4
+effects = Array[ExtResource("1_c401k")]([SubResource("Resource_711ib")])
+metadata/_custom_type_script = "uid://8eoy375x8x7p"

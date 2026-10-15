@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="UnitDef" format=3 uid="uid://dhsuccbo21rms"]
+
+[ext_resource type="Script" uid="uid://8eoy375x8x7p" path="res://Data/Defs/AbilityDef.gd" id="1_4bx6r"]
+[ext_resource type="Resource" uid="uid://djp7f3cahtm13" path="res://Data/abilities/byte.tres" id="2_ew4q6"]
+[ext_resource type="Script" uid="uid://blqqqqy2ad1a0" path="res://Data/Defs/UnitDef.gd" id="2_wk31b"]
+
+[resource]
+script = ExtResource("2_wk31b")
+unit_name = "Bug"
+description = "Creeps up everywhere"
+abbr = "bug"
+hp_max = 1
+moves_max = 4
+memory = 2
+abilities = Array[ExtResource("1_4bx6r")]([ExtResource("2_ew4q6")])
+metadata/_custom_type_script = "uid://blqqqqy2ad1a0"

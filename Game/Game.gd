@@ -1,8 +1,8 @@
 extends Node
 
 const SAVE_PATH = "user://save.dat"
-const UNIT_LIBRARY = "res://Data/UnitLibrary.tres"
-const TECH_TREE = "res://Data/TechTree.tres"
+const UNIT_FOLDER = "res://Data/units/"
+const TECH_FOLDER = "res://Data/tech/"
 const CAMPAIGN = "res://Data/Campaign.tres"
 const Validator = preload("res://Data/Validator.gd")
 const TechLayout = preload("res://Game/TechLayout.gd")
@@ -27,14 +27,25 @@ func unit_to_dict(def):
 		"starts_unlocked": def.starts_unlocked,
 		"tags": Array(def.tags),
 		"hp_max": def.hp_max,
+		"memory": def.memory,
 		"moves_max": def.moves_max,
 		"abilities": []
 	}
 	
+	if def.primary_bg_color != Color.BLACK:
+		data["bg_primary"] = def.primary_bg_color
+	if def.secondary_bg_color != Color.BLACK:
+		data["bg_secondary"] = def.secondary_bg_color
 	if def.sprite_main:
 		data["sprite_main"] = def.sprite_main.resource_path
 	if def.sprite_shadow:
 		data["sprite_shadow"] = def.sprite_shadow.resource_path
+	if def.sound_move:
+		data["sound_move"] = def.sound_move.resource_path
+	if def.sound_hurt:
+		data["sound_hurt"] = def.sound_hurt.resource_path
+	if def.sound_death:
+		data["sound_death"] = def.sound_death.resource_path
 	
 	for ability in def.abilities:
 		data["abilities"].append(ability_to_dict(ability))
@@ -60,20 +71,26 @@ func ability_to_dict(def):
 		data["size_requirement"] = def.size_requirement
 	if def.size_cost > 0:
 		data["size_cost"] = def.size_cost
+	if def.sound:
+		data["sound"] = def.sound.resource_path
 	
 	return data
 
 func effect_to_dict(def):
+	var data = {
+		"type": def.type,
+		"amount": def.amount
+	}
 	if def.type == "tile_set":
-		return {
+		data = {
 			"type": def.type,
 			"state": def.tile_state
 		}
 	
-	return {
-		"type": def.type,
-		"amount": def.amount
-	}
+	if def.sound:
+		data["sound"] = def.sound.resource_path
+	
+	return data
 
 func start_mission(mission_id):
 	selected_mission_id = mission_id
@@ -87,17 +104,23 @@ func new_save():
 func level_to_dict(scene):
 	var level = scene.instantiate()
 	var layer = level.get_node("Floor")
-	var rect = layer.get_used_rect()
+	var rect = grid_rect(layer)
 	
 	var grid = []
+	var styles = []
 	for y in rect.size.y:
 		var row = []
+		var style_row = []
 		for x in rect.size.x:
-			if layer.get_cell_source_id(rect.position + Vector2i(x, y)) == -1:
+			var source_id = layer.get_cell_source_id(rect.position + Vector2i(x, y))
+			if source_id == -1:
 				row.append(0)
+				style_row.append("")
 			else:
 				row.append(1)
+				style_row.append(layer.tile_set.get_source(source_id).texture.resource_path)
 		grid.append(row)
+		styles.append(style_row)
 	
 	var spawn_tiles = []
 	var fixed_units = []
@@ -136,26 +159,52 @@ func level_to_dict(scene):
 	elif level.victory_type == "kill_unit":
 		victory["enemy"] = "target"
 	
+	var required_ids = []
+	for required in level.requires:
+		required_ids.append(_resource_id(required))
+	
 	var challenge_list = []
 	for challenge in level.challenges:
 		challenge_list.append(challenge_to_dict(challenge))
 	
 	var data = {
 		"name": level.mission_name,
+		"company": company_to_dict(level.company),
+		"info": level.mission_info,
 		"scene": scene.resource_path,
 		"max_generation": level.max_generation,
+		"max_memory": level.max_memory,
 		"grid": grid,
+		"styles": styles,
 		"spawn_tiles": spawn_tiles,
 		"fixed_units": fixed_units,
 		"victory": victory,
-		"first_clear_reward": level.first_clear_reward.duplicate(),
+		"first_clear_reward": amounts_to_dict(level.first_clear_reward),
 		"challenges": challenge_list,
 		"enemies": enemies,
-		"requires": Array(level.requires)
+		"requires": required_ids
 	}
 	
 	level.free()
 	return data
+
+func amounts_to_dict(amounts):
+	var result = {}
+	for entry in amounts:
+		result[entry.type] = result.get(entry.type, 0) + entry.amount
+	return result
+
+func company_to_dict(def):
+	if def == null:
+		return {}
+	
+	return {
+		"id": def.resource_path.get_file().get_basename(),
+		"name": def.company_name,
+		"tagline": def.tagline,
+		"language": def.language,
+		"description": def.description
+	}
 
 func behavior_to_dict(def):
 	if def == null:
@@ -192,7 +241,7 @@ func challenge_to_dict(def):
 		"description": def.description,
 		"type": def.type,
 		"params": params,
-		"reward": def.reward.duplicate()
+		"reward": amounts_to_dict(def.reward)
 	}
 
 func go_to_overworld():
@@ -249,7 +298,7 @@ func available_units(max_generation):
 	var result = []
 	for unit_id in units:
 		var data = units[unit_id]
-		if data["side"] == "player" && data["generation"] <= max_generation && is_unit_unlocked(unit_id):
+		if data["side"] == "player" && (max_generation <= 0 || data["generation"] <= max_generation) && is_unit_unlocked(unit_id):
 			result.append(unit_id)
 	return result
 
@@ -262,6 +311,8 @@ func unit_details_text(unit_id):
 	
 	if data["description"] != "":
 		lines.append(data["description"])
+	
+	lines.append("Memory: %d" % data["memory"])
 	
 	for ability in data["abilities"]:
 		var line = "%s (range %d)" % [ability["ability_name"], ability["ability_range"]]
@@ -276,6 +327,8 @@ func unit_label(unit_id):
 	var ability_names = []
 	for ability in data["abilities"]:
 		ability_names.append(ability["ability_name"])
+	if ability_names.size() == 0:
+		return data["name"]
 	return "%s: %s" % [data["name"], ", ".join(ability_names)]
 
 func mission_state(mission_id):
@@ -387,21 +440,46 @@ func _flag_names(flags, names):
 	return result
 
 func _load_units():
-	var library = ResourceLoader.load(UNIT_LIBRARY, "", ResourceLoader.CACHE_MODE_REPLACE_DEEP)
-	for def in library.units:
-		if def == null:
-			_report_errors(["UnitLibrary: a unit slot is empty"])
+	var seen = {}
+	for path in _resource_paths(UNIT_FOLDER):
+		var unit_id = path.get_file().get_basename()
+		if seen.has(unit_id):
+			_report_errors(["Unit %s: two files share this id (%s and %s)" % [unit_id, seen[unit_id], path]])
+			continue
+		seen[unit_id] = path
+		
+		var def = ResourceLoader.load(path, "", ResourceLoader.CACHE_MODE_REPLACE_DEEP)
+		if !(def is UnitDef):
+			_report_errors(["Unit %s: %s is not a UnitDef resource" % [unit_id, path]])
 			continue
 		
-		var unit_id = _resource_id(def)
 		var errors = validator.unit_errors(unit_id, def)
-		if units.has(unit_id):
-			errors.append("Unit %s: listed twice in the UnitLibrary" % unit_id)
-		
 		if errors.size() > 0:
 			_report_errors(errors)
 		else:
 			units[unit_id] = unit_to_dict(def)
+
+func _resource_paths(folder):
+	var paths = []
+	for file_name in DirAccess.get_files_at(folder):
+		if file_name.ends_with(".remap"):
+			file_name = file_name.trim_suffix(".remap")
+		if (file_name.ends_with(".tres") || file_name.ends_with(".res")) && !paths.has(folder + file_name):
+			paths.append(folder + file_name)
+	
+	for directory in DirAccess.get_directories_at(folder):
+		paths.append_array(_resource_paths(folder + directory + "/"))
+	
+	paths.sort_custom(Callable(self, "_compare_file_names"))
+	return paths
+
+func _compare_file_names(a, b):
+	return a.get_file() < b.get_file()
+
+func grid_rect(layer):
+	var used = layer.get_used_rect()
+	var origin = Vector2i(min(0, used.position.x), min(0, used.position.y))
+	return Rect2i(origin, used.end - origin)
 
 func marker_cell(layer, rect, marker):
 	return position_cell(layer, rect, marker.position)
@@ -482,14 +560,24 @@ func _load_missions():
 		missions[mission_id]["position"] = positions[mission_id]
 
 func _load_tech():
-	var tree = ResourceLoader.load(TECH_TREE, "", ResourceLoader.CACHE_MODE_REPLACE_DEEP)
+	var defs = []
+	var seen = {}
+	for path in _resource_paths(TECH_FOLDER):
+		var node_id = path.get_file().get_basename()
+		if seen.has(node_id):
+			_report_errors(["Tech node %s: two files share this id (%s and %s)" % [node_id, seen[node_id], path]])
+			continue
+		seen[node_id] = path
+		
+		var def = ResourceLoader.load(path, "", ResourceLoader.CACHE_MODE_REPLACE_DEEP)
+		if def is TechNodeDef:
+			defs.append(def)
+		else:
+			_report_errors(["Tech node %s: %s is not a TechNodeDef resource" % [node_id, path]])
 	
 	var node_for_unit_id = {}
 	var skipped = []
-	for node in tree.nodes:
-		if node == null:
-			_report_errors(["TechTree: a node slot is empty"])
-			continue
+	for node in defs:
 		if node.unit == null:
 			continue
 		
@@ -506,8 +594,8 @@ func _load_tech():
 			obtainable.append(unit_id)
 	
 	var requires_by_id = {}
-	for node in tree.nodes:
-		if node == null || skipped.has(_resource_id(node)):
+	for node in defs:
+		if skipped.has(_resource_id(node)):
 			continue
 		
 		var needs = []
@@ -519,8 +607,8 @@ func _load_tech():
 	
 	var in_cycle = validator.tech_cycle_ids(requires_by_id)
 	
-	for node in tree.nodes:
-		if node == null || skipped.has(_resource_id(node)):
+	for node in defs:
+		if skipped.has(_resource_id(node)):
 			continue
 		
 		var node_id = _resource_id(node)
@@ -538,7 +626,7 @@ func _load_tech():
 		
 		tech_nodes[node_id] = {
 			"unit": _resource_id(node.unit),
-			"cost": node.cost.duplicate(),
+			"cost": amounts_to_dict(node.cost),
 			"required_units": required_ids,
 			"requires_mode": node.requires_mode
 		}
@@ -605,7 +693,15 @@ func _add_resources(target, added):
 	for type in added:
 		target[type] = target.get(type, 0) + added[type]
 
+func _input(event):
+	if event is InputEventKey && event.pressed && !event.echo && event.keycode == KEY_F11:
+		if DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_FULLSCREEN:
+			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
+		else:
+			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
+
 func _ready():
+	DisplayServer.window_set_min_size(Vector2i(960, 540))
 	profile = _default_profile()
 	load_game()
 	_load_content()

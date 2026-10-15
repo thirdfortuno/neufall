@@ -1,0 +1,53 @@
+[gd_scene format=4 uid="uid://dw5wi0hbrwxrk"]
+
+[ext_resource type="Script" uid="uid://b07rjjx3xxy1a" path="res://Data/Defs/LevelDef.gd" id="1_txpw7"]
+[ext_resource type="PackedScene" uid="uid://bxkmf52ejgqyb" path="res://Levels/area1/pr_database.tscn" id="2_1xxpk"]
+[ext_resource type="TileSet" uid="uid://chuqbxkdp8gs6" path="res://Levels/floor_tileset.tres" id="2_07b1n"]
+[ext_resource type="Script" uid="uid://ch68weh071ce8" path="res://Data/Defs/EnemyMarker.gd" id="3_apy0g"]
+[ext_resource type="Resource" uid="uid://dhx81vf2ggq56" path="res://Data/units/enemy/eagereye.tres" id="4_1xxpk"]
+[ext_resource type="Script" uid="uid://xbsgn7svfaem" path="res://Data/Defs/SpawnMarker.gd" id="4_t2tym"]
+[ext_resource type="Resource" uid="uid://cthiv1vqyxv1b" path="res://Data/units/enemy/guardpup.tres" id="5_lnoch"]
+
+[node name="Records" type="Node2D" unique_id=1252978512]
+script = ExtResource("1_txpw7")
+mission_name = "Records"
+requires = Array[PackedScene]([ExtResource("2_1xxpk")])
+metadata/_custom_type_script = "uid://b07rjjx3xxy1a"
+
+[node name="Floor" type="TileMapLayer" parent="." unique_id=1632656115]
+scale = Vector2(0.5, 0.5)
+tile_map_data = PackedByteArray("AAABAAQAAAAAAAAAAAABAAUAAAAAAAAAAAABAAYAAAAAAAAAAAACAAQAAAAAAAAAAAADAAQAAAAAAAAAAAAEAAQAAAAAAAAAAAAFAAQAAAAAAAAAAAAGAAQAAAAAAAAAAAAHAAQAAAAAAAAAAAAIAAQAAAAAAAAAAAAJAAQAAAAAAAAAAAAKAAQAAAAAAAAAAAALAAQAAAAAAAAAAAAMAAQAAAAAAAAAAAANAAQAAAAAAAAAAAAOAAQAAAAAAAAAAAAOAAUAAAAAAAAAAAANAAUAAAAAAAAAAAAMAAUAAAAAAAAAAAALAAUAAAAAAAAAAAAKAAUAAAAAAAAAAAAJAAUAAAAAAAAAAAAIAAUAAAAAAAAAAAAHAAUAAAAAAAAAAAAGAAUAAAAAAAAAAAAFAAUAAAAAAAAAAAAEAAUAAAAAAAAAAAADAAUAAAAAAAAAAAACAAUAAAAAAAAAAAACAAYAAAAAAAAAAAADAAYAAAAAAAAAAAAEAAYAAAAAAAAAAAAFAAYAAAAAAAAAAAAGAAYAAAAAAAAAAAAHAAYAAAAAAAAAAAAIAAYAAAAAAAAAAAAJAAYAAAAAAAAAAAAKAAYAAAAAAAAAAAALAAYAAAAAAAAAAAAMAAYAAAAAAAAAAAANAAYAAAAAAAAAAAAOAAYAAAAAAAAAAAA=")
+tile_set = ExtResource("2_07b1n")
+
+[node name="EnemyMarker" type="Marker2D" parent="." unique_id=78739859]
+position = Vector2(432, 176)
+script = ExtResource("3_apy0g")
+unit = ExtResource("4_1xxpk")
+metadata/_custom_type_script = "uid://ch68weh071ce8"
+
+[node name="EnemyMarker2" type="Marker2D" parent="." unique_id=1164206902]
+position = Vector2(464, 176)
+script = ExtResource("3_apy0g")
+unit = ExtResource("5_lnoch")
+metadata/_custom_type_script = "uid://ch68weh071ce8"
+
+[node name="EnemyMarker3" type="Marker2D" parent="." unique_id=62936625]
+position = Vector2(400, 176)
+script = ExtResource("3_apy0g")
+unit = ExtResource("5_lnoch")
+metadata/_custom_type_script = "uid://ch68weh071ce8"
+
+[node name="SpawnMarker" type="Marker2D" parent="." unique_id=855800223]
+position = Vector2(48, 176)
+script = ExtResource("4_t2tym")
+metadata/_custom_type_script = "uid://xbsgn7svfaem"
+
+[node name="SpawnMarker2" type="Marker2D" parent="." unique_id=1642974888]
+position = Vector2(80, 176)
+script = ExtResource("4_t2tym")
+metadata/_custom_type_script = "uid://xbsgn7svfaem"
+
+[node name="SpawnMarker3" type="Marker2D" parent="." unique_id=667285226]
+position = Vector2(112, 176)
+script = ExtResource("4_t2tym")
+metadata/_custom_type_script = "uid://xbsgn7svfaem"

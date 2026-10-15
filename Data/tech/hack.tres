@@ -1,9 +1,9 @@
-[gd_resource type="Resource" script_class="TechNodeDef" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="TechNodeDef" format=3 uid="uid://r6jsc6l0pcnr"]
 
-[ext_resource type="Script" path="res://Data/Defs/TechNodeDef.gd" id="1_node"]
-[ext_resource type="Resource" path="res://Data/units/hack.tres" id="2_unit"]
+[ext_resource type="Script" uid="uid://blqqqqy2ad1a0" path="res://Data/Defs/UnitDef.gd" id="1_4v0kj"]
+[ext_resource type="Script" uid="uid://cs1hsp355u6m0" path="res://Data/Defs/TechNodeDef.gd" id="1_node"]
+[ext_resource type="Resource" uid="uid://dyyosqmjkb3k7" path="res://Data/units/player/hack.tres" id="2_unit"]
 
 [resource]
 script = ExtResource("1_node")
 unit = ExtResource("2_unit")
-cost = {}

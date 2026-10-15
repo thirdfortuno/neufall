@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="UnitDef" format=3 uid="uid://da83gwg5hh8vu"]
+
+[ext_resource type="Script" uid="uid://8eoy375x8x7p" path="res://Data/Defs/AbilityDef.gd" id="1_lblrr"]
+[ext_resource type="Resource" uid="uid://prk07gewvjfy" path="res://Data/abilities/kilobyte.tres" id="2_lblrr"]
+[ext_resource type="Script" uid="uid://blqqqqy2ad1a0" path="res://Data/Defs/UnitDef.gd" id="3_v6da3"]
+
+[resource]
+script = ExtResource("3_v6da3")
+unit_name = "Attack Dog"
+description = "A loyal defender"
+abbr = "dawg"
+side = "enemy"
+hp_max = 8
+moves_max = 4
+abilities = Array[ExtResource("1_lblrr")]([ExtResource("2_lblrr")])
+metadata/_custom_type_script = "uid://blqqqqy2ad1a0"

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="UnitDef" format=3 uid="uid://d35hoxka58j84"]
+
+[ext_resource type="Script" uid="uid://blqqqqy2ad1a0" path="res://Data/Defs/UnitDef.gd" id="1_unit"]
+[ext_resource type="Script" uid="uid://8eoy375x8x7p" path="res://Data/Defs/AbilityDef.gd" id="2_abilitydef"]
+[ext_resource type="Resource" uid="uid://cql4rkqsa0cim" path="res://Data/abilities/clean.tres" id="3_clean"]
+
+[resource]
+script = ExtResource("1_unit")
+unit_name = "Mopper"
+description = "Ready to mop you up"
+abbr = "CLN2"
+side = "enemy"
+hp_max = 4
+moves_max = 2
+abilities = Array[ExtResource("2_abilitydef")]([ExtResource("3_clean")])

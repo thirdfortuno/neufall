@@ -90,6 +90,15 @@ func _show_details():
 	var state = Game.mission_state(selected_id)
 	var lines = [mission["name"], "Status: %s" % state]
 
+	if mission["company"].has("name"):
+		lines.append("Company: %s" % mission["company"]["name"])
+		if mission["company"]["description"] != "":
+			lines.append(mission["company"]["description"])
+	if mission["info"] != "":
+		lines.append("")
+		lines.append(mission["info"])
+		lines.append("")
+
 	if mission["requires"].size() > 0:
 		lines.append("Requires:")
 		for required_id in mission["requires"]:
@@ -103,7 +112,14 @@ func _show_details():
 
 	lines.append("Objective: %s" % Game.victory_text(mission["victory"]))
 	lines.append("Squad size: %d" % mission["spawn_tiles"].size())
-	lines.append("Max generation: %d" % mission["max_generation"])
+	if mission["max_generation"] > 0:
+		lines.append("Max generation: %d" % mission["max_generation"])
+	else:
+		lines.append("Max generation: Any")
+	if mission["max_memory"] > 0:
+		lines.append("Memory limit: %d" % mission["max_memory"])
+	else:
+		lines.append("Memory limit: None")
 
 	if state != "cleared":
 		lines.append("First clear: %s" % Game.resources_text(mission["first_clear_reward"], "+"))

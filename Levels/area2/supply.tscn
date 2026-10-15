@@ -1,0 +1,146 @@
+[gd_scene format=4 uid="uid://bk33e173elow2"]
+
+[ext_resource type="Script" uid="uid://b07rjjx3xxy1a" path="res://Data/Defs/LevelDef.gd" id="1_67r20"]
+[ext_resource type="TileSet" uid="uid://chuqbxkdp8gs6" path="res://Levels/floor_tileset.tres" id="2_kfq88"]
+[ext_resource type="Script" uid="uid://xbsgn7svfaem" path="res://Data/Defs/SpawnMarker.gd" id="3_yvv8x"]
+[ext_resource type="Script" uid="uid://ch68weh071ce8" path="res://Data/Defs/EnemyMarker.gd" id="4_8tumh"]
+[ext_resource type="Resource" path="res://Data/units/enemy/cleaner.tres" id="5_aj13b"]
+[ext_resource type="Script" uid="uid://cqgjrppkthvii" path="res://Data/Defs/BodyMarker.gd" id="6_fujr6"]
+[ext_resource type="Resource" uid="uid://d35hoxka58j84" path="res://Data/units/enemy/mopper.tres" id="7_3vpw5"]
+
+[node name="Supply" type="Node2D" unique_id=271577440]
+script = ExtResource("1_67r20")
+metadata/_custom_type_script = "uid://b07rjjx3xxy1a"
+
+[node name="Floor" type="TileMapLayer" parent="." unique_id=1265713157]
+scale = Vector2(0.5, 0.5)
+tile_map_data = PackedByteArray("AAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAACAAAAAAAAAAAAAAADAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAFAAAAAAAAAAAAAAAGAAAAAAAAAAAAAAAHAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAJAAAAAAAAAAAAAAAKAAAAAAAAAAAAAAALAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAUAAAAAAAAAAAAAAAYAAAAAAAAAAAAAAAcAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAkAAAAAAAAAAAABAAkAAAAAAAAAAAACAAkAAAAAAAAAAAADAAkAAAAAAAAAAAAEAAkAAAAAAAAAAAAFAAkAAAAAAAAAAAAGAAkAAAAAAAAAAAAHAAkAAAAAAAAAAAAIAAkAAAAAAAAAAAAJAAkAAAAAAAAAAAAKAAkAAAAAAAAAAAALAAkAAAAAAAAAAAALAAEAAAAAAAAAAAALAAIAAAAAAAAAAAALAAMAAAAAAAAAAAALAAQAAAAAAAAAAAALAAUAAAAAAAAAAAALAAYAAAAAAAAAAAALAAcAAAAAAAAAAAALAAgAAAAAAAAAAAAKAAgAAAAAAAAAAAAJAAgAAAAAAAAAAAAIAAgAAAAAAAAAAAAHAAgAAAAAAAAAAAAGAAgAAAAAAAAAAAAFAAgAAAAAAAAAAAAEAAgAAAAAAAAAAAADAAgAAAAAAAAAAAACAAgAAAAAAAAAAAABAAgAAAAAAAAAAAABAAcAAAAAAAAAAAABAAYAAAAAAAAAAAABAAUAAAAAAAAAAAABAAQAAAAAAAAAAAACAAQAAAAAAAAAAAACAAMAAAAAAAAAAAABAAMAAAAAAAAAAAABAAIAAAAAAAAAAAABAAEAAAAAAAAAAAACAAEAAAAAAAAAAAADAAEAAAAAAAAAAAAEAAEAAAAAAAAAAAAFAAEAAAAAAAAAAAAGAAEAAAAAAAAAAAAHAAEAAAAAAAAAAAAIAAEAAAAAAAAAAAAJAAEAAAAAAAAAAAAKAAEAAAAAAAAAAAAKAAIAAAAAAAAAAAAKAAMAAAAAAAAAAAAKAAQAAAAAAAAAAAAKAAUAAAAAAAAAAAAKAAYAAAAAAAAAAAAJAAYAAAAAAAAAAAAJAAcAAAAAAAAAAAAIAAcAAAAAAAAAAAAHAAcAAAAAAAAAAAAGAAcAAAAAAAAAAAAFAAcAAAAAAAAAAAAEAAcAAAAAAAAAAAADAAcAAAAAAAAAAAADAAYAAAAAAAAAAAACAAYAAAAAAAAAAAACAAUAAAAAAAAAAAACAAIAAAAAAAAAAAADAAIAAAAAAAAAAAAEAAIAAAAAAAAAAAAFAAIAAAAAAAAAAAAGAAIAAAAAAAAAAAAHAAIAAAAAAAAAAAAIAAIAAAAAAAAAAAAJAAIAAAAAAAAAAAAJAAMAAAAAAAAAAAAJAAQAAAAAAAAAAAAKAAcAAAAAAAAAAAACAAcAAAAAAAAAAAADAAQAAAAAAAAAAAAEAAMAAAAAAAAAAAAFAAMAAAAAAAAAAAAGAAMAAAAAAAAAAAAHAAMAAAAAAAAAAAAHAAQAAAAAAAAAAAAIAAQAAAAAAAAAAAAJAAUAAAAAAAAAAAAIAAUAAAAAAAAAAAAIAAYAAAAAAAAAAAAHAAYAAAAAAAAAAAAHAAUAAAAAAAAAAAAGAAUAAAAAAAAAAAAFAAUAAAAAAAAAAAAEAAUAAAAAAAAAAAADAAUAAAAAAAAAAAAEAAQAAAAAAAAAAAADAAMAAAAAAAAAAAAIAAMAAAAAAAAAAAAGAAQAAAAAAAAAAAAFAAQAAAAAAAAAAAAGAAYAAAAAAAAAAAAFAAYAAAAAAAAAAAAEAAYAAAAAAAAAAAA=")
+tile_set = ExtResource("2_kfq88")
+
+[node name="SpawnMarker6" type="Marker2D" parent="." unique_id=2101666384]
+position = Vector2(368, 304)
+script = ExtResource("3_yvv8x")
+metadata/_custom_type_script = "uid://xbsgn7svfaem"
+
+[node name="SpawnMarker5" type="Marker2D" parent="." unique_id=101754765]
+position = Vector2(48, 304)
+script = ExtResource("3_yvv8x")
+metadata/_custom_type_script = "uid://xbsgn7svfaem"
+
+[node name="SpawnMarker4" type="Marker2D" parent="." unique_id=1083621738]
+position = Vector2(16, 272)
+script = ExtResource("3_yvv8x")
+metadata/_custom_type_script = "uid://xbsgn7svfaem"
+
+[node name="SpawnMarker3" type="Marker2D" parent="." unique_id=2053797038]
+position = Vector2(336, 16)
+script = ExtResource("3_yvv8x")
+metadata/_custom_type_script = "uid://xbsgn7svfaem"
+
+[node name="SpawnMarker2" type="Marker2D" parent="." unique_id=725271591]
+position = Vector2(368, 48)
+script = ExtResource("3_yvv8x")
+metadata/_custom_type_script = "uid://xbsgn7svfaem"
+
+[node name="SpawnMarker" type="Marker2D" parent="." unique_id=1412020344]
+position = Vector2(16, 16)
+script = ExtResource("3_yvv8x")
+metadata/_custom_type_script = "uid://xbsgn7svfaem"
+
+[node name="EnemyMarker6" type="Marker2D" parent="." unique_id=56566134]
+position = Vector2(144, 80)
+script = ExtResource("4_8tumh")
+unit = ExtResource("5_aj13b")
+metadata/_custom_type_script = "uid://ch68weh071ce8"
+
+[node name="BodyMarker" type="Marker2D" parent="EnemyMarker6" unique_id=1811825327]
+position = Vector2(32, 0)
+script = ExtResource("6_fujr6")
+metadata/_custom_type_script = "uid://cqgjrppkthvii"
+
+[node name="EnemyMarker5" type="Marker2D" parent="." unique_id=1956623179]
+position = Vector2(208, 80)
+script = ExtResource("4_8tumh")
+unit = ExtResource("5_aj13b")
+metadata/_custom_type_script = "uid://ch68weh071ce8"
+
+[node name="BodyMarker" type="Marker2D" parent="EnemyMarker5" unique_id=1910708406]
+position = Vector2(0, 32)
+script = ExtResource("6_fujr6")
+metadata/_custom_type_script = "uid://cqgjrppkthvii"
+
+[node name="EnemyMarker4" type="Marker2D" parent="." unique_id=277520840]
+position = Vector2(112, 208)
+script = ExtResource("4_8tumh")
+unit = ExtResource("5_aj13b")
+metadata/_custom_type_script = "uid://ch68weh071ce8"
+
+[node name="BodyMarker" type="Marker2D" parent="EnemyMarker4" unique_id=1004242566]
+position = Vector2(0, -32)
+script = ExtResource("6_fujr6")
+metadata/_custom_type_script = "uid://cqgjrppkthvii"
+
+[node name="EnemyMarker3" type="Marker2D" parent="." unique_id=936445850]
+position = Vector2(176, 240)
+script = ExtResource("4_8tumh")
+unit = ExtResource("5_aj13b")
+metadata/_custom_type_script = "uid://ch68weh071ce8"
+
+[node name="BodyMarker" type="Marker2D" parent="EnemyMarker3" unique_id=1768136641]
+position = Vector2(32, 0)
+script = ExtResource("6_fujr6")
+metadata/_custom_type_script = "uid://cqgjrppkthvii"
+
+[node name="EnemyMarker2" type="Marker2D" parent="." unique_id=2125074932]
+position = Vector2(304, 208)
+script = ExtResource("4_8tumh")
+unit = ExtResource("5_aj13b")
+metadata/_custom_type_script = "uid://ch68weh071ce8"
+
+[node name="BodyMarker" type="Marker2D" parent="EnemyMarker2" unique_id=1578118606]
+position = Vector2(0, -32)
+script = ExtResource("6_fujr6")
+metadata/_custom_type_script = "uid://cqgjrppkthvii"
+
+[node name="EnemyMarker" type="Marker2D" parent="." unique_id=1422925151]
+position = Vector2(272, 112)
+script = ExtResource("4_8tumh")
+unit = ExtResource("5_aj13b")
+metadata/_custom_type_script = "uid://ch68weh071ce8"
+
+[node name="BodyMarker" type="Marker2D" parent="EnemyMarker" unique_id=214019011]
+position = Vector2(-32, 0)
+script = ExtResource("6_fujr6")
+metadata/_custom_type_script = "uid://cqgjrppkthvii"
+
+[node name="EnemyMarker7" type="Marker2D" parent="." unique_id=1769797224]
+position = Vector2(208, 176)
+script = ExtResource("4_8tumh")
+unit = ExtResource("7_3vpw5")
+metadata/_custom_type_script = "uid://ch68weh071ce8"
+
+[node name="BodyMarker" type="Marker2D" parent="EnemyMarker7" unique_id=584078805]
+position = Vector2(32, 0)
+script = ExtResource("6_fujr6")
+metadata/_custom_type_script = "uid://cqgjrppkthvii"
+
+[node name="BodyMarker2" type="Marker2D" parent="EnemyMarker7" unique_id=810963322]
+position = Vector2(64, 0)
+script = ExtResource("6_fujr6")
+metadata/_custom_type_script = "uid://cqgjrppkthvii"
+
+[node name="EnemyMarker8" type="Marker2D" parent="." unique_id=1223469758]
+position = Vector2(144, 144)
+script = ExtResource("4_8tumh")
+unit = ExtResource("7_3vpw5")
+metadata/_custom_type_script = "uid://ch68weh071ce8"
+
+[node name="BodyMarker" type="Marker2D" parent="EnemyMarker8" unique_id=941242795]
+position = Vector2(32, 0)
+script = ExtResource("6_fujr6")
+metadata/_custom_type_script = "uid://cqgjrppkthvii"
+
+[node name="BodyMarker2" type="Marker2D" parent="EnemyMarker8" unique_id=1149851957]
+position = Vector2(32, -32)
+script = ExtResource("6_fujr6")
+metadata/_custom_type_script = "uid://cqgjrppkthvii"

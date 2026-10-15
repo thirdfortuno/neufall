@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="UnitDef" format=3 uid="uid://6fgdx80yjyju"]
+
+[ext_resource type="Script" uid="uid://blqqqqy2ad1a0" path="res://Data/Defs/UnitDef.gd" id="1_unit"]
+[ext_resource type="Script" uid="uid://8eoy375x8x7p" path="res://Data/Defs/AbilityDef.gd" id="2_abilitydef"]
+[ext_resource type="Resource" uid="uid://usi2bsoklwa3" path="res://Data/abilities/one.tres" id="3_one"]
+[ext_resource type="Resource" uid="uid://dp6ll6337al40" path="res://Data/abilities/zero.tres" id="4_zero"]
+
+[resource]
+script = ExtResource("1_unit")
+unit_name = "Bitflipper"
+abbr = "BIT"
+hp_max = 2
+memory = 2
+abilities = Array[ExtResource("2_abilitydef")]([ExtResource("3_one"), ExtResource("4_zero")])

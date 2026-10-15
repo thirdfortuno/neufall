@@ -1,0 +1,62 @@
+[gd_scene format=4 uid="uid://drm3y2gdotd3p"]
+
+[ext_resource type="Script" uid="uid://b07rjjx3xxy1a" path="res://Data/Defs/LevelDef.gd" id="1_0j624"]
+[ext_resource type="PackedScene" uid="uid://b2c16ywlw0kb1" path="res://Levels/area1/tower.tscn" id="2_1f2o2"]
+[ext_resource type="TileSet" uid="uid://chuqbxkdp8gs6" path="res://Levels/floor_tileset.tres" id="2_n8n35"]
+[ext_resource type="Script" uid="uid://ch68weh071ce8" path="res://Data/Defs/EnemyMarker.gd" id="3_v1pju"]
+[ext_resource type="Resource" path="res://Data/units/enemy/cleaner.tres" id="4_1f2o2"]
+[ext_resource type="Script" uid="uid://xbsgn7svfaem" path="res://Data/Defs/SpawnMarker.gd" id="5_wodvw"]
+[ext_resource type="Script" uid="uid://djgjwj77mn535" path="res://Data/Defs/FixedUnitMarker.gd" id="6_v1j83"]
+[ext_resource type="Resource" path="res://Data/units/player/bitflipper.tres" id="7_srvur"]
+[ext_resource type="Script" uid="uid://gyd5w36xnwa6" path="res://Data/Defs/GoalMarker.gd" id="8_v1pju"]
+
+[node name="Unlock" type="Node2D" unique_id=1687621287]
+script = ExtResource("1_0j624")
+mission_name = "Unlock"
+victory_type = "reach_tile"
+requires = Array[PackedScene]([ExtResource("2_1f2o2")])
+metadata/_custom_type_script = "uid://b07rjjx3xxy1a"
+
+[node name="Floor" type="TileMapLayer" parent="." unique_id=1980178587]
+scale = Vector2(0.5, 0.5)
+tile_map_data = PackedByteArray("AAABAAMAAAAAAAAAAAABAAQAAAAAAAAAAAABAAUAAAAAAAAAAAABAAYAAAAAAAAAAAABAAcAAAAAAAAAAAAHAAcAAAAAAAAAAAAHAAYAAAAAAAAAAAAHAAUAAAAAAAAAAAAHAAQAAAAAAAAAAAAHAAMAAAAAAAAAAAACAAMAAAAAAAAAAAACAAQAAAAAAAAAAAACAAUAAAAAAAAAAAACAAYAAAAAAAAAAAACAAcAAAAAAAAAAAADAAcAAAAAAAAAAAAFAAcAAAAAAAAAAAAGAAcAAAAAAAAAAAAGAAYAAAAAAAAAAAAFAAYAAAAAAAAAAAADAAYAAAAAAAAAAAADAAUAAAAAAAAAAAAFAAUAAAAAAAAAAAAGAAUAAAAAAAAAAAAGAAQAAAAAAAAAAAAFAAQAAAAAAAAAAAADAAQAAAAAAAAAAAADAAMAAAAAAAAAAAAFAAMAAAAAAAAAAAAGAAMAAAAAAAAAAAAKAAQAAAAAAAAAAAAKAAYAAAAAAAAAAAAKAAUAAAAAAAAAAAAMAAQAAAAAAAAAAAAMAAUAAAAAAAAAAAALAAYAAAAAAAAAAAALAAUAAAAAAAAAAAALAAQAAAAAAAAAAAAMAAYAAAAAAAAAAAA=")
+tile_set = ExtResource("2_n8n35")
+
+[node name="EnemyMarker" type="Marker2D" parent="." unique_id=251628703]
+position = Vector2(240, 208)
+script = ExtResource("3_v1pju")
+unit = ExtResource("4_1f2o2")
+metadata/_custom_type_script = "uid://ch68weh071ce8"
+
+[node name="EnemyMarker3" type="Marker2D" parent="." unique_id=1795727951]
+position = Vector2(240, 144)
+script = ExtResource("3_v1pju")
+unit = ExtResource("4_1f2o2")
+metadata/_custom_type_script = "uid://ch68weh071ce8"
+
+[node name="EnemyMarker2" type="Marker2D" parent="." unique_id=602483324]
+position = Vector2(336, 176)
+script = ExtResource("3_v1pju")
+unit = ExtResource("4_1f2o2")
+metadata/_custom_type_script = "uid://ch68weh071ce8"
+
+[node name="SpawnMarker2" type="Marker2D" parent="." unique_id=1101795922]
+position = Vector2(112, 208)
+script = ExtResource("5_wodvw")
+metadata/_custom_type_script = "uid://xbsgn7svfaem"
+
+[node name="SpawnMarker" type="Marker2D" parent="." unique_id=184037213]
+position = Vector2(112, 144)
+script = ExtResource("5_wodvw")
+metadata/_custom_type_script = "uid://xbsgn7svfaem"
+
+[node name="FixedUnitMarker" type="Marker2D" parent="." unique_id=1830821165]
+position = Vector2(48, 176)
+script = ExtResource("6_v1j83")
+unit = ExtResource("7_srvur")
+metadata/_custom_type_script = "uid://djgjwj77mn535"
+
+[node name="GoalMarker" type="Marker2D" parent="." unique_id=1411339774]
+position = Vector2(368, 176)
+script = ExtResource("8_v1pju")
+metadata/_custom_type_script = "uid://gyd5w36xnwa6"

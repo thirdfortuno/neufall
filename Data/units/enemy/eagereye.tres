@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="UnitDef" format=3 uid="uid://dhx81vf2ggq56"]
+
+[ext_resource type="Script" uid="uid://8eoy375x8x7p" path="res://Data/Defs/AbilityDef.gd" id="1_2vo5q"]
+[ext_resource type="Resource" uid="uid://bhmf0wy8e08mw" path="res://Data/abilities/spot.tres" id="2_2vo5q"]
+[ext_resource type="Script" uid="uid://blqqqqy2ad1a0" path="res://Data/Defs/UnitDef.gd" id="3_752i7"]
+
+[resource]
+script = ExtResource("3_752i7")
+unit_name = "Eagle Eye"
+description = "Classic Corporate ranged defense program"
+abbr = "eye"
+side = "enemy"
+hp_max = 2
+moves_max = 1
+abilities = Array[ExtResource("1_2vo5q")]([ExtResource("2_2vo5q")])
+metadata/_custom_type_script = "uid://blqqqqy2ad1a0"

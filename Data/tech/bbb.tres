@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="TechNodeDef" format=3 uid="uid://u46woybh37b8"]
+
+[ext_resource type="Script" uid="uid://dldsastxk5pmk" path="res://Data/Defs/ResourceAmount.gd" id="1_lym7g"]
+[ext_resource type="Script" uid="uid://blqqqqy2ad1a0" path="res://Data/Defs/UnitDef.gd" id="2_7042w"]
+[ext_resource type="Script" uid="uid://cs1hsp355u6m0" path="res://Data/Defs/TechNodeDef.gd" id="3_wuq1r"]
+[ext_resource type="Resource" uid="uid://ddhy010773rvi" path="res://Data/units/player/bb.tres" id="4_i0s62"]
+[ext_resource type="Resource" uid="uid://c8hqtoxq2p523" path="res://Data/units/player/bbb.tres" id="4_lym7g"]
+
+[resource]
+script = ExtResource("3_wuq1r")
+unit = ExtResource("4_lym7g")
+required_units = Array[ExtResource("2_7042w")]([ExtResource("4_i0s62")])
+metadata/_custom_type_script = "uid://cs1hsp355u6m0"

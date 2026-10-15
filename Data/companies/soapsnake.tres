@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="CompanyDef" format=3 uid="uid://bhen4s2nebkad"]
+
+[ext_resource type="Script" uid="uid://boui8t5tupmcp" path="res://Data/Defs/CompanyDef.gd" id="1_s6lvg"]
+
+[resource]
+script = ExtResource("1_s6lvg")
+company_name = "Soap Snake Media"
+tagline = "We spice up your life"
+language = "Spanish"
+metadata/_custom_type_script = "uid://boui8t5tupmcp"

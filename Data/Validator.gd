@@ -14,11 +14,11 @@ func unit_errors(unit_id, def):
 		errors.append("%s: moves_max cannot be negative" % label)
 	if def.generation < 1:
 		errors.append("%s: generation must be at least 1" % label)
+	if def.memory < 0:
+		errors.append("%s: memory cannot be negative" % label)
 	if def.sprite_main != null && def.sprite_shadow == null:
 		errors.append("%s: has a sprite_main but no sprite_shadow" % label)
 
-	if def.abilities.size() == 0:
-		errors.append("%s: has no abilities" % label)
 	if def.abilities.size() > MAX_ABILITIES:
 		errors.append("%s: has more than %d abilities (the UI has %d buttons)" % [label, MAX_ABILITIES, MAX_ABILITIES])
 
@@ -40,11 +40,9 @@ func tech_errors(node_id, def, unit_ids, obtainable_unit_ids):
 	else:
 		own_unit_id = def.unit.resource_path.get_file().get_basename()
 		if !unit_ids.has(own_unit_id):
-			errors.append("%s: unit %s is not a valid unit in the UnitLibrary" % [label, own_unit_id])
+			errors.append("%s: unit %s is not a valid unit in Data/units" % [label, own_unit_id])
 	
-	for type in def.cost:
-		if typeof(def.cost[type]) != TYPE_INT || def.cost[type] < 0:
-			errors.append("%s: cost for '%s' must be a whole number of 0 or more" % [label, type])
+	errors.append_array(_amount_errors(label, "cost", def.cost))
 	
 	for required in def.required_units:
 		if required == null:
@@ -55,7 +53,7 @@ func tech_errors(node_id, def, unit_ids, obtainable_unit_ids):
 		if required_id == own_unit_id:
 			errors.append("%s: requires its own unit" % label)
 		elif !unit_ids.has(required_id):
-			errors.append("%s: requires unit %s, which is not a valid unit in the UnitLibrary" % [label, required_id])
+			errors.append("%s: requires unit %s, which is not a valid unit in Data/units" % [label, required_id])
 		elif !obtainable_unit_ids.has(required_id):
 			errors.append("%s: requires unit %s, which no tech node unlocks and which does not start unlocked" % [label, required_id])
 	
@@ -80,15 +78,25 @@ func level_errors(level_id, scene, unit_ids, level_ids):
 
 	if level.mission_name == "":
 		errors.append("%s: mission_name is empty" % label)
-	if level.max_generation < 1:
-		errors.append("%s: max_generation must be at least 1" % label)
+	if level.max_generation < 0:
+		errors.append("%s: max_generation cannot be negative" % label)
+	if level.max_memory < 0:
+		errors.append("%s: max_memory cannot be negative" % label)
+	if level.company != null && level.company.company_name == "":
+		errors.append("%s: its company has an empty company_name" % label)
 
-	for required_id in level.requires:
+	for required in level.requires:
+		if required == null:
+			errors.append("%s: a requires slot is empty" % label)
+			continue
+		
+		var required_id = required.resource_path.get_file().get_basename()
 		if required_id == level_id:
 			errors.append("%s: requires itself" % label)
 		elif !level_ids.has(required_id):
 			errors.append("%s: requires %s, which is not in the Campaign" % [label, required_id])
 
+	errors.append_array(_amount_errors(label, "first_clear_reward", level.first_clear_reward))
 	errors.append_array(_challenge_errors(label, level.challenges))
 
 	var layer = level.get_node_or_null("Floor")
@@ -97,7 +105,7 @@ func level_errors(level_id, scene, unit_ids, level_ids):
 		level.free()
 		return errors
 
-	var rect = layer.get_used_rect()
+	var rect = Game.grid_rect(layer)
 	if layer.tile_set == null:
 		errors.append("%s: Floor has no TileSet" % label)
 	elif rect.size == Vector2i.ZERO:
@@ -150,7 +158,7 @@ func _marker_errors(label, level, layer, rect, unit_ids):
 			else:
 				unit_id = child.unit.resource_path.get_file().get_basename()
 				if !unit_ids.has(unit_id):
-					errors.append("%s: %s uses unit %s, which is not a valid unit in the UnitLibrary" % [label, where, unit_id])
+					errors.append("%s: %s uses unit %s, which is not a valid unit in Data/units" % [label, where, unit_id])
 			
 			errors.append_array(_body_errors(label, where, layer, rect, occupied, child, cell))
 			
@@ -237,9 +245,7 @@ func _challenge_errors(label, challenges):
 				if challenge.value < 1:
 					errors.append("%s: value must be at least 1" % challenge_label)
 
-		for type in challenge.reward:
-			if typeof(challenge.reward[type]) != TYPE_INT || challenge.reward[type] < 0:
-				errors.append("%s: reward for '%s' must be a whole number of 0 or more" % [challenge_label, type])
+		errors.append_array(_amount_errors(challenge_label, "reward", challenge.reward))
 
 	return errors
 
@@ -272,6 +278,15 @@ func _ability_errors(unit_label, ability):
 	if ability.targets == TILE_TARGET_FLAG && !has_tile_effect:
 		errors.append("%s: only targets tiles but has no tile_set effect" % label)
 
+	return errors
+
+func _amount_errors(label, field, amounts):
+	var errors = []
+	for entry in amounts:
+		if entry == null:
+			errors.append("%s: %s has an empty slot" % [label, field])
+		elif entry.amount < 0:
+			errors.append("%s: %s has a negative amount for '%s'" % [label, field, entry.type])
 	return errors
 
 func _reaches(requires_by_id, current, target, visited):

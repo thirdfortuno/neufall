@@ -53,6 +53,7 @@ func damage_blink():
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	$Sprite2D.texture = SPR_ARRAY[0]
+	modulate = get_parent().body_tint()
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):

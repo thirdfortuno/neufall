@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="TechNodeDef" format=3 uid="uid://rkxwc1apimw4"]
+
+[ext_resource type="Script" uid="uid://dldsastxk5pmk" path="res://Data/Defs/ResourceAmount.gd" id="1_df1xn"]
+[ext_resource type="Script" uid="uid://blqqqqy2ad1a0" path="res://Data/Defs/UnitDef.gd" id="2_vj71a"]
+[ext_resource type="Script" uid="uid://cs1hsp355u6m0" path="res://Data/Defs/TechNodeDef.gd" id="3_7321e"]
+[ext_resource type="Resource" path="res://Data/units/player/bitflipper.tres" id="4_vj71a"]
+
+[resource]
+script = ExtResource("3_7321e")
+unit = ExtResource("4_vj71a")
+metadata/_custom_type_script = "uid://cs1hsp355u6m0"
