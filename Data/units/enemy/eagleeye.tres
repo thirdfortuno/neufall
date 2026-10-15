@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="UnitDef" format=3 uid="uid://d2udcvt5rejy4"]
+
+[ext_resource type="Script" uid="uid://8eoy375x8x7p" path="res://Data/Defs/AbilityDef.gd" id="1_mly3y"]
+[ext_resource type="Script" uid="uid://blqqqqy2ad1a0" path="res://Data/Defs/UnitDef.gd" id="2_3b8cw"]
+[ext_resource type="Resource" uid="uid://bhmf0wy8e08mw" path="res://Data/abilities/spot.tres" id="2_ubo6d"]
+
+[resource]
+script = ExtResource("2_3b8cw")
+unit_name = "Eagle Eye"
+abbr = "eag"
+side = "enemy"
+moves_max = 1
+abilities = Array[ExtResource("1_mly3y")]([ExtResource("2_ubo6d")])
+metadata/_custom_type_script = "uid://blqqqqy2ad1a0"

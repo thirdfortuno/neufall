@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="AbilityDef" format=3 uid="uid://bkau2i1wtjfop"]
+
+[ext_resource type="Script" uid="uid://snibrfoceuqv" path="res://Data/Defs/EffectDef.gd" id="1_7mtxo"]
+[ext_resource type="Script" uid="uid://8eoy375x8x7p" path="res://Data/Defs/AbilityDef.gd" id="2_mgadb"]
+
+[sub_resource type="Resource" id="Resource_7mtxo"]
+script = ExtResource("1_7mtxo")
+metadata/_custom_type_script = "uid://snibrfoceuqv"
+
+[resource]
+script = ExtResource("2_mgadb")
+ability_name = "Burn"
+description = "Deletes 1 cell from the target"
+effects = Array[ExtResource("1_7mtxo")]([SubResource("Resource_7mtxo")])
+metadata/_custom_type_script = "uid://8eoy375x8x7p"

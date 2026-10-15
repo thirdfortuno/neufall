@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="CompanyDef" format=3 uid="uid://v74uprehi3av"]
+
+[ext_resource type="Script" uid="uid://boui8t5tupmcp" path="res://Data/Defs/CompanyDef.gd" id="1_xxmj5"]
+
+[resource]
+script = ExtResource("1_xxmj5")
+company_name = "Apotique"
+tagline = "There is beauty in health"
+language = "Italian"
+metadata/_custom_type_script = "uid://boui8t5tupmcp"

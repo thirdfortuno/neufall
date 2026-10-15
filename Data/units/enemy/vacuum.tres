@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="UnitDef" format=3 uid="uid://cb7n5qbbwi6mt"]
+
+[ext_resource type="Script" uid="uid://8eoy375x8x7p" path="res://Data/Defs/AbilityDef.gd" id="1_nnoah"]
+[ext_resource type="Resource" uid="uid://cql4rkqsa0cim" path="res://Data/abilities/clean.tres" id="2_se63t"]
+[ext_resource type="Script" uid="uid://blqqqqy2ad1a0" path="res://Data/Defs/UnitDef.gd" id="3_yqafr"]
+
+[resource]
+script = ExtResource("3_yqafr")
+unit_name = "Vacuum"
+description = "Die, son"
+abbr = "CLN3"
+side = "enemy"
+hp_max = 4
+abilities = Array[ExtResource("1_nnoah")]([ExtResource("2_se63t")])

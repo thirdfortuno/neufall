@@ -5,6 +5,12 @@ extends Node
 var DELAY_MOVE = 0.5
 var DELAY_TARGET = 0.5
 var DELAY_ATTACK = 0.5
+var DELAY_SPEEDUP = 0.1
+var DELAY_MIN_SCALE = 0.2
+
+# Every tile moved without an ability landing shortens the waits between moves (and
+# between units); a landed ability puts them back to normal
+var move_streak = 0
 
 var height
 var width
@@ -23,7 +29,7 @@ func handle_unit(unit):
 		var target_unit
 		if unit.behavior.search:
 			units_in_range = _unit_search(unit)
-		if units_in_range.size() == 0:
+		if units_in_range.size() == 0 || unit.abilities.size() == 0:
 			if unit.behavior.peace:
 				await _unit_peace(unit)
 		else:
@@ -35,10 +41,22 @@ func handle_unit(unit):
 					unit
 				)
 				var path = _path_to_target(grid_distance, unit)
+				if path.size() == 0 && grid_distance.get_value(unit.x, unit.y) != 0:
+					path = _path_to_closest(target_unit, unit)
+					if path.size() == 0:
+						await _unit_shuffle(unit)
 				print(path)
 				await _move_along_path(path, unit)
 				await _use_ability_on_target(unit.abilities[0], target_unit, unit)
 				print(unit, "moved")
+
+func delay_scale():
+	return max(DELAY_MIN_SCALE, 1.0 - move_streak * DELAY_SPEEDUP)
+
+func _move_delay():
+	var delay = DELAY_MOVE * delay_scale()
+	move_streak = move_streak + 1
+	await get_tree().create_timer(delay).timeout
 
 func _unit_search(unit):
 	for search in unit.behavior.search:
@@ -49,8 +67,8 @@ func _unit_peace(unit):
 	for peace in unit.behavior.peace:
 		if peace.method == "roam":
 			_show_move_range(unit)
-			while unit.moves_available:
-				await get_tree().create_timer(DELAY_MOVE).timeout
+			while unit.moves_available > 0:
+				await _move_delay()
 				var legal_tiles = _unit_max_mobility(unit).adjacent
 				if legal_tiles.size() == 0:
 					break
@@ -66,27 +84,14 @@ func _unit_war(unit, units_in_range):
 			break
 		match(war.method):
 			"nearest":
-				var closest = grid_units.get_distance(
-					unit_to_target[0].x,
-					unit_to_target[0].y,
-					unit.x,
-					unit.y
-				)
+				var closest = _distance_to_unit(unit.x, unit.y, unit_to_target[0])
 				var units_to_check = unit_to_target.duplicate()
 				for target_unit in units_to_check:
-					var target_closest = 99999
-					for body in target_unit.bodies:
-						var distance = grid_units.get_distance(
-							body.x,
-							body.y,
-							unit.x,
-							unit.y
-						)
-						if distance < target_closest:
-							target_closest = distance
+					var target_closest = _distance_to_unit(unit.x, unit.y, target_unit)
 					if target_closest > closest:
 						unit_to_target.erase(target_unit)
 					elif target_closest < closest:
+						closest = target_closest
 						unit_to_target.clear()
 						unit_to_target.append(target_unit)
 			"weakest":
@@ -216,17 +221,71 @@ func _path_to_target(grid_distance, unit):
 
 	return route
 	
+func _path_to_closest(target, unit):
+	var reachable = [grid_tiles.get_value(unit.x, unit.y)]
+	var reachable_index = 0
+	while reachable_index < reachable.size():
+		var tile = reachable[reachable_index]
+		reachable_index = reachable_index + 1
+
+		for neighbor in grid_tiles.get_adjacent_values(tile.x, tile.y):
+			if neighbor.state == 0 || reachable.has(neighbor):
+				continue
+			var unit_on_tile = grid_units.get_value(neighbor.x, neighbor.y)
+			if unit_on_tile != null && unit_on_tile != unit:
+				continue
+			reachable.append(neighbor)
+
+	var closest_tile = null
+	var closest_distance = _distance_to_unit(unit.x, unit.y, target)
+	for tile in reachable:
+		var distance = _distance_to_unit(tile.x, tile.y, target)
+		if distance < closest_distance:
+			closest_distance = distance
+			closest_tile = tile
+
+	if closest_tile == null:
+		return []
+
+	var grid_closest = Grid.new(width, height)
+	grid_closest.set_value(closest_tile.x, closest_tile.y, 0)
+	return _path_to_target(grid_closest, unit)
+
+func _distance_to_unit(x, y, target):
+	var closest = 99999
+	for body in target.bodies:
+		var distance = grid_units.get_distance(body.x, body.y, x, y)
+		if distance < closest:
+			closest = distance
+	return closest
+
+# A unit that cannot get any closer moves onto free tiles (growing bodies back if it is hurt)
+func _unit_shuffle(unit):
+	_show_move_range(unit)
+	while unit.moves_available > 0:
+		await _move_delay()
+		var free_tiles = []
+		for tile in _unit_max_mobility(unit).adjacent:
+			if grid_units.get_value(tile.x, tile.y) == null:
+				free_tiles.append(tile)
+		if free_tiles.size() == 0:
+			break
+		free_tiles.shuffle()
+		get_parent()._handle_unit_move(free_tiles[0], unit)
+		_show_move_range(unit)
+	get_parent()._clear_tile_tags()
+
 func _move_along_path(path, unit):
 	var moveable_path = path.duplicate()
 	
 	if path.size() > unit.moves_available:
-		moveable_path.resize(unit.moves_available)
+		moveable_path.resize(max(unit.moves_available, 0))
 	
 	if moveable_path.size() > 0:
 		_show_move_range(unit)
 
 	for tile in moveable_path:
-		await get_tree().create_timer(DELAY_MOVE).timeout
+		await _move_delay()
 		get_parent()._handle_unit_move(tile, unit)
 		_show_move_range(unit)
 
@@ -245,7 +304,8 @@ func _use_ability_on_target(ability, target, unit):
 	for body in target.bodies:
 		var tile = grid_tiles.get_value(body.x, body.y)
 		if tiles_in_range.has(tile):
-			get_parent()._handle_unit_ability(tile, unit, ability)
+			await get_parent()._handle_unit_ability(tile, unit, ability)
+			move_streak = 0
 			break
 	get_parent()._clear_tile_tags()
 

@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="AbilityDef" format=3 uid="uid://prk07gewvjfy"]
+
+[ext_resource type="Script" uid="uid://snibrfoceuqv" path="res://Data/Defs/EffectDef.gd" id="1_dopjy"]
+[ext_resource type="Script" uid="uid://8eoy375x8x7p" path="res://Data/Defs/AbilityDef.gd" id="2_pee5k"]
+
+[sub_resource type="Resource" id="Resource_6xff6"]
+script = ExtResource("1_dopjy")
+amount = 3
+metadata/_custom_type_script = "uid://snibrfoceuqv"
+
+[resource]
+script = ExtResource("2_pee5k")
+ability_name = "Kilobyte"
+description = "Deletes 3 cells from the target"
+effects = Array[ExtResource("1_dopjy")]([SubResource("Resource_6xff6")])
+metadata/_custom_type_script = "uid://8eoy375x8x7p"

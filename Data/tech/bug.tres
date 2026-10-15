@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="TechNodeDef" format=3 uid="uid://crfdpe4sniglx"]
+
+[ext_resource type="Script" uid="uid://blqqqqy2ad1a0" path="res://Data/Defs/UnitDef.gd" id="1_oibnp"]
+[ext_resource type="Script" uid="uid://dldsastxk5pmk" path="res://Data/Defs/ResourceAmount.gd" id="1_uosh0"]
+[ext_resource type="Script" uid="uid://cs1hsp355u6m0" path="res://Data/Defs/TechNodeDef.gd" id="2_j4gpq"]
+[ext_resource type="Resource" uid="uid://dyyosqmjkb3k7" path="res://Data/units/player/hack.tres" id="2_krr7h"]
+[ext_resource type="Resource" uid="uid://dhsuccbo21rms" path="res://Data/units/player/bug.tres" id="4_uosh0"]
+
+[sub_resource type="Resource" id="Resource_14frb"]
+script = ExtResource("1_uosh0")
+amount = 2
+
+[resource]
+script = ExtResource("2_j4gpq")
+unit = ExtResource("4_uosh0")
+cost = Array[ExtResource("1_uosh0")]([SubResource("Resource_14frb")])
+required_units = Array[ExtResource("1_oibnp")]([ExtResource("2_krr7h")])
+metadata/_custom_type_script = "uid://cs1hsp355u6m0"

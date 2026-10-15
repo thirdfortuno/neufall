@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="AbilityDef" format=3 uid="uid://bh5uu55ocary0"]
+
+[ext_resource type="Script" uid="uid://snibrfoceuqv" path="res://Data/Defs/EffectDef.gd" id="1_ga81p"]
+[ext_resource type="Script" uid="uid://8eoy375x8x7p" path="res://Data/Defs/AbilityDef.gd" id="2_mo5j6"]
+
+[sub_resource type="Resource" id="Resource_damage"]
+script = ExtResource("1_ga81p")
+amount = 4
+
+[resource]
+script = ExtResource("2_mo5j6")
+ability_name = "VAC"
+description = "Deletes 4 cells from the target"
+effects = Array[ExtResource("1_ga81p")]([SubResource("Resource_damage")])

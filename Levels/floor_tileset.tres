@@ -1,12 +1,40 @@
 [gd_resource type="TileSet" format=3 uid="uid://chuqbxkdp8gs6"]
 
-[ext_resource type="Texture2D" uid="uid://ioe01e8yw785" path="res://Tile/Sprites/tile_active.png" id="1_floor"]
+[ext_resource type="Texture2D" uid="uid://bv7hse8owsss5" path="res://Tile/Styles/normal.png" id="1_normal"]
+[ext_resource type="Texture2D" uid="uid://bursuyojgujy" path="res://Tile/Styles/dark.png" id="2_dark"]
+[ext_resource type="Texture2D" uid="uid://blst7v3be0suj" path="res://Tile/Styles/light.png" id="3_light"]
+[ext_resource type="Texture2D" uid="uid://cow3r8w54yyve" path="res://Tile/Styles/nines.png" id="4_nines"]
+[ext_resource type="Texture2D" uid="uid://mddxmda4h6q1" path="res://Tile/Styles/smoothstone.png" id="5_smoothstone"]
 
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_floor"]
-texture = ExtResource("1_floor")
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_normal"]
+texture = ExtResource("1_normal")
+texture_region_size = Vector2i(64, 64)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_dark"]
+texture = ExtResource("2_dark")
+texture_region_size = Vector2i(64, 64)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_light"]
+texture = ExtResource("3_light")
+texture_region_size = Vector2i(64, 64)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_nines"]
+texture = ExtResource("4_nines")
+texture_region_size = Vector2i(64, 64)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_smoothstone"]
+texture = ExtResource("5_smoothstone")
 texture_region_size = Vector2i(64, 64)
 0:0/0 = 0
 
 [resource]
 tile_size = Vector2i(64, 64)
-sources/0 = SubResource("TileSetAtlasSource_floor")
+sources/0 = SubResource("TileSetAtlasSource_normal")
+sources/1 = SubResource("TileSetAtlasSource_dark")
+sources/2 = SubResource("TileSetAtlasSource_light")
+sources/3 = SubResource("TileSetAtlasSource_nines")
+sources/4 = SubResource("TileSetAtlasSource_smoothstone")

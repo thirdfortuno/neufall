@@ -1,0 +1,27 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Battle/UI/BattleMenu.gd" id="1_menu"]
+
+[node name="BattleMenu" type="AcceptDialog"]
+title = "Menu"
+ok_button_text = "Resume"
+visible = false
+script = ExtResource("1_menu")
+
+[node name="Buttons" type="VBoxContainer" parent="."]
+offset_left = 8.0
+offset_top = 8.0
+offset_right = 92.0
+offset_bottom = 39.0
+
+[node name="OverworldButton" type="Button" parent="Buttons"]
+layout_mode = 2
+text = "Back to Overworld"
+
+[node name="LeaveDialog" type="ConfirmationDialog" parent="."]
+title = "Back to Overworld"
+visible = false
+dialog_text = "Leave this battle? Its progress will be lost."
+
+[connection signal="pressed" from="Buttons/OverworldButton" to="." method="_on_overworld_button_pressed"]
+[connection signal="confirmed" from="LeaveDialog" to="." method="_on_leave_confirmed"]

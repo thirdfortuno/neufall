@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="UnitDef" format=3 uid="uid://c2tr5rm0bqx5i"]
+
+[ext_resource type="Script" uid="uid://8eoy375x8x7p" path="res://Data/Defs/AbilityDef.gd" id="1_e3nhv"]
+[ext_resource type="Script" uid="uid://blqqqqy2ad1a0" path="res://Data/Defs/UnitDef.gd" id="2_ny3qg"]
+[ext_resource type="Resource" uid="uid://bkau2i1wtjfop" path="res://Data/abilities/burn.tres" id="2_sll6d"]
+
+[resource]
+script = ExtResource("2_ny3qg")
+unit_name = "Firewall"
+side = "enemy"
+hp_max = 20
+moves_max = 2
+abilities = Array[ExtResource("1_e3nhv")]([ExtResource("2_sll6d")])
+metadata/_custom_type_script = "uid://blqqqqy2ad1a0"

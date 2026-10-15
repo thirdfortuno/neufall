@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="AbilityDef" format=3 uid="uid://ctq6a48t8wytt"]
+
+[ext_resource type="Script" uid="uid://snibrfoceuqv" path="res://Data/Defs/EffectDef.gd" id="1_2cl4x"]
+[ext_resource type="Script" uid="uid://8eoy375x8x7p" path="res://Data/Defs/AbilityDef.gd" id="2_73uvj"]
+
+[sub_resource type="Resource" id="Resource_2cl4x"]
+script = ExtResource("1_2cl4x")
+metadata/_custom_type_script = "uid://snibrfoceuqv"
+
+[resource]
+script = ExtResource("2_73uvj")
+ability_name = "Surveil"
+description = "Deletes 1 cell from the target"
+ability_range = 7
+effects = Array[ExtResource("1_2cl4x")]([SubResource("Resource_2cl4x")])
+metadata/_custom_type_script = "uid://8eoy375x8x7p"

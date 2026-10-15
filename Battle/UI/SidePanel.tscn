@@ -1,0 +1,68 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://Battle/UI/SidePanel.gd" id="1_panel"]
+[ext_resource type="Texture2D" path="res://Battle/UI/Parts/panel_stitched.png" id="2_panel"]
+[ext_resource type="Theme" path="res://UI/panel_theme.tres" id="3_theme"]
+
+[sub_resource type="StyleBoxTexture" id="Style_panel"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+texture = ExtResource("2_panel")
+texture_margin_left = 107.0
+texture_margin_top = 25.0
+texture_margin_right = 2.0
+texture_margin_bottom = 3.0
+
+[node name="SidePanel" type="PanelContainer"]
+custom_minimum_size = Vector2(132, 0)
+texture_filter = 1
+mouse_filter = 0
+theme = ExtResource("3_theme")
+theme_override_styles/panel = SubResource("Style_panel")
+script = ExtResource("1_panel")
+
+[node name="VBox" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Title" type="Control" parent="VBox"]
+custom_minimum_size = Vector2(0, 25)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Text" type="Label" parent="VBox/Title"]
+layout_mode = 0
+offset_left = 11.0
+offset_top = -2.0
+offset_right = 104.0
+offset_bottom = 24.0
+mouse_filter = 2
+clip_text = true
+
+[node name="Toggle" type="Button" parent="VBox/Title"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+flat = true
+
+[node name="Body" type="MarginContainer" parent="VBox"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 4
+
+[node name="Content" type="VBoxContainer" parent="VBox/Body"]
+layout_mode = 2
+
+[node name="Footer" type="Control" parent="VBox"]
+custom_minimum_size = Vector2(0, 3)
+layout_mode = 2
+mouse_filter = 2
+
+[connection signal="pressed" from="VBox/Title/Toggle" to="." method="_on_title_pressed"]

@@ -1,0 +1,71 @@
+[gd_scene format=4 uid="uid://b2c16ywlw0kb1"]
+
+[ext_resource type="Script" uid="uid://b07rjjx3xxy1a" path="res://Data/Defs/LevelDef.gd" id="1_6fmjf"]
+[ext_resource type="PackedScene" uid="uid://bxkmf52ejgqyb" path="res://Levels/area1/pr_database.tscn" id="2_15jox"]
+[ext_resource type="TileSet" uid="uid://chuqbxkdp8gs6" path="res://Levels/floor_tileset.tres" id="2_pxj8p"]
+[ext_resource type="Script" uid="uid://ch68weh071ce8" path="res://Data/Defs/EnemyMarker.gd" id="3_i5qeh"]
+[ext_resource type="Script" uid="uid://xbsgn7svfaem" path="res://Data/Defs/SpawnMarker.gd" id="4_4iqcf"]
+[ext_resource type="Resource" uid="uid://cthiv1vqyxv1b" path="res://Data/units/enemy/guardpup.tres" id="4_kxth4"]
+[ext_resource type="Resource" path="res://Data/units/enemy/cleaner.tres" id="5_15jox"]
+[ext_resource type="Resource" uid="uid://dhx81vf2ggq56" path="res://Data/units/enemy/eagereye.tres" id="6_ucrjy"]
+
+[node name="Tower" type="Node2D" unique_id=855399697]
+script = ExtResource("1_6fmjf")
+mission_name = "Tower"
+requires = Array[PackedScene]([ExtResource("2_15jox")])
+metadata/_custom_type_script = "uid://b07rjjx3xxy1a"
+
+[node name="Floor" type="TileMapLayer" parent="." unique_id=1277198957]
+scale = Vector2(0.5, 0.5)
+tile_map_data = PackedByteArray("AAACAAIAAAAAAAAAAAADAAIAAAAAAAAAAAAEAAIAAAAAAAAAAAAFAAIAAAAAAAAAAAAGAAIAAAAAAAAAAAABAAYAAAAAAAAAAAABAAcAAAAAAAAAAAABAAgAAAAAAAAAAAACAAgAAAAAAAAAAAADAAgAAAAAAAAAAAAHAAgAAAAAAAAAAAAIAAgAAAAAAAAAAAAJAAgAAAAAAAAAAAAKAAgAAAAAAAAAAAAKAAcAAAAAAAAAAAAKAAYAAAAAAAAAAAAKAAUAAAAAAAAAAAAKAAQAAAAAAAAAAAAHAAIAAAAAAAAAAAAFAAMAAAAAAAAAAAAEAAMAAAAAAAAAAAADAAMAAAAAAAAAAAACAAMAAAAAAAAAAAABAAMAAAAAAAAAAAADAAQAAAAAAAAAAAAEAAQAAAAAAAAAAAAFAAQAAAAAAAAAAAAGAAMAAAAAAAAAAAAHAAMAAAAAAAAAAAAIAAMAAAAAAAAAAAAJAAMAAAAAAAAAAAAJAAQAAAAAAAAAAAAIAAQAAAAAAAAAAAAHAAQAAAAAAAAAAAAGAAQAAAAAAAAAAAACAAQAAAAAAAAAAAABAAQAAAAAAAAAAAABAAUAAAAAAAAAAAACAAUAAAAAAAAAAAADAAUAAAAAAAAAAAACAAYAAAAAAAAAAAACAAcAAAAAAAAAAAADAAcAAAAAAAAAAAAEAAgAAAAAAAAAAAAFAAgAAAAAAAAAAAAGAAgAAAAAAAAAAAAHAAcAAAAAAAAAAAAGAAcAAAAAAAAAAAAFAAcAAAAAAAAAAAAEAAcAAAAAAAAAAAADAAYAAAAAAAAAAAAEAAUAAAAAAAAAAAAFAAUAAAAAAAAAAAAGAAUAAAAAAAAAAAAGAAYAAAAAAAAAAAAFAAYAAAAAAAAAAAAEAAYAAAAAAAAAAAAHAAYAAAAAAAAAAAAIAAYAAAAAAAAAAAAIAAcAAAAAAAAAAAAJAAcAAAAAAAAAAAAJAAYAAAAAAAAAAAAJAAUAAAAAAAAAAAAIAAUAAAAAAAAAAAAHAAUAAAAAAAAAAAAIAAIAAAAAAAAAAAAJAAIAAAAAAAAAAAAKAAMAAAAAAAAAAAA=")
+tile_set = ExtResource("2_pxj8p")
+
+[node name="EnemyMarker3" type="Marker2D" parent="." unique_id=745373236]
+position = Vector2(240, 80)
+script = ExtResource("3_i5qeh")
+unit = ExtResource("4_kxth4")
+metadata/_custom_type_script = "uid://ch68weh071ce8"
+
+[node name="EnemyMarker4" type="Marker2D" parent="." unique_id=1775589802]
+position = Vector2(336, 144)
+script = ExtResource("3_i5qeh")
+unit = ExtResource("4_kxth4")
+metadata/_custom_type_script = "uid://ch68weh071ce8"
+
+[node name="EnemyMarker5" type="Marker2D" parent="." unique_id=1071646201]
+position = Vector2(304, 112)
+script = ExtResource("3_i5qeh")
+unit = ExtResource("5_15jox")
+metadata/_custom_type_script = "uid://ch68weh071ce8"
+
+[node name="EnemyMarker2" type="Marker2D" parent="." unique_id=864559817]
+position = Vector2(272, 80)
+script = ExtResource("3_i5qeh")
+unit = ExtResource("6_ucrjy")
+metadata/_custom_type_script = "uid://ch68weh071ce8"
+
+[node name="EnemyMarker" type="Marker2D" parent="." unique_id=1652831644]
+position = Vector2(336, 112)
+script = ExtResource("3_i5qeh")
+unit = ExtResource("6_ucrjy")
+metadata/_custom_type_script = "uid://ch68weh071ce8"
+
+[node name="SpawnMarker2" type="Marker2D" parent="." unique_id=1704487375]
+position = Vector2(112, 240)
+script = ExtResource("4_4iqcf")
+metadata/_custom_type_script = "uid://xbsgn7svfaem"
+
+[node name="SpawnMarker" type="Marker2D" parent="." unique_id=1778039081]
+position = Vector2(80, 240)
+script = ExtResource("4_4iqcf")
+metadata/_custom_type_script = "uid://xbsgn7svfaem"
+
+[node name="SpawnMarker3" type="Marker2D" parent="." unique_id=1659081983]
+position = Vector2(144, 240)
+script = ExtResource("4_4iqcf")
+metadata/_custom_type_script = "uid://xbsgn7svfaem"
+
+[node name="SpawnMarker4" type="Marker2D" parent="." unique_id=1711926610]
+position = Vector2(80, 208)
+script = ExtResource("4_4iqcf")
+metadata/_custom_type_script = "uid://xbsgn7svfaem"

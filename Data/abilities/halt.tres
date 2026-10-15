@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="AbilityDef" format=3 uid="uid://141okhk8gw5o"]
+
+[ext_resource type="Script" uid="uid://snibrfoceuqv" path="res://Data/Defs/EffectDef.gd" id="1_rhfnd"]
+[ext_resource type="Script" uid="uid://8eoy375x8x7p" path="res://Data/Defs/AbilityDef.gd" id="2_8yca8"]
+
+[sub_resource type="Resource" id="Resource_jbysy"]
+script = ExtResource("1_rhfnd")
+amount = 5
+metadata/_custom_type_script = "uid://snibrfoceuqv"
+
+[resource]
+script = ExtResource("2_8yca8")
+ability_name = "Halt"
+description = "Deletes 5 cells from the target"
+effects = Array[ExtResource("1_rhfnd")]([SubResource("Resource_jbysy")])
+metadata/_custom_type_script = "uid://8eoy375x8x7p"

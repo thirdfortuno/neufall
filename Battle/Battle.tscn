@@ -5,20 +5,22 @@
 [ext_resource type="PackedScene" path="res://Unit/Unit.tscn" id="3"]
 [ext_resource type="Script" uid="uid://cldxmanmdrwn0" path="res://Battle/SelectedTileUI.gd" id="5_r7yql"]
 [ext_resource type="PackedScene" uid="uid://c6hno6l0pc2sq" path="res://Battle/UI/BattleUI.tscn" id="6_ig2hg"]
+[ext_resource type="Script" path="res://Battle/BattleCamera.gd" id="7_camera"]
 
 [node name="Node2D" type="Node2D" unique_id=1163058844]
 script = ExtResource("1")
 tile_scene = ExtResource("2")
 unit_scene = ExtResource("3")
 
-[node name="BattleUI" parent="." unique_id=250451049 instance=ExtResource("6_ig2hg")]
-anchors_preset = 0
-anchor_right = 0.0
-offset_right = 151.0
-offset_bottom = 0.0
-grow_horizontal = 1
+[node name="Camera" type="Camera2D" parent="."]
+anchor_mode = 0
+script = ExtResource("7_camera")
 
-[node name="SelectedTileUI" type="VBoxContainer" parent="." unique_id=75866071]
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="BattleUI" parent="UI" unique_id=250451049 instance=ExtResource("6_ig2hg")]
+
+[node name="SelectedTileUI" type="VBoxContainer" parent="UI" unique_id=75866071]
 visible = false
 offset_left = 556.0
 offset_top = 6.0
@@ -26,16 +28,21 @@ offset_right = 707.0
 offset_bottom = 46.0
 script = ExtResource("5_r7yql")
 
-[node name="TileCoords" type="Label" parent="SelectedTileUI" unique_id=741009358]
+[node name="TileCoords" type="Label" parent="UI/SelectedTileUI" unique_id=741009358]
 layout_mode = 2
 
-[node name="TileState" type="Label" parent="SelectedTileUI" unique_id=2043503716]
+[node name="TileState" type="Label" parent="UI/SelectedTileUI" unique_id=2043503716]
 layout_mode = 2
 
-[connection signal="ability_1_button_pressed" from="BattleUI" to="." method="_on_Ability1Button_pressed"]
-[connection signal="ability_2_button_pressed" from="BattleUI" to="." method="_on_Ability2Button_pressed"]
-[connection signal="ability_3_button_pressed" from="BattleUI" to="." method="_on_Ability3Button_pressed"]
-[connection signal="ability_4_button_pressed" from="BattleUI" to="." method="_on_Ability4Button_pressed"]
-[connection signal="end_turn_button_pressed" from="BattleUI" to="." method="_on_EndTurnButton_pressed"]
-[connection signal="move_button_pressed" from="BattleUI" to="." method="_on_MoveButton_pressed"]
-[connection signal="undo_move_button_pressed" from="BattleUI" to="." method="_on_UndoMoveButton_pressed"]
+[connection signal="ability_1_button_pressed" from="UI/BattleUI" to="." method="_on_Ability1Button_pressed"]
+[connection signal="ability_2_button_pressed" from="UI/BattleUI" to="." method="_on_Ability2Button_pressed"]
+[connection signal="ability_3_button_pressed" from="UI/BattleUI" to="." method="_on_Ability3Button_pressed"]
+[connection signal="ability_4_button_pressed" from="UI/BattleUI" to="." method="_on_Ability4Button_pressed"]
+[connection signal="ability_hovered" from="UI/BattleUI" to="." method="_on_AbilityHovered"]
+[connection signal="ability_unhovered" from="UI/BattleUI" to="." method="_on_AbilityUnhovered"]
+[connection signal="event_dismissed" from="UI/BattleUI" to="." method="_on_event_dismissed"]
+[connection signal="end_all_confirmed" from="UI/BattleUI" to="." method="_end_all_turns"]
+[connection signal="end_all_button_pressed" from="UI/BattleUI" to="." method="_on_EndAllButton_pressed"]
+[connection signal="end_turn_button_pressed" from="UI/BattleUI" to="." method="_on_EndTurnButton_pressed"]
+[connection signal="move_button_pressed" from="UI/BattleUI" to="." method="_on_MoveButton_pressed"]
+[connection signal="undo_move_button_pressed" from="UI/BattleUI" to="." method="_on_UndoMoveButton_pressed"]

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="UnitDef" format=3 uid="uid://daneplfky0s61"]
+
+[ext_resource type="Script" uid="uid://8eoy375x8x7p" path="res://Data/Defs/AbilityDef.gd" id="1_qnj0m"]
+[ext_resource type="Script" uid="uid://blqqqqy2ad1a0" path="res://Data/Defs/UnitDef.gd" id="2_msfgj"]
+[ext_resource type="Resource" uid="uid://djkvirdxu2yvl" path="res://Data/abilities/seek.tres" id="2_ti7cs"]
+
+[resource]
+script = ExtResource("2_msfgj")
+unit_name = "Evil Eye"
+abbr = "evl"
+side = "enemy"
+moves_max = 2
+abilities = Array[ExtResource("1_qnj0m")]([ExtResource("2_ti7cs")])
+metadata/_custom_type_script = "uid://blqqqqy2ad1a0"

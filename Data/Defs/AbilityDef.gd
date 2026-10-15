@@ -8,5 +8,6 @@ extends Resource
 @export_flags("tile", "unit") var blockers: int = 0
 @export_flags("enemy", "ally", "self", "tile") var targets: int = 1
 @export var effects: Array[EffectDef] = []
+@export var sound: AudioStream
 @export var size_requirement: int = 0
 @export var size_cost: int = 0

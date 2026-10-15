@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="UnitDef" format=3 uid="uid://c8hqtoxq2p523"]
+
+[ext_resource type="Script" uid="uid://8eoy375x8x7p" path="res://Data/Defs/AbilityDef.gd" id="1_oqltp"]
+[ext_resource type="Resource" uid="uid://csmdcgte8vqv8" path="res://Data/abilities/pplink.tres" id="2_oqltp"]
+[ext_resource type="Script" uid="uid://blqqqqy2ad1a0" path="res://Data/Defs/UnitDef.gd" id="3_k5ofo"]
+
+[resource]
+script = ExtResource("3_k5ofo")
+unit_name = "BBB"
+description = "An upgrade to the BB program"
+abbr = "bbb"
+hp_max = 2
+moves_max = 2
+memory = 3
+abilities = Array[ExtResource("1_oqltp")]([ExtResource("2_oqltp")])
+metadata/_custom_type_script = "uid://blqqqqy2ad1a0"

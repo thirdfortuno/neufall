@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="UnitDef" format=3 uid="uid://d15p7a6ub3lmi"]
+
+[ext_resource type="Script" uid="uid://8eoy375x8x7p" path="res://Data/Defs/AbilityDef.gd" id="1_w08ii"]
+[ext_resource type="Script" uid="uid://blqqqqy2ad1a0" path="res://Data/Defs/UnitDef.gd" id="2_i1pjl"]
+[ext_resource type="Resource" uid="uid://ctq6a48t8wytt" path="res://Data/abilities/surveil.tres" id="2_rwtkr"]
+
+[resource]
+script = ExtResource("2_i1pjl")
+unit_name = "CCTV"
+description = "You have been spotted."
+side = "enemy"
+hp_max = 1
+moves_max = 0
+abilities = Array[ExtResource("1_w08ii")]([ExtResource("2_rwtkr")])
+metadata/_custom_type_script = "uid://blqqqqy2ad1a0"

@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="TechNodeDef" format=3 uid="uid://byy53lb4oitwl"]
+
+[ext_resource type="Script" uid="uid://blqqqqy2ad1a0" path="res://Data/Defs/UnitDef.gd" id="1_fmulk"]
+[ext_resource type="Script" uid="uid://cs1hsp355u6m0" path="res://Data/Defs/TechNodeDef.gd" id="2_h56o3"]
+[ext_resource type="Resource" uid="uid://ddhy010773rvi" path="res://Data/units/player/bb.tres" id="3_h56o3"]
+
+[resource]
+script = ExtResource("2_h56o3")
+unit = ExtResource("3_h56o3")
+metadata/_custom_type_script = "uid://cs1hsp355u6m0"

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="UnitDef" format=3 uid="uid://c610gmtitcm1y"]
+
+[ext_resource type="Script" uid="uid://8eoy375x8x7p" path="res://Data/Defs/AbilityDef.gd" id="1_6su8p"]
+[ext_resource type="Resource" uid="uid://djp7f3cahtm13" path="res://Data/abilities/byte.tres" id="2_vqpbb"]
+[ext_resource type="Script" uid="uid://blqqqqy2ad1a0" path="res://Data/Defs/UnitDef.gd" id="3_0u1jb"]
+
+[resource]
+script = ExtResource("3_0u1jb")
+unit_name = "Guard Dog"
+description = "A loyal defender"
+abbr = "dog"
+side = "enemy"
+abilities = Array[ExtResource("1_6su8p")]([ExtResource("2_vqpbb")])
+metadata/_custom_type_script = "uid://blqqqqy2ad1a0"

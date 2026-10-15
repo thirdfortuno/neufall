@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="CompanyDef" format=3 uid="uid://b6xey1n4dijmw"]
+
+[ext_resource type="Script" uid="uid://boui8t5tupmcp" path="res://Data/Defs/CompanyDef.gd" id="1_7jvvh"]
+
+[resource]
+script = ExtResource("1_7jvvh")
+company_name = "Dr. Dumpling"
+tagline = "Open wide and say ahhh"
+language = "Mandarin"
+metadata/_custom_type_script = "uid://boui8t5tupmcp"
